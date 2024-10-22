@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <?php 
 session_start();
+include ('../mantenimiento.php');
 require('Funcion.php');
 
 // Generar un token CSRF si no existe
