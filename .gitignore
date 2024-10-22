@@ -1,3 +1,6 @@
+#ingnorar la conexion de base de datos
+conexion.php
+/conexion.php
 # Sistema operativo macOS
 .DS_Store
 
@@ -9,10 +12,11 @@ Desktop.ini
 .env
 .env.local
 .env.*.local
-conexion.php
+
 
 #capertas de uso
-
+home/plugins/*
+home/dist/img/*
 
 # Dependencias
 /vendor/
