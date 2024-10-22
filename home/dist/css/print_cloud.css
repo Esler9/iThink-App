@@ -1,0 +1,42 @@
+/* print_cloud.css */
+
+body {
+    margin: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Fondo más suave */
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #007bff; /* Borde azul */
+    border-radius: 8px; /* Bordes redondeados */
+    background-color: #ffffff; /* Fondo blanco para el contenedor */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para darle profundidad */
+}
+
+h2 {
+    color: #007bff; /* Color del encabezado */
+    margin-bottom: 20px;
+    font-size: 24px; /* Tamaño de fuente más grande */
+}
+
+p {
+    font-size: 18px; /* Tamaño de fuente */
+    margin: 15px 0; /* Espaciado entre párrafos */
+    line-height: 1.5; /* Mejora la legibilidad */
+    color: #333; /* Color de texto más oscuro para mejor contraste */
+}
+
+.icon {
+    color: #007bff; /* Color de íconos */
+    margin-right: 10px; /* Espaciado entre ícono y texto */
+    font-size: 22px; /* Aumenta el tamaño del ícono */
+}
+
+/* Estilo de la clave para mayor énfasis */
+.icon-key {
+    color: #dc3545; /* Color rojo para la contraseña */
+    margin-right: 10px; /* Espaciado entre ícono y texto */
+    font-size: 22px; /* Tamaño de ícono más grande */
+}
