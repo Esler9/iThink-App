@@ -2,7 +2,7 @@
 <?php 
 session_start();
 
-include ('../mantenimiento.php');
+include ('../default.php');
 $User = $_SESSION["username"];
 if(!isset($User)){
   header('location:login.php');
