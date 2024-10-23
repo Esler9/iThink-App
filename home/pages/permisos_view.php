@@ -26,6 +26,7 @@ $grupos = Traer_grupo_usuario($conn);
 ?>
 
 <head>
+  <link rel="icon" href="/home/dist/img/logo_ithink.png" type="image/x-icon">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>iThink | Web</title>

@@ -24,7 +24,7 @@ $rememberedUser = isset($_COOKIE['remember_user']) ? $_COOKIE['remember_user'] :
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>iThink | Log in</title>
-    <link rel="icon" href="dist/img/logo_ithink.png" type="image/x-icon">
+    <link rel="icon" href="/home/dist/img/logo_ithink.png" type="image/x-icon">
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
