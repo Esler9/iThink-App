@@ -2,7 +2,7 @@
 <?php 
 session_start();
 include ('../default.php');
-require('Funcion.php');
+include ('Funcion.php');
 
 // Generar un token CSRF si no existe
 if (empty($_SESSION['csrf_token'])) {
