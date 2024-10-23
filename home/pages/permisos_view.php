@@ -111,8 +111,8 @@ $grupos = Traer_grupo_usuario($conn);
 <script src="../dist/js/adminlte.min.js"></script>
 
 <script>
-  const groupPermissions = {
-    <?php foreach ($grupos as $grupo): ?>
+ const groupPermissions = {
+    <?php foreach ($grupos as $index => $grupo): ?>
       '<?php echo $grupo['codigo']; ?>': <?php 
         $permisos = traer_permisos($conn, $grupo['codigo']);
         $permissionsGrouped = [];
@@ -132,9 +132,14 @@ $grupos = Traer_grupo_usuario($conn);
           ];
         }
         echo json_encode($permissionsGrouped);
-      ?>,
+
+        // Evitar agregar una coma después del último elemento
+        if ($index !== array_key_last($grupos)) {
+            echo ',';
+        }
+      ?>
     <?php endforeach; ?>
-  };
+};
 
   // Cargar permisos al hacer clic en un grupo
   $('#groupList').on('click', 'li', function(event) {
