@@ -1,6 +1,6 @@
 <?php 
 
-$mantenimiento = false;
+include('setting.php');
 
 if($mantenimiento != true){
     header('location:home/dashboard.php');
