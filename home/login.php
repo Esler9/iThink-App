@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <?php 
 session_start();
-include ('../default.php');
+
 include ('Funcion.php');
 
 // Generar un token CSRF si no existe
@@ -11,6 +11,8 @@ if (empty($_SESSION['csrf_token'])) {
 
 // Recuperar el nombre de usuario guardado en la cookie si existe
 $rememberedUser = isset($_COOKIE['remember_user']) ? $_COOKIE['remember_user'] : '';
+
+include ('../default.php');
 ?>
 <html lang="en">
 <head>
