@@ -4,6 +4,11 @@ session_start();
 $User = $_SESSION["username"];
 $cod_user = $_SESSION['cod_user'];
 
+include ('../Setting.php');
+
+if($mantenimiento == true ){
+  header('location:../mantenimiento.php');
+  exit;}
 
 if(!isset($User)){
   header('location:login.php');
