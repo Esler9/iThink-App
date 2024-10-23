@@ -2,13 +2,23 @@
 <?php 
 session_start();
 $User = $_SESSION["username"];
-if(!isset($User)){
-  header('location:login.php');
-}else{require("../../conexion.php"); 
+
+include ('../../Setting.php');
+
+if($mantenimiento == true ){
+  header('location:../../mantenimiento.php');
+  exit;}
+
+  if(!isset($User)){
+    header('location:../login.php');
+    exit();
+  }
+
+require("../../conexion.php"); 
   
-    include('../Funcion.php');
-    
-}
+include('../Funcion.php');
+  
+
 ?>
 <php lang="en">
 <head>

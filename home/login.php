@@ -4,6 +4,12 @@ session_start();
 
 include ('Funcion.php');
 
+include ('../Setting.php');
+
+if($mantenimiento == true ){
+  header('location:../mantenimiento.php');
+  exit;}
+
 // Generar un token CSRF si no existe
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

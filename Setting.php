@@ -1,3 +1,3 @@
 <?php
-$mantenimiento = true;
+$mantenimiento = false;
 ?>

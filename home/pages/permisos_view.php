@@ -1,5 +1,12 @@
 <?php 
 session_start();
+
+include ('../../Setting.php');
+
+if($mantenimiento == true ){
+  header('location:../../mantenimiento.php');
+  exit;}
+
 // Verificar que las variables de sesión estén configuradas
 if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
   header('Location: ../../login.php');
