@@ -38,7 +38,7 @@ $rememberedUser = isset($_COOKIE['remember_user']) ? $_COOKIE['remember_user'] :
 <body class="hold-transition login-page">
 <div class="login-box">
     <div class="login-logo">
-        <img src="dist/img/logo_ithink.png" alt="logo iThink" width="50">
+        <img src="/home/dist/img/logo_ithink.png" alt="logo iThink" width="50">
         <a href="https://www.ithinkguatemala.com"><b>iThink</b> Web</a>
     </div>
     <!-- /.login-logo -->
