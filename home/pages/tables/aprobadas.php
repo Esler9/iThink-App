@@ -48,7 +48,7 @@ if (Tiene_permiso($permisos_user,'ver-aprobadas-lb')) {
   <link rel="stylesheet" href="../../dist/css/app.css">
 
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed">
 
  
       <?php include("sidebar.php");?>
