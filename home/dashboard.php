@@ -112,7 +112,7 @@ $tiendas = $_SESSION['tiendas'];
               </div>
             </div>
           <?php endif; ?>
-          
+
           <?php if (Tiene_permiso($permisos_user, 'ver-aprobadas-lb')): ?>
             <div class="col-lg-3 col-6">
               <div class="small-box bg-success">
@@ -157,7 +157,7 @@ $tiendas = $_SESSION['tiendas'];
             </div>
           <?php endif; ?>
 
-          <!-- Otras Secciones de cajas pequeñas (Aprobadas y Finalizadas) siguen aquí... -->
+          
 
         </div>
 
