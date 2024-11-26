@@ -69,8 +69,6 @@ if ($accion == 0){
   $body = $correo_consulta;
   Renviar_correo($correos,$correo,$imei,$body);
 
- 
-
   // redirige a Crear Notificando la creacion de la Nueva lIberacion
 
   header("location:../pages/tables/crear.php?alert=0&imei=$imei&model=$model&name=$name&celular=$celular");
