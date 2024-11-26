@@ -1,6 +1,7 @@
 <?php
 
 use function PHPSTORM_META\sql_injection_subst;
+include("diseño_correos.php");
 
 session_start();
 $User = $_SESSION["username"];
@@ -65,31 +66,7 @@ if ($accion == 0){
 
   // Envia Correo de Notificacion
 
-  $body = "
-  *¡Nueva Consulta de Liberación: !*
-
-  *Creacion de Nueva Liberacion:*
-    ----------------------------------------------------
-    Nombre: $name
-    IMEI: $imei
-    Modelo: $model
-    Celular: $celular
-    -----------------------------------------------------
-
-    En el Siguiente Link Puedes realizar la Accion Necesaria:
-
-    https://app.ithinkguatemala.com/home/pages/tables/buscar.php?search=$imei
-
-  ¡Gracias!
-      
-
-  
-
-  Este es un Correo Automatico no responder.
- 
-  Codigo: 0
-  
-  ";
+  $body = $consulta;
   Renviar_correo($correos,$correo,$imei,$body);
 
  
