@@ -1,6 +1,6 @@
 <?php
 
-$Consulta = " <!DOCTYPE html>
+$Correo_Consulta = " <!DOCTYPE html>
 <html lang='en'>
 <head>
 <meta charset='UTF-8'>

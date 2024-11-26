@@ -66,7 +66,7 @@ if ($accion == 0){
 
   // Envia Correo de Notificacion
 
-  $body = $consulta;
+  $body = $correo_consulta;
   Renviar_correo($correos,$correo,$imei,$body);
 
  
