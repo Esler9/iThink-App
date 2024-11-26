@@ -29,11 +29,13 @@ $correos = enviar_todos_los_emails($conn);
 
 function enviar($destinatario,$asunto,$mensaje){
   
-    
-    // Cabeceras del correo
-    $headers = "From: App iThink <app@ithinkguatemala.com> \r\n";
-    $headers .= "Reply-To: app@ithinkguatemala.com\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
+     // Cabeceras del correo
+     $headers = "From: App iThink <app@ithinkguatemala.com>\r\n";
+     $headers .= "Reply-To: app@ithinkguatemala.com\r\n";
+     $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
+     $headers .= "MIME-Version: 1.0\r\n";
+     $headers .= "Content-Type: text/html; charset=UTF-8\r\n"; // Cabecera para correo HTML
+ 
     
     // Enviar el correo
     $mailEnviado = mail($destinatario, $asunto, $mensaje, $headers);
