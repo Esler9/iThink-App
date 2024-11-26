@@ -65,8 +65,8 @@ if ($accion == 0){
   $consulta = mysqli_query($conn,$sql);
 
   // Envia Correo de Notificacion
-
-  $body = $correo_consulta;
+  
+  $body = correo_enviar("consulta", $name, $imei, $model, $celular);
   Renviar_correo($correos,$correo,$imei,$body);
 
   // redirige a Crear Notificando la creacion de la Nueva lIberacion

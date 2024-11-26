@@ -1,5 +1,7 @@
 <?php
 
+function correo_enviar($tipo, $name, $imei, $model, $celular)
+{
 $correo_consulta = "<!DOCTYPE html>
 <html lang='en'>
 <head>
@@ -81,5 +83,10 @@ $correo_consulta = "<!DOCTYPE html>
 </html>
 
 
-"
-?>
+";
+
+
+    if ($tipo == "consulta") {
+        return $correo_consulta;
+    }else{};
+}
