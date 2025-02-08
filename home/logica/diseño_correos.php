@@ -2,7 +2,7 @@
 /**
  * Genera el cuerpo del correo HTML según el tipo de notificación y los datos proporcionados.
  *
- * @param string $tipo   Tipo de correo ("consulta", "pendiente", "aprobado", "rechazado", etc.).
+ * @param string $tipo   Tipo de correo ("consulta", "pendiente", "aprobado", "finalizado", "rechazado", "consultaReiniciada", etc.).
  * @param array  $datos  Arreglo asociativo con la información necesaria. Se espera que incluya:
  *                       - 'name'          => Nombre del cliente
  *                       - 'celular'       => Número de celular
@@ -17,7 +17,7 @@
  */
 function correo_enviar($tipo, $datos)
 {
-    // Definición de estilos base y estructura de documento
+    // Cabecera HTML y estilos base
     $html_header = <<<HTML
 <!DOCTYPE html>
 <html lang="es">
@@ -95,7 +95,7 @@ function correo_enviar($tipo, $datos)
 <div class="container">
 HTML;
 
-    // Pie de página con un placeholder para el código
+    // Pie de página, con placeholder para el código
     $html_footer = <<<HTML
 <div class="footer">
     <p>Este es un correo automático, no responder.</p>
@@ -106,67 +106,67 @@ HTML;
 </html>
 HTML;
 
-    // Según el tipo de correo, definimos título, texto del botón, código, color e ícono.
+    // Definir variables según el tipo de notificación
     switch ($tipo) {
         case "consulta":
             $titulo      = "¡Nueva Consulta de Liberación!";
             $ctaText     = "Informar Consulta";
             $codigo      = "0";
-            $headerColor = "#007bff";  // Azul
-            $icon        = "&#x2139;";  // Símbolo de información
+            $headerColor = "#0097A7";  // Azul para Consultas
+            $icon        = "&#x2139;";  // Ícono de información
             break;
         case "pendiente":
             $titulo      = "¡Liberación Cambio a Pendiente!";
             $ctaText     = "Realizar Acción";
             $codigo      = "1";
-            $headerColor = "#ffc107";  // Amarillo
+            $headerColor = "#D32F2F";  // Rojo para Pendientes
             $icon        = "&#x23F3;";  // Reloj de arena
             break;
         case "aprobado":
             $titulo      = "¡Liberación Aprobada Por Cliente!";
             $ctaText     = "Ver Detalles";
             $codigo      = "2";
-            $headerColor = "#28a745";  // Verde
+            $headerColor = "#388E3C";  // Verde para Aprobadas
             $icon        = "&#x2705;";  // Marca de verificación
-            break;
-        case "iniciado":
-            $titulo      = "¡Inicio de Proceso de Liberación!";
-            $ctaText     = "Ver Progreso";
-            $codigo      = "3";
-            $headerColor = "#17a2b8";  // Teal
-            $icon        = "&#x1F680;"; // Cohete
             break;
         case "finalizado":
             $titulo      = "¡Finalizado el Proceso de Liberación!";
             $ctaText     = "Ver Resultados";
             $codigo      = "4";
-            $headerColor = "#6f42c1";  // Morado
+            $headerColor = "#FBC02D";  // Amarillo para Finalizadas
             $icon        = "&#x1F3C1;"; // Bandera a cuadros
+            break;
+        case "iniciado":
+            $titulo      = "¡Inicio de Proceso de Liberación!";
+            $ctaText     = "Ver Progreso";
+            $codigo      = "3";
+            $headerColor = "#17a2b8";  // Se mantiene un color por defecto (teal)
+            $icon        = "&#x1F680;"; // Cohete
             break;
         case "rechazado":
             $titulo      = "¡Liberación Rechazada!";
             $ctaText     = "Realizar Acción";
             $codigo      = "5";
-            $headerColor = "#dc3545";  // Rojo
+            $headerColor = "#dc3545";  // Se mantiene el rojo (o se podría ajustar)
             $icon        = "&#x274C;";  // Cruz
             break;
         case "consultaReiniciada":
             $titulo      = "¡Nueva Consulta de Liberación Reiniciada!";
             $ctaText     = "Realizar Acción";
             $codigo      = "2.1";
-            $headerColor = "#fd7e14";  // Naranja
+            $headerColor = "#fd7e14";  // Naranja, por defecto
             $icon        = "&#x1F501;"; // Símbolo de reinicio
             break;
         default:
             $titulo      = "Notificación de Liberación";
             $ctaText     = "Ver Detalles";
             $codigo      = "0";
-            $headerColor = "#007bff";
+            $headerColor = "#0097A7";
             $icon        = "&#x2139;";
             break;
     }
 
-    // Sección de contenido con la cabecera diferenciada según el tipo
+    // Sección de contenido con cabecera personalizada según el tipo
     $content = <<<HTML
 <div class="header" style="background: $headerColor;">
     <h1>$icon $titulo</h1>
@@ -201,7 +201,7 @@ HTML;
     // Reemplazar el placeholder {codigo} en el footer
     $html_footer = str_replace("{codigo}", $codigo, $html_footer);
 
-    // Se unen las partes para formar el correo completo
+    // Unir todas las partes para formar el correo completo
     $correo = $html_header . $content . $html_footer;
     return $correo;
 }
