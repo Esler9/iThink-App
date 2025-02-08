@@ -40,9 +40,9 @@ if (!isset($User)) {
 
 
 
-    function Renviar_correo($correos, $correo, $imei, $body)
+    function Renviar_correo($Listacorreos, $correo, $imei, $body)
     {
-      foreach ($correos as $correo) {
+      foreach ($Listacorreos as $correo) {
         enviar($correo, "$imei", $body);
       }
     }
