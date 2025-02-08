@@ -1,0 +1,91 @@
+/* login.css */
+
+body {
+    background-color: #111;
+    font-family: 'Source Sans Pro', sans-serif;
+    color: #fff;
+}
+
+.login-box {
+    width: 360px;
+    margin: 7% auto;
+}
+
+.login-logo a {
+    color: #ff7700;
+    font-size: 2.1rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.login-logo img {
+    animation: logo-bounce 2s infinite;
+}
+
+@keyframes logo-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.card {
+    background-color: #333;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    animation: fade-in 0.7s ease-in-out;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.card-body {
+    padding: 30px;
+}
+
+.input-animated {
+    background-color: #222;
+    border: none;
+    color: #ff7700;
+    border-bottom: 2px solid #ff7700;
+    transition: all 0.3s ease;
+}
+
+.input-animated:focus {
+    border-bottom: 2px solid #fff;
+    background-color: #111;
+}
+
+.btn-animated {
+    background-color: #ff7700;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-animated:hover {
+    background-color: #fff;
+    color: #ff7700;
+    box-shadow: 0 0 10px rgba(255, 119, 0, 0.5);
+}
+
+.animated-alert {
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
