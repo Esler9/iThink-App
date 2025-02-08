@@ -17,7 +17,7 @@
  */
 function correo_enviar($tipo, $datos)
 {
-    // Cabecera HTML y estilos
+    // Definición de estilos base y estructura de documento
     $html_header = <<<HTML
 <!DOCTYPE html>
 <html lang="es">
@@ -26,7 +26,7 @@ function correo_enviar($tipo, $datos)
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notificación de Liberación</title>
 <style>
-    /* Reset y base */
+    /* Reset y estilos base */
     body, p, div { margin: 0; padding: 0; }
     body {
         background-color: #f4f4f4;
@@ -44,10 +44,9 @@ function correo_enviar($tipo, $datos)
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     .header {
-        background: #007bff;
-        color: #ffffff;
         text-align: center;
         padding: 20px;
+        color: #ffffff;
     }
     .header h1 {
         font-size: 24px;
@@ -96,7 +95,7 @@ function correo_enviar($tipo, $datos)
 <div class="container">
 HTML;
 
-    // Pie de página, se utilizará un placeholder para el código
+    // Pie de página con un placeholder para el código
     $html_footer = <<<HTML
 <div class="footer">
     <p>Este es un correo automático, no responder.</p>
@@ -107,54 +106,70 @@ HTML;
 </html>
 HTML;
 
-    // Según el tipo de correo, definimos título, texto del botón y código
+    // Según el tipo de correo, definimos título, texto del botón, código, color e ícono.
     switch ($tipo) {
         case "consulta":
-            $titulo  = "¡Nueva Consulta de Liberación!";
-            $ctaText = "Informar Consulta";
-            $codigo  = "0";
+            $titulo      = "¡Nueva Consulta de Liberación!";
+            $ctaText     = "Informar Consulta";
+            $codigo      = "0";
+            $headerColor = "#007bff";  // Azul
+            $icon        = "&#x2139;";  // Símbolo de información
             break;
         case "pendiente":
-            $titulo  = "¡Liberación Cambio a Pendiente!";
-            $ctaText = "Realizar Acción";
-            $codigo  = "1";
+            $titulo      = "¡Liberación Cambio a Pendiente!";
+            $ctaText     = "Realizar Acción";
+            $codigo      = "1";
+            $headerColor = "#ffc107";  // Amarillo
+            $icon        = "&#x23F3;";  // Reloj de arena
             break;
         case "aprobado":
-            $titulo  = "¡Liberación Aprobada Por Cliente!";
-            $ctaText = "Ver Detalles";
-            $codigo  = "2";
+            $titulo      = "¡Liberación Aprobada Por Cliente!";
+            $ctaText     = "Ver Detalles";
+            $codigo      = "2";
+            $headerColor = "#28a745";  // Verde
+            $icon        = "&#x2705;";  // Marca de verificación
             break;
         case "iniciado":
-            $titulo  = "¡Inicio de Proceso de Liberación!";
-            $ctaText = "Ver Progreso";
-            $codigo  = "3";
+            $titulo      = "¡Inicio de Proceso de Liberación!";
+            $ctaText     = "Ver Progreso";
+            $codigo      = "3";
+            $headerColor = "#17a2b8";  // Teal
+            $icon        = "&#x1F680;"; // Cohete
             break;
         case "finalizado":
-            $titulo  = "¡Finalizado el Proceso de Liberación!";
-            $ctaText = "Ver Resultados";
-            $codigo  = "4";
+            $titulo      = "¡Finalizado el Proceso de Liberación!";
+            $ctaText     = "Ver Resultados";
+            $codigo      = "4";
+            $headerColor = "#6f42c1";  // Morado
+            $icon        = "&#x1F3C1;"; // Bandera a cuadros
             break;
         case "rechazado":
-            $titulo  = "¡Liberación Rechazada!";
-            $ctaText = "Realizar Acción";
-            $codigo  = "5";
+            $titulo      = "¡Liberación Rechazada!";
+            $ctaText     = "Realizar Acción";
+            $codigo      = "5";
+            $headerColor = "#dc3545";  // Rojo
+            $icon        = "&#x274C;";  // Cruz
             break;
         case "consultaReiniciada":
-            $titulo  = "¡Nueva Consulta de Liberación Reiniciada!";
-            $ctaText = "Realizar Acción";
-            $codigo  = "2.1";
+            $titulo      = "¡Nueva Consulta de Liberación Reiniciada!";
+            $ctaText     = "Realizar Acción";
+            $codigo      = "2.1";
+            $headerColor = "#fd7e14";  // Naranja
+            $icon        = "&#x1F501;"; // Símbolo de reinicio
             break;
         default:
-            $titulo  = "Notificación de Liberación";
-            $ctaText = "Ver Detalles";
-            $codigo  = "0";
+            $titulo      = "Notificación de Liberación";
+            $ctaText     = "Ver Detalles";
+            $codigo      = "0";
+            $headerColor = "#007bff";
+            $icon        = "&#x2139;";
             break;
     }
 
-    // Sección de contenido (cabecera de sección y detalles)
+    // Sección de contenido con la cabecera diferenciada según el tipo
     $content = <<<HTML
-<div class="header">
-    <h1>$titulo</h1>
+<div class="header" style="background: $headerColor;">
+    <h1>$icon $titulo</h1>
 </div>
 <div class="content">
     <p>Se detallan los datos asociados:</p>
@@ -164,14 +179,15 @@ HTML;
         <p><strong>IMEI:</strong> {$datos['imei']}</p>
         <p><strong>Modelo:</strong> {$datos['modelo']}</p>
 HTML;
-    // Se agregan opcionalmente Precio, Tiempo y Observaciones
-    if (isset($datos['precio'])) {
+
+    // Se agregan opcionalmente Precio, Tiempo y Observaciones si están definidos
+    if (isset($datos['precio']) && $datos['precio'] !== "") {
         $content .= "<p><strong>Precio:</strong> {$datos['precio']}</p>";
     }
-    if (isset($datos['tiempo'])) {
+    if (isset($datos['tiempo']) && $datos['tiempo'] !== "") {
         $content .= "<p><strong>Tiempo:</strong> {$datos['tiempo']}</p>";
     }
-    if (isset($datos['observaciones'])) {
+    if (isset($datos['observaciones']) && $datos['observaciones'] !== "") {
         $content .= "<p><strong>Observaciones:</strong> {$datos['observaciones']}</p>";
     }
     $content .= <<<HTML
@@ -182,10 +198,10 @@ HTML;
 </div>
 HTML;
 
-    // Reemplazar placeholder {codigo} en el footer
+    // Reemplazar el placeholder {codigo} en el footer
     $html_footer = str_replace("{codigo}", $codigo, $html_footer);
 
-    // Unir todas las partes para formar el correo completo
+    // Se unen las partes para formar el correo completo
     $correo = $html_header . $content . $html_footer;
     return $correo;
 }
