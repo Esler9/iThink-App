@@ -100,8 +100,18 @@ if (!isset($User)) {
 
 
       // Envia Correo de Notificacion
+      $datos = [
+        'name'          => $name,       // Ejemplo: "Juan Pérez"
+        'celular'       => $celular,    // Ejemplo: "5551234567"
+        'imei'          => $imei,       // Ejemplo: "123456789012345"
+        'modelo'        => $model,      // Ejemplo: "iPhone 12"
+        // Los siguientes son opcionales, según el tipo de correo:
+        'precio'        => $precio,     // Ejemplo: "$200"
+        'tiempo'        => $tiempo,     // Ejemplo: "2 días"
+        'observaciones' => $desc        // Ejemplo: "Ninguna observación adicional"
+      ];
 
-      $body = correo_enviar("consulta", $name, $imei, $model, $celular);
+      $body = correo_enviar("rechazado", $datos);
       Renviar_correo($correos, $correo, $imei, $body);
       //envia los Correos
 
