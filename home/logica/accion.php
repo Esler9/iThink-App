@@ -111,7 +111,7 @@ if (!isset($User)) {
         'observaciones' => $desc        // Ejemplo: "Ninguna observación adicional"
       ];
 
-      $body = correo_enviar("consulta", $datos);
+      $body = correo_enviar("pendiente", $datos);
       Renviar_correo($correos, $correo, $imei, $body);
       //envia los Correos
 
