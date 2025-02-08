@@ -103,7 +103,7 @@ $tiendas = $_SESSION['tiendas'];
                     echo $row['consultas'];
                     ?>
                   </h3>
-                  <p>Pendientes</p>
+                  <p>Pendientes 2</p>
                 </div>
                 <div class="icon">
                   <i class="fas fa-solid fa-exclamation"></i>
