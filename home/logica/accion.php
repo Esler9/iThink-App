@@ -151,7 +151,7 @@ if (!isset($User)) {
         'observaciones' => $desc        // Ejemplo: "Ninguna observación adicional"
       ];
 
-      $body = correo_enviar("pendiente", $datos);
+      $body = correo_enviar("aprobado", $datos);
 
       //envia los Correos
 
@@ -167,32 +167,18 @@ if (!isset($User)) {
 
       // Envia Correo de Notificacion
 
-      $body = "
+      $datos = [
+        'name'          => $name,       // Ejemplo: "Juan Pérez"
+        'celular'       => $celular,    // Ejemplo: "5551234567"
+        'imei'          => $imei,       // Ejemplo: "123456789012345"
+        'modelo'        => $model,      // Ejemplo: "iPhone 12"
+        // Los siguientes son opcionales, según el tipo de correo:
+        'precio'        => $precio,     // Ejemplo: "$200"
+        'tiempo'        => $tiempo,     // Ejemplo: "2 días"
+        'observaciones' => $desc        // Ejemplo: "Ninguna observación adicional"
+      ];
 
-       *¡Nueva Consulta de Liberación: Consulta Reinicia da por Sistema, se Solicita nuevamente Información!*
-
-       ----------------------------------------------------
-       se detallan los datos asociados de Liberacion:
-    
-       - Nombre: $dtname
-       - Celular: $dtcel
-       - IMEI: $dtimei
-       - Modelo: $dtmodel
-       - Precio: $dtprecio
-       - Tiempo: $dttime
-       - Observaciones: $dtobs
-       -----------------------------------------------------
-    
-       En el Siguiente Link Puedes realizar la Accion Necesaria:
-    
-       https://app.ithinkguatemala.com/home/pages/tables/buscar.php?search=$imei
-    
-       ¡Gracias!
-           
-       Este es un Correo Automatico no responder.
-
-       Codigo: 2.1
-       ";
+      $body = correo_enviar("consultaReiniciada", $datos);
 
       //envia los Correos
 
@@ -206,30 +192,18 @@ if (!isset($User)) {
 
       // Envia Correo de Notificacion
 
-      $body = "
-   *¡Liberacion Rechazada:!*
-   ----------------------------------------------------
-   se detallan los datos asociados:
+      $datos = [
+        'name'          => $name,       // Ejemplo: "Juan Pérez"
+        'celular'       => $celular,    // Ejemplo: "5551234567"
+        'imei'          => $imei,       // Ejemplo: "123456789012345"
+        'modelo'        => $model,      // Ejemplo: "iPhone 12"
+        // Los siguientes son opcionales, según el tipo de correo:
+        'precio'        => $precio,     // Ejemplo: "$200"
+        'tiempo'        => $tiempo,     // Ejemplo: "2 días"
+        'observaciones' => $desc        // Ejemplo: "Ninguna observación adicional"
+      ];
 
-   - Nombre: $dtname
-   - Celular: $dtcel
-   - IMEI: $dtimei
-   - Modelo: $dtmodel
-   - Precio: $dtprecio
-   - Tiempo: $dttime
-   - Observaciones: $dtobs
-   -----------------------------------------------------
-
-   En el Siguiente Link Puedes realizar la Accion Necesaria:
-
-   https://app.ithinkguatemala.com/home/pages/tables/buscar.php?search=$imei
-
-   ¡Gracias!
-       
-   Este es un Correo Automatico no responder.
-
-   Codigo: 5.2
-   ";
+      $body = correo_enviar("rechazado", $datos);
 
       //envia los Correos
 
@@ -244,32 +218,18 @@ if (!isset($User)) {
 
       // Envia Correo de Notificacion
 
-      $body = "
+      $datos = [
+        'name'          => $name,       // Ejemplo: "Juan Pérez"
+        'celular'       => $celular,    // Ejemplo: "5551234567"
+        'imei'          => $imei,       // Ejemplo: "123456789012345"
+        'modelo'        => $model,      // Ejemplo: "iPhone 12"
+        // Los siguientes son opcionales, según el tipo de correo:
+        'precio'        => $precio,     // Ejemplo: "$200"
+        'tiempo'        => $tiempo,     // Ejemplo: "2 días"
+        'observaciones' => $desc        // Ejemplo: "Ninguna observación adicional"
+      ];
 
-         *¡Liberacion Rechazada desde Aprobadas:!*
-  
-         ----------------------------------------------------
-         se detallan los datos asociados de Liberacion:
-      
-         - Nombre: $dtname
-         - Celular: $dtcel
-         - IMEI: $dtimei
-         - Modelo: $dtmodel
-         - Precio: $dtprecio
-         - Tiempo: $dttime
-         - Observaciones: $dtobs
-         -----------------------------------------------------
-      
-         En el Siguiente Link Puedes realizar la Accion Necesaria:
-      
-         https://app.ithinkguatemala.com/home/pages/tables/buscar.php?search=$imei
-      
-         ¡Gracias!
-             
-         Este es un Correo Automatico no responder.
-
-         Codigo: 5.3
-         ";
+      $body = correo_enviar("rechazado", $datos);
 
       //envia los Correos
 
@@ -283,32 +243,18 @@ if (!isset($User)) {
 
       // Envia Correo de Notificacion
 
-      $body = "
+      $datos = [
+        'name'          => $name,       // Ejemplo: "Juan Pérez"
+        'celular'       => $celular,    // Ejemplo: "5551234567"
+        'imei'          => $imei,       // Ejemplo: "123456789012345"
+        'modelo'        => $model,      // Ejemplo: "iPhone 12"
+        // Los siguientes son opcionales, según el tipo de correo:
+        'precio'        => $precio,     // Ejemplo: "$200"
+        'tiempo'        => $tiempo,     // Ejemplo: "2 días"
+        'observaciones' => $desc        // Ejemplo: "Ninguna observación adicional"
+      ];
 
-       *¡Liberacion Rechazada desde Finalizadas:!*
-
-       ----------------------------------------------------
-       se detallan los datos asociados de Liberacion:
-    
-       - Nombre: $dtname
-       - Celular: $dtcel
-       - IMEI: $dtimei
-       - Modelo: $dtmodel
-       - Precio: $dtprecio
-       - Tiempo: $dttime
-       - Observaciones: $dtobs
-       -----------------------------------------------------
-    
-       En el Siguiente Link Puedes realizar la Accion Necesaria:
-    
-       https://app.ithinkguatemala.com/home/pages/tables/buscar.php?search=$imei
-    
-       ¡Gracias!
-           
-       Este es un Correo Automatico no responder.
-
-       Codigo: 5.4
-       ";
+      $body = correo_enviar("rechazada", $datos);
 
       //envia los Correos
 
@@ -322,32 +268,18 @@ if (!isset($User)) {
 
       // Envia Correo de Notificacion
 
-      $body = "
+      $datos = [
+        'name'          => $name,       // Ejemplo: "Juan Pérez"
+        'celular'       => $celular,    // Ejemplo: "5551234567"
+        'imei'          => $imei,       // Ejemplo: "123456789012345"
+        'modelo'        => $model,      // Ejemplo: "iPhone 12"
+        // Los siguientes son opcionales, según el tipo de correo:
+        'precio'        => $precio,     // Ejemplo: "$200"
+        'tiempo'        => $tiempo,     // Ejemplo: "2 días"
+        'observaciones' => $desc        // Ejemplo: "Ninguna observación adicional"
+      ];
 
-         *¡Inicio de Proceso de Liberación:!*
-  
-         ----------------------------------------------------
-         se detallan los datos asociados de Liberacion:
-      
-         - Nombre: $dtname
-         - Celular: $dtcel
-         - IMEI: $dtimei
-         - Modelo: $dtmodel
-         - Precio: $dtprecio
-         - Tiempo: $dttime
-         - Observaciones: $dtobs
-         -----------------------------------------------------
-      
-         En el Siguiente Link Puedes realizar la Accion Necesaria:
-      
-         https://app.ithinkguatemala.com/home/pages/tables/buscar.php?search=$imei
-      
-         ¡Gracias!
-             
-         Este es un Correo Automatico no responder.
-
-         Codigo: 3
-         ";
+      $body = correo_enviar("iniciado", $datos);
 
       //envia los Correos
 
@@ -360,36 +292,18 @@ if (!isset($User)) {
 
       // Envia Correo de Notificacion
 
-      $body = "
+      $datos = [
+        'name'          => $name,       // Ejemplo: "Juan Pérez"
+        'celular'       => $celular,    // Ejemplo: "5551234567"
+        'imei'          => $imei,       // Ejemplo: "123456789012345"
+        'modelo'        => $model,      // Ejemplo: "iPhone 12"
+        // Los siguientes son opcionales, según el tipo de correo:
+        'precio'        => $precio,     // Ejemplo: "$200"
+        'tiempo'        => $tiempo,     // Ejemplo: "2 días"
+        'observaciones' => $desc        // Ejemplo: "Ninguna observación adicional"
+      ];
 
-         *¡Finalizado el Proceso de Liberacion:!*
-        
-         Notificar a Cliente de Finalizacion
-         ----------------------------------------------------
-         se detallan los datos asociados de Liberacion:
-      
-         - Nombre: $dtname
-         - Celular: $dtcel
-         - IMEI: $dtimei
-         - Modelo: $dtmodel
-         - Precio: $dtprecio
-         - Tiempo: $dttime
-         - Observaciones: $dtobs
-         -----------------------------------------------------
-
-         recordar que Cliente debe quitar cuenta de Icloud previo a ingresar SIM
-      
-         En el Siguiente Link Puedes realizar la Accion Necesaria:
-      
-         https://app.ithinkguatemala.com/home/pages/tables/buscar.php?search=$imei
-      
-         ¡Gracias!
-
-         Este es un Correo Automatico no responder.
-
-         Codigo: 4
-             
-         ";
+      $body = correo_enviar("finalizado", $datos);
 
       //envia los Correos
 
