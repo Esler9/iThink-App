@@ -125,7 +125,7 @@ $tiendas = $_SESSION['tiendas'];
                     echo $row['aprobadas'];
                     ?>
                   </h3>
-                  <p>Aprobadas 2</p>
+                  <p>Aprobadas</p>
                 </div>
                 <div class="icon">
                   <i class="fas fa-check"></i>
