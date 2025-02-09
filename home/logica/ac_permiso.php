@@ -15,6 +15,6 @@ function Tiene_permiso($permisos, $slug_requerido) {
 
 // Obtener todos los permisos del usuario en una sola consulta
 $permisos_user = Obtener_permisos_usuario($cod_user, $conn);
-
-
+ 
+// Verificar si el usuario tiene permiso para acceder a la página
 ?>
