@@ -41,7 +41,7 @@
                     </form>
                 </div>
             </li>
-            <!-- Dark Mode Switch (solo afecta header y sidebar) -->
+            <!-- Dark Mode Switch (afecta todos los elementos cambiando el tema) -->
             <li class="nav-item d-flex align-items-center">
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input" id="darkModeSwitch">
@@ -67,7 +67,7 @@
     <aside class="main-sidebar">
         <!-- Brand Logo -->
         <a href="/home/dashboard" class="brand-link text-center">
-            <!-- Usamos la misma imagen que la del usuario -->
+            <!-- Se usa la misma imagen del usuario para el logo, y se mejora el estilo del título -->
             <img src="/home/dist/img/user2-160x160.jpg" alt="iThink Logo" class="brand-image img-circle elevation-3" style="opacity: .9">
             <span class="brand-text font-weight-bold" style="font-size:1.3rem; letter-spacing: 1px; text-transform: uppercase;">iThink Web</span>
         </a>
@@ -335,17 +335,6 @@
             </nav>
         </div>
     </aside>
-
-    <!-- Content Wrapper -->
-    <div class="content-wrapper">
-        <!-- Contenido Principal -->
-        <section class="content">
-            <div class="container-fluid">
-                <h2>Bienvenido a iThink-App</h2>
-                <p>Selecciona una opción del menú para comenzar.</p>
-            </div>
-        </section>
-    </div>
 </div>
 
 <!-- JavaScript -->
@@ -353,10 +342,10 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<!-- Script para el menú Sidebar con animaciones y Dark Mode para header y sidebar -->
+<!-- Script para el menú Sidebar con animaciones y Dark Mode para todos los elementos -->
 <script>
   $(document).ready(function() {
-      // Toggle submenus
+      // Toggle submenús
       $('.nav-item.has-treeview > a').on('click', function(e) {
           e.preventDefault();
           var $parent = $(this).parent();
@@ -378,30 +367,43 @@
           }
       });
 
-      // Dark Mode Switch (solo afecta header y sidebar)
+      // Dark Mode Switch (afecta a todo el body)
       $('#darkModeSwitch').on('change', function() {
           if ($(this).is(':checked')) {
-              $('.main-header, .main-sidebar').addClass('dark-mode');
+              $('body').addClass('dark-mode');
           } else {
-              $('.main-header, .main-sidebar').removeClass('dark-mode');
+              $('body').removeClass('dark-mode');
           }
       });
   });
 </script>
 
-<!-- Estilos para Dark Mode aplicados solo al header y sidebar -->
+<!-- Estilos para Dark Mode aplicados a todos los elementos -->
 <style>
-  /* Modo oscuro: fondo en #2c2c2c para header y sidebar */
-  .main-header.dark-mode {
-      background-color: #2c2c2c !important;
-      color: #ffffff;
+  body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
   }
-  .main-header.dark-mode .nav-link i,
-  .main-header.dark-mode .nav-icon {
+  /* Header y Sidebar en modo oscuro */
+  .main-header.dark-mode,
+  .main-sidebar.dark-mode,
+  .main-header.dark-mode .navbar-nav .nav-link,
+  .main-sidebar.dark-mode .nav-link {
+      background-color: #2c2c2c !important;
       color: #ffffff !important;
   }
-  .main-sidebar.dark-mode {
-      background-color: #2c2c2c !important;
+  /* Content Wrapper en modo oscuro */
+  .content-wrapper.dark-mode {
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+  }
+  /* Aseguramos que enlaces y botones en modo oscuro tengan un color adecuado */
+  body.dark-mode a {
+      color: #4fc3f7;
+  }
+  body.dark-mode .nav-link.active,
+  body.dark-mode .nav-link:hover {
+      background-color: #333333;
       color: #ffffff;
   }
 </style>
