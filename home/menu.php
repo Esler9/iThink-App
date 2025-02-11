@@ -399,7 +399,7 @@
   }
   .main-header .nav-link,
   .main-sidebar .nav-link {
-      color:  #515a5a !important;
+      color:  #ffffff !important;
   }
   .main-header .nav-link:hover,
   .main-sidebar .nav-link:hover {
