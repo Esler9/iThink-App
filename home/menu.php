@@ -404,7 +404,7 @@
   .main-header .nav-link:hover,
   .main-sidebar .nav-link:hover {
       background-color: #e6e6e6;
-      color: #000000;
+      color:  #515a5a !important;
   }
   
   /* Dark Mode para header y sidebar */
@@ -441,7 +441,7 @@
       font-size: 1.3rem;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: #000000;
+      color:  #515a5a !important;
   }
   .main-sidebar.dark-mode .brand-link .brand-text {
       color: #ffffff !important;
