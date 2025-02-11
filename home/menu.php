@@ -67,7 +67,7 @@
     <aside class="main-sidebar">
         <!-- Brand Logo -->
         <a href="/home/dashboard" class="brand-link text-center">
-            <!-- Usamos la misma imagen que la del usuario para el logo -->
+            <!-- Se utiliza la misma imagen del usuario para el logo -->
             <img src="/home/dist/img/user2-160x160.jpg" alt="iThink Logo" class="brand-image img-circle elevation-3" style="opacity: .9">
             <span class="brand-text font-weight-bold" id="siteTitle" style="font-size:1.3rem; letter-spacing: 1px; text-transform: uppercase;">iThink Web</span>
         </a>
@@ -335,17 +335,6 @@
             </nav>
         </div>
     </aside>
-
-    <!-- Content Wrapper -->
-    <div class="content-wrapper">
-        <!-- Contenido Principal -->
-        <section class="content">
-            <div class="container-fluid">
-                <h2>Bienvenido a iThink-App</h2>
-                <p>Selecciona una opción del menú para comenzar.</p>
-            </div>
-        </section>
-    </div>
 </div>
 
 <!-- JavaScript -->
@@ -378,12 +367,20 @@
           }
       });
 
-      // Dark Mode Switch: Solo afecta al header y sidebar
+      // Verificar en localStorage la preferencia de Dark Mode
+      if (localStorage.getItem('darkMode') === 'true') {
+          $('.main-header, .main-sidebar').addClass('dark-mode');
+          $('#darkModeSwitch').prop('checked', true);
+      }
+
+      // Dark Mode Switch: Solo afecta header y sidebar
       $('#darkModeSwitch').on('change', function() {
           if ($(this).is(':checked')) {
               $('.main-header, .main-sidebar').addClass('dark-mode');
+              localStorage.setItem('darkMode', 'true');
           } else {
               $('.main-header, .main-sidebar').removeClass('dark-mode');
+              localStorage.setItem('darkMode', 'false');
           }
       });
   });
@@ -409,6 +406,7 @@
       background-color: #e6e6e6;
       color: #000000;
   }
+  
   /* Dark Mode para header y sidebar */
   .main-header.dark-mode {
       background-color: #2c2c2c !important;
@@ -434,7 +432,7 @@
       background-color: #444444 !important;
       color: #ffffff !important;
   }
-  /* Ajuste para el nombre de usuario en el panel (cambia de color en modo oscuro) */
+  /* Ajuste para el nombre de usuario en el panel (modo oscuro) */
   .main-sidebar.dark-mode .user-panel .info span {
       color: #ffcc00 !important;
   }
