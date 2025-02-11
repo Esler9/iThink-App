@@ -378,7 +378,7 @@
           }
       });
 
-      // Dark Mode Switch (solo afecta el navbar y sidebar)
+      // Dark Mode Switch: Solo afecta al header y sidebar
       $('#darkModeSwitch').on('change', function() {
           if ($(this).is(':checked')) {
               $('.main-header, .main-sidebar').addClass('dark-mode');
@@ -389,60 +389,63 @@
   });
 </script>
 
-<!-- Estilos para Dark Mode (afectando solo header y sidebar) -->
+<!-- Estilos para Light y Dark Mode (solo header y sidebar cambian de tema) -->
 <style>
-  /* Modo claro: colores originales */
+  /* Light Mode (por defecto) */
   .main-header {
       background-color: #ffffff;
       color: #000000;
   }
   .main-sidebar {
-      background-color: #343a40;
-      color: #c2c7d0;
+      background-color: #ffffff;
+      color: #000000;
   }
   .main-header .nav-link,
   .main-sidebar .nav-link {
-      color: inherit;
+      color: #000000;
   }
   .main-header .nav-link:hover,
   .main-sidebar .nav-link:hover {
       background-color: #e6e6e6;
       color: #000000;
   }
-  
-  /* Modo oscuro: aplicamos a header y sidebar */
+  /* Dark Mode para header y sidebar */
   .main-header.dark-mode {
       background-color: #2c2c2c !important;
       color: #ffffff;
+  }
+  .main-header.dark-mode .nav-link,
+  .main-header.dark-mode #homeLink {
+      color: #ffffff !important;
+  }
+  .main-header.dark-mode .nav-link:hover,
+  .main-header.dark-mode #homeLink:hover {
+      background-color: #444444 !important;
+      color: #ffffff !important;
   }
   .main-sidebar.dark-mode {
       background-color: #2c2c2c !important;
       color: #ffffff;
   }
-  .main-header.dark-mode .nav-link,
   .main-sidebar.dark-mode .nav-link {
       color: #ffffff !important;
   }
-  .main-header.dark-mode .nav-link:hover,
   .main-sidebar.dark-mode .nav-link:hover {
       background-color: #444444 !important;
-      color: #ffffff;
+      color: #ffffff !important;
   }
-  /* Ajuste del nombre de usuario en modo oscuro */
+  /* Ajuste para el nombre de usuario en el panel (cambia de color en modo oscuro) */
   .main-sidebar.dark-mode .user-panel .info span {
       color: #ffcc00 !important;
   }
   /* Ajuste del título del sitio */
-  .main-sidebar.dark-mode .brand-text {
-      color: #ffffff !important;
-      font-size: 1.4rem;
-      font-weight: bold;
+  .brand-link .brand-text {
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #000000;
   }
-  /* Ajuste del enlace "Home" en el header en modo oscuro */
-  .main-header.dark-mode a#homeLink {
+  .main-sidebar.dark-mode .brand-link .brand-text {
       color: #ffffff !important;
-  }
-  .main-header.dark-mode a#homeLink:hover {
-      color: #cccccc !important;
   }
 </style>
