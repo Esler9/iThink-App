@@ -57,10 +57,10 @@
     </nav>
 
     <!-- Sidebar -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <aside class="main-sidebar">
         <!-- Brand Logo -->
         <a href="/home/dashboard" class="brand-link text-center">
-            <img src="/home/dist/img/Logo_BIT.png" alt="iThink Logo" class="brand-image img-circle elevation-3" style="opacity: .9">
+            <img src="/home/dist/img/Logo_BIT.png" alt="iThink Logo" class="brand-image img-circle elevation-3">
             <span class="brand-text font-weight-bold">iThink Web</span>
         </a>
 
@@ -144,7 +144,7 @@
                     </li>
 
                     <!-- iCloud (Permisos) -->
-                    <?php if(Tiene_permiso($permisos_user,'ver-icloud')){ ?>
+                    <?php if(Tiene_permiso($permisos_user, 'ver-icloud')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="/home/pages/permisos_view.php" class="nav-link">
                             <i class="nav-icon fas fa-cloud"></i>
@@ -171,7 +171,7 @@
                     <?php } ?>
 
                     <!-- Clientes -->
-                    <?php if(Tiene_permiso($permisos_user,'ver-garantia')){ ?>
+                    <?php if(Tiene_permiso($permisos_user, 'ver-garantia')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-shield-alt"></i>
@@ -198,7 +198,7 @@
                     <?php } ?>
 
                     <!-- Garantías -->
-                    <?php if(Tiene_permiso($permisos_user,'ver-garantia')){ ?>
+                    <?php if(Tiene_permiso($permisos_user, 'ver-garantia')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-shield-alt"></i>
@@ -219,7 +219,7 @@
                     <?php } ?>
 
                     <!-- Permisos -->
-                    <?php if(Tiene_permiso($permisos_user,'ver_permiso')){ ?>
+                    <?php if(Tiene_permiso($permisos_user, 'ver_permiso')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="/home/pages/permisos_view.php" class="nav-link">
                             <i class="nav-icon fas fa-user-shield"></i>
@@ -328,34 +328,45 @@
         </div>
     </aside>
 
-    <!-- Custom Styles for better UX -->
-    <style>
-        .nav-sidebar .nav-link.active {
-            background-color: #007bff;
-            color: white;
-        }
-        .nav-sidebar .nav-link:hover {
-            background-color: #1e90ff;
-            color: white;
-        }
-        .nav-icon {
-            font-size: 1.2rem;
-        }
-        .nav-item.has-treeview .nav-link .right {
-            transition: transform 0.3s;
-        }
-        .nav-item.has-treeview.menu-open .nav-link .right {
-            transform: rotate(360deg);
-        }
-    </style>
-
-    <!-- jQuery for treeview toggle functionality -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.nav-item.has-treeview > a').on('click', function() {
-                $(this).parent().toggleClass('menu-open');
-            });
-        });
-    </script>
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Contenido Principal -->
+        <section class="content">
+            <div class="container-fluid">
+                <h2>Bienvenido a iThink-App</h2>
+                <p>Selecciona una opción del menú para comenzar.</p>
+            </div>
+        </section>
+    </div>
 </div>
+
+<!-- JavaScript -->
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Script para el menú Sidebar con animaciones -->
+<script>
+  $(document).ready(function() {
+      $('.nav-item.has-treeview > a').on('click', function(e) {
+          e.preventDefault();
+          var $parent = $(this).parent();
+          var $submenu = $parent.find('ul.nav-treeview').first();
+          if ($parent.hasClass('menu-open')) {
+              $submenu.slideUp(300, function() {
+                  $parent.removeClass('menu-open');
+              });
+          } else {
+              // Cerrar otros submenús abiertos
+              $('.nav-item.has-treeview.menu-open').not($parent).each(function() {
+                  $(this).find('ul.nav-treeview').slideUp(300, function() {
+                      $(this).closest('.nav-item').removeClass('menu-open');
+                  });
+              });
+              $submenu.slideDown(300, function() {
+                  $parent.addClass('menu-open');
+              });
+          }
+      });
+  });
+</script>
