@@ -391,11 +391,11 @@
   /* Light Mode (por defecto) */
   .main-header {
       background-color: #ffffff;
-      color: #000000;
+      color:  #515a5a 
   }
   .main-sidebar {
       background-color: #ffffff;
-      color: #000000;
+      color:  #515a5a ;
   }
   .main-header .nav-link,
   .main-sidebar .nav-link {
