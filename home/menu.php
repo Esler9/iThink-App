@@ -4,7 +4,7 @@
         <img class="animation__shake" src="/home/dist/img/logo_ithink.png" alt="iThinkWeb" height="60" width="60">
     </div>
 
-    <!-- Navbar -->
+    <!-- Navbar (Header) -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <!-- Left navbar links -->
         <ul class="navbar-nav">
@@ -14,7 +14,7 @@
                 </a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-                <a href="/home/dashboard.php" class="nav-link">Home</a>
+                <a href="/home/dashboard.php" class="nav-link" id="homeLink">Home</a>
             </li>
         </ul>
 
@@ -41,7 +41,7 @@
                     </form>
                 </div>
             </li>
-            <!-- Dark Mode Switch (afecta todos los elementos cambiando el tema) -->
+            <!-- Dark Mode Switch (afecta header y sidebar) -->
             <li class="nav-item d-flex align-items-center">
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input" id="darkModeSwitch">
@@ -67,9 +67,9 @@
     <aside class="main-sidebar">
         <!-- Brand Logo -->
         <a href="/home/dashboard" class="brand-link text-center">
-            <!-- Se usa la misma imagen del usuario para el logo, y se mejora el estilo del título -->
+            <!-- Usamos la misma imagen que la del usuario para el logo -->
             <img src="/home/dist/img/user2-160x160.jpg" alt="iThink Logo" class="brand-image img-circle elevation-3" style="opacity: .9">
-            <span class="brand-text font-weight-bold" style="font-size:1.3rem; letter-spacing: 1px; text-transform: uppercase;">iThink Web</span>
+            <span class="brand-text font-weight-bold" id="siteTitle" style="font-size:1.3rem; letter-spacing: 1px; text-transform: uppercase;">iThink Web</span>
         </a>
 
         <!-- Sidebar -->
@@ -81,7 +81,7 @@
                         <img src="/home/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info ml-2">
-                        <span class="d-block text-white"><?php echo $User; ?></span>
+                        <span class="d-block" id="username"><?php echo $User; ?></span>
                     </div>
                 </a>
             </div>
@@ -335,6 +335,17 @@
             </nav>
         </div>
     </aside>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Contenido Principal -->
+        <section class="content">
+            <div class="container-fluid">
+                <h2>Bienvenido a iThink-App</h2>
+                <p>Selecciona una opción del menú para comenzar.</p>
+            </div>
+        </section>
+    </div>
 </div>
 
 <!-- JavaScript -->
@@ -342,7 +353,7 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<!-- Script para el menú Sidebar con animaciones y Dark Mode para todos los elementos -->
+<!-- Script para el menú Sidebar con animaciones y Dark Mode para header y sidebar -->
 <script>
   $(document).ready(function() {
       // Toggle submenús
@@ -367,43 +378,71 @@
           }
       });
 
-      // Dark Mode Switch (afecta a todo el body)
+      // Dark Mode Switch (solo afecta el navbar y sidebar)
       $('#darkModeSwitch').on('change', function() {
           if ($(this).is(':checked')) {
-              $('body').addClass('dark-mode');
+              $('.main-header, .main-sidebar').addClass('dark-mode');
           } else {
-              $('body').removeClass('dark-mode');
+              $('.main-header, .main-sidebar').removeClass('dark-mode');
           }
       });
   });
 </script>
 
-<!-- Estilos para Dark Mode aplicados a todos los elementos -->
+<!-- Estilos para Dark Mode (afectando solo header y sidebar) -->
 <style>
-  body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
+  /* Modo claro: colores originales */
+  .main-header {
+      background-color: #ffffff;
+      color: #000000;
   }
-  /* Header y Sidebar en modo oscuro */
-  .main-header.dark-mode,
-  .main-sidebar.dark-mode,
-  .main-header.dark-mode .navbar-nav .nav-link,
-  .main-sidebar.dark-mode .nav-link {
+  .main-sidebar {
+      background-color: #343a40;
+      color: #c2c7d0;
+  }
+  .main-header .nav-link,
+  .main-sidebar .nav-link {
+      color: inherit;
+  }
+  .main-header .nav-link:hover,
+  .main-sidebar .nav-link:hover {
+      background-color: #e6e6e6;
+      color: #000000;
+  }
+  
+  /* Modo oscuro: aplicamos a header y sidebar */
+  .main-header.dark-mode {
       background-color: #2c2c2c !important;
+      color: #ffffff;
+  }
+  .main-sidebar.dark-mode {
+      background-color: #2c2c2c !important;
+      color: #ffffff;
+  }
+  .main-header.dark-mode .nav-link,
+  .main-sidebar.dark-mode .nav-link {
       color: #ffffff !important;
   }
-  /* Content Wrapper en modo oscuro */
-  .content-wrapper.dark-mode {
-      background-color: #1e1e1e;
-      color: #e0e0e0;
-  }
-  /* Aseguramos que enlaces y botones en modo oscuro tengan un color adecuado */
-  body.dark-mode a {
-      color: #4fc3f7;
-  }
-  body.dark-mode .nav-link.active,
-  body.dark-mode .nav-link:hover {
-      background-color: #333333;
+  .main-header.dark-mode .nav-link:hover,
+  .main-sidebar.dark-mode .nav-link:hover {
+      background-color: #444444 !important;
       color: #ffffff;
+  }
+  /* Ajuste del nombre de usuario en modo oscuro */
+  .main-sidebar.dark-mode .user-panel .info span {
+      color: #ffcc00 !important;
+  }
+  /* Ajuste del título del sitio */
+  .main-sidebar.dark-mode .brand-text {
+      color: #ffffff !important;
+      font-size: 1.4rem;
+      font-weight: bold;
+  }
+  /* Ajuste del enlace "Home" en el header en modo oscuro */
+  .main-header.dark-mode a#homeLink {
+      color: #ffffff !important;
+  }
+  .main-header.dark-mode a#homeLink:hover {
+      color: #cccccc !important;
   }
 </style>
