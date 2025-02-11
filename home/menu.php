@@ -93,7 +93,10 @@
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-file-alt"></i>
-                            <p>Liberaciones <i class="fas fa-angle-left right"></i></p>
+                            <p>
+                                Liberaciones
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
@@ -141,11 +144,14 @@
                     </li>
 
                     <!-- iCloud (Permisos) -->
-                    <?php if(Tiene_permiso($permisos_user,'ver-icloud')){?>
+                    <?php if(Tiene_permiso($permisos_user,'ver-icloud')){ ?>
                     <li class="nav-item has-treeview">
                         <a href="/home/pages/permisos_view.php" class="nav-link">
                             <i class="nav-icon fas fa-cloud"></i>
-                            <p>iCloud <i class="fas fa-angle-left right"></i></p>
+                            <p>
+                                iCloud
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
@@ -162,14 +168,17 @@
                             </li>
                         </ul>
                     </li>
-                    <?php }?>
+                    <?php } ?>
 
-                     <!-- Clientes -->
-                     <?php if(Tiene_permiso($permisos_user,'ver-garantia')){?>
+                    <!-- Clientes -->
+                    <?php if(Tiene_permiso($permisos_user,'ver-garantia')){ ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-shield-alt"></i>
-                            <p>Clientes <i class="fas fa-angle-left right"></i></p>
+                            <p>
+                                Clientes
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
@@ -186,14 +195,17 @@
                             </li>
                         </ul>
                     </li>
-                    <?php }?>
+                    <?php } ?>
 
                     <!-- Garantías -->
-                    <?php if(Tiene_permiso($permisos_user,'ver-garantia')){?>
+                    <?php if(Tiene_permiso($permisos_user,'ver-garantia')){ ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-shield-alt"></i>
-                            <p>Garantías <i class="fas fa-angle-left right"></i></p>
+                            <p>
+                                Garantías
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
@@ -204,15 +216,17 @@
                             </li>
                         </ul>
                     </li>
-                    <?php }?>
-
+                    <?php } ?>
 
                     <!-- Permisos -->
-                    <?php if(Tiene_permiso($permisos_user,'ver_permiso')){?>
+                    <?php if(Tiene_permiso($permisos_user,'ver_permiso')){ ?>
                     <li class="nav-item has-treeview">
                         <a href="/home/pages/permisos_view.php" class="nav-link">
                             <i class="nav-icon fas fa-user-shield"></i>
-                            <p>Permisos <i class="fas fa-angle-left right"></i></p>
+                            <p>
+                                Permisos
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
@@ -229,7 +243,86 @@
                             </li>
                         </ul>
                     </li>
-                    <?php }?>
+                    <?php } ?>
+
+                    <!-- Nuevos Módulos -->
+                    <li class="nav-header">NUEVOS MÓDULOS</li>
+
+                    <!-- Empleados -->
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-user"></i>
+                            <p>
+                                Empleados
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/home/pages/empleados/lista.php" class="nav-link">
+                                    <i class="fas fa-list nav-icon"></i>
+                                    <p>Listado de Empleados</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/home/pages/empleados/nuevo.php" class="nav-link">
+                                    <i class="fas fa-user-plus nav-icon"></i>
+                                    <p>Nuevo Empleado</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Horarios -->
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-clock"></i>
+                            <p>
+                                Horarios
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/home/pages/horarios/configurar.php" class="nav-link">
+                                    <i class="fas fa-cog nav-icon"></i>
+                                    <p>Configurar Horarios</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/home/pages/horarios/marcar.php" class="nav-link">
+                                    <i class="fas fa-edit nav-icon"></i>
+                                    <p>Marcar Asistencia</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Usuarios -->
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-users-cog"></i>
+                            <p>
+                                Usuarios
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/home/pages/usuarios/lista.php" class="nav-link">
+                                    <i class="fas fa-list nav-icon"></i>
+                                    <p>Listado de Usuarios</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/home/pages/usuarios/nuevo.php" class="nav-link">
+                                    <i class="fas fa-user-plus nav-icon"></i>
+                                    <p>Nuevo Usuario</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
                 </ul>
             </nav>
         </div>
@@ -257,6 +350,7 @@
     </style>
 
     <!-- jQuery for treeview toggle functionality -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script>
         $(document).ready(function() {
             $('.nav-item.has-treeview > a').on('click', function() {
