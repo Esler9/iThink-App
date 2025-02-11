@@ -334,17 +334,6 @@
             </nav>
         </div>
     </aside>
-
-    <!-- Content Wrapper -->
-    <div class="content-wrapper">
-        <!-- Contenido Principal -->
-        <section class="content">
-            <div class="container-fluid">
-                <h2>Bienvenido a iThink-App</h2>
-                <p>Selecciona una opción del menú para comenzar.</p>
-            </div>
-        </section>
-    </div>
 </div>
 
 <!-- JavaScript -->
