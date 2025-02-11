@@ -41,6 +41,13 @@
                     </form>
                 </div>
             </li>
+            <!-- Dark Mode Switch -->
+            <li class="nav-item d-flex align-items-center">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="darkModeSwitch">
+                    <label class="custom-control-label" for="darkModeSwitch" style="cursor:pointer;">Modo Oscuro</label>
+                </div>
+            </li>
             <!-- Logout -->
             <li class="nav-item">
                 <a class="nav-link" href="/home/logica/salir.php" role="button">
@@ -328,6 +335,17 @@
         </div>
     </aside>
 
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Contenido Principal -->
+        <section class="content">
+            <div class="container-fluid">
+                <h2>Bienvenido a iThink-App</h2>
+                <p>Selecciona una opción del menú para comenzar.</p>
+            </div>
+        </section>
+    </div>
+</div>
 
 <!-- JavaScript -->
 <!-- jQuery -->
@@ -337,6 +355,7 @@
 <!-- Script para el menú Sidebar con animaciones -->
 <script>
   $(document).ready(function() {
+      // Toggle submenus
       $('.nav-item.has-treeview > a').on('click', function(e) {
           e.preventDefault();
           var $parent = $(this).parent();
@@ -357,5 +376,41 @@
               });
           }
       });
+
+      // Dark Mode Switch
+      $('#darkModeSwitch').on('change', function() {
+          if ($(this).is(':checked')) {
+              $('body').addClass('dark-mode');
+          } else {
+              $('body').removeClass('dark-mode');
+          }
+      });
   });
 </script>
+
+<!-- Estilos adicionales para Dark Mode -->
+<style>
+  /* Estilos para modo oscuro */
+  body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+  }
+  body.dark-mode .main-header.navbar {
+      background-color: #1c1c1c;
+  }
+  body.dark-mode .main-sidebar {
+      background-color: #1c1c1c;
+  }
+  body.dark-mode .content-wrapper {
+      background-color: #181818;
+  }
+  body.dark-mode .brand-link,
+  body.dark-mode .nav-sidebar .nav-link {
+      color: #e0e0e0;
+  }
+  body.dark-mode .nav-sidebar .nav-link.active,
+  body.dark-mode .nav-sidebar .nav-link:hover {
+      background-color: #333333;
+      color: #ffffff;
+  }
+</style>
