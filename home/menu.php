@@ -41,7 +41,7 @@
                     </form>
                 </div>
             </li>
-            <!-- Dark Mode Switch (Solo afecta header y sidebar) -->
+            <!-- Dark Mode Switch (solo afecta header y sidebar) -->
             <li class="nav-item d-flex align-items-center">
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input" id="darkModeSwitch">
@@ -67,8 +67,9 @@
     <aside class="main-sidebar">
         <!-- Brand Logo -->
         <a href="/home/dashboard" class="brand-link text-center">
-            <img src="/home/dist/img/Logo_BIT.png" alt="iThink Logo" class="brand-image img-circle elevation-3">
-            <span class="brand-text font-weight-bold">iThink Web</span>
+            <!-- Usamos la misma imagen que la del usuario -->
+            <img src="/home/dist/img/user2-160x160.jpg" alt="iThink Logo" class="brand-image img-circle elevation-3" style="opacity: .9">
+            <span class="brand-text font-weight-bold" style="font-size:1.3rem; letter-spacing: 1px; text-transform: uppercase;">iThink Web</span>
         </a>
 
         <!-- Sidebar -->
@@ -334,6 +335,17 @@
             </nav>
         </div>
     </aside>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Contenido Principal -->
+        <section class="content">
+            <div class="container-fluid">
+                <h2>Bienvenido a iThink-App</h2>
+                <p>Selecciona una opción del menú para comenzar.</p>
+            </div>
+        </section>
+    </div>
 </div>
 
 <!-- JavaScript -->
@@ -366,7 +378,7 @@
           }
       });
 
-      // Dark Mode Switch (sólo para header y sidebar)
+      // Dark Mode Switch (solo afecta header y sidebar)
       $('#darkModeSwitch').on('change', function() {
           if ($(this).is(':checked')) {
               $('.main-header, .main-sidebar').addClass('dark-mode');
@@ -377,16 +389,19 @@
   });
 </script>
 
-<!-- Estilos para Dark Mode aplicados únicamente al header y sidebar -->
+<!-- Estilos para Dark Mode aplicados solo al header y sidebar -->
 <style>
+  /* Modo oscuro: fondo en #2c2c2c para header y sidebar */
   .main-header.dark-mode {
-      background-color: #1c1c1c !important;
+      background-color: #2c2c2c !important;
       color: #ffffff;
+  }
+  .main-header.dark-mode .nav-link i,
+  .main-header.dark-mode .nav-icon {
+      color: #ffffff !important;
   }
   .main-sidebar.dark-mode {
-      background-color: #1c1c1c !important;
+      background-color: #2c2c2c !important;
       color: #ffffff;
   }
-  /* Si se desean ajustar otros elementos del header o sidebar en modo oscuro,
-     se pueden incluir aquí estilos adicionales. */
 </style>
