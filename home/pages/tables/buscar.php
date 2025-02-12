@@ -3,7 +3,8 @@
 session_start();
 // Verificar que las variables de sesión estén configuradas
 if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
-  header('Location: ../../login.php');
+  $linkre = urlencode($_SERVER['REQUEST_URI']);
+  header("Location: ../../login.php?linkre=$linkre");
   exit();
 }
 
