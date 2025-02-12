@@ -448,4 +448,9 @@
   .main-sidebar.dark-mode .brand-link .brand-text {
       color: #ffffff !important;
   }
+  /* Estilos para la pestaña activa */
+  .nav-sidebar .nav-link.active {
+      background-color: #007bff !important;
+      color: #ffffff !important;
+  }
 </style>
