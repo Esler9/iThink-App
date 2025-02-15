@@ -1,4 +1,5 @@
 RewriteEngine On
+RewriteBase /
 
 # Si no es un archivo o directorio existente
 RewriteCond %{REQUEST_FILENAME} !-f
