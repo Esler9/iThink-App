@@ -1,9 +1,11 @@
 RewriteEngine On
 RewriteBase /
 
-# Si no es un archivo o directorio existente
+# Redirige las solicitudes que incluyan .php en la URL a la versión sin extensión
+RewriteCond %{THE_REQUEST} \s/+(.+?)\.php[\s?] [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# Si no es un archivo o directorio existente, reescribe internamente la URL agregando la extensión .php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-
-# Reescribe internamente la URL agregando la extensión .php
 RewriteRule ^([^\.]+)$ $1.php [L]
