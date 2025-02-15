@@ -26,7 +26,7 @@
                     <i class="fas fa-search"></i>
                 </a>
                 <div class="navbar-search-block">
-                    <form class="form-inline" action="/home/pages/tables/buscar.php" method="GET">
+                    <form class="form-inline" action="/home/pages/liberaciones/buscar.php" method="GET">
                         <div class="input-group input-group-sm">
                             <input class="form-control form-control-navbar" name="search" type="search" placeholder="Buscar" aria-label="Search">
                             <div class="input-group-append">
@@ -108,41 +108,41 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/pages/tables/crear.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/crear.php" class="nav-link">
                                     <i class="fas fa-plus nav-icon"></i>
                                     <p>Crear Consulta</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/pages/tables/consultas.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/consultas.php" class="nav-link">
                                     <i class="fas fa-question-circle nav-icon"></i>
                                     <p>Consultas</p>
                                     <span class="badge badge-info right"><?php echo $con; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/pages/tables/pendientes.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/pendientes.php" class="nav-link">
                                     <i class="fas fa-exclamation-triangle nav-icon"></i>
                                     <p>Pendientes</p>
                                     <span class="badge badge-danger right"><?php echo $pen; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/pages/tables/aprobadas.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/aprobadas.php" class="nav-link">
                                     <i class="fas fa-check-circle nav-icon"></i>
                                     <p>Aprobadas</p>
                                     <span class="badge badge-success right"><?php echo $apro; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/pages/tables/finalizadas.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/finalizadas.php" class="nav-link">
                                     <i class="fas fa-handshake nav-icon"></i>
                                     <p>Finalizadas</p>
                                     <span class="badge badge-warning right"><?php echo $fin; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/pages/tables/rechazadas.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/rechazadas.php" class="nav-link">
                                     <i class="fas fa-times-circle nav-icon"></i>
                                     <p>Rechazadas</p>
                                     <span class="badge badge-danger right"><?php echo $recha; ?></span>
