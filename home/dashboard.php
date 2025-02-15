@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-include("vistas/footer.php");
+include("vistas/header.php");
 ?>
 
 <html lang="es">
