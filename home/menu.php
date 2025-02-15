@@ -253,8 +253,6 @@
                     </li>
                     <?php } ?>
 
-                    <!-- Nuevos Módulos -->
-                    <li class="nav-header">NUEVOS MÓDULOS</li>
 
                     <!-- Empleados -->
                     <li class="nav-item has-treeview">
