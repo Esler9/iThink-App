@@ -1,28 +1,5 @@
 <?php 
-session_start();
-if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
-  header('Location: ../../login.php');
-  exit();
-}
-
-$User = $_SESSION["username"];
-$cod_user = $_SESSION['cod_user'];
-
-
-include("../../../conexion.php");
-include("../../logica/ac_permiso.php");
-
-// Obtención de tiendas a las que tiene acceso el usuario
-$sql = "SELECT cod_tienda FROM `asignacion_tienda` where cod_user = $cod_user";
-$consulta = mysqli_query($conn, $sql);
-while ($fila = mysqli_fetch_array($consulta)) {
-  $marcas[] = $fila['cod_tienda'];
-}
-if (!empty($marcas)) {
-  $tiendas = implode(', ', $marcas);
-  $_SESSION['tiendas'] = $tiendas;
-}
-$tiendas = $_SESSION['tiendas'];
+include("../../vistas/header.php");
 
 
 // Validar permiso para ver usuarios
