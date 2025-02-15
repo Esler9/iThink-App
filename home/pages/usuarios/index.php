@@ -15,7 +15,7 @@ include "../../../conexion.php"; // Asegúrate de que la ruta sea correcta
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
   <!-- Se incluye el Sidebar de raíz -->
-  <?php include("../sidebar.php"); ?>
+  <?php include("../../sidebar.php"); ?>
   
   <!-- Content Wrapper. Contenido de la página -->
   <div class="content-wrapper">
