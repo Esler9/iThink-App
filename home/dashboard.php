@@ -86,7 +86,7 @@ $tiendas = $_SESSION['tiendas'];
                 <div class="icon">
                   <i class="fas fa-solid fa-question"></i>
                 </div>
-                <a href="pages/tables/consultas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="pages/liberaciones/consultas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           <?php endif; ?>
