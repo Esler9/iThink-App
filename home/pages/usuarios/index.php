@@ -104,7 +104,7 @@ if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
               </thead>
               <tbody>
                 <?php 
-                $sql = "SELECT * FROM Usuarios ORDER BY id ASC";
+                $sql = "SELECT * FROM Usuarios ORDER BY Codigo ASC";
                 $result = mysqli_query($conn, $sql);
                 if($result){
                   while($row = mysqli_fetch_array($result)) {
