@@ -37,7 +37,7 @@ while ($data = mysqli_fetch_array($valores)) {
     }
 }
 
-// Incluye el archivo de menú
-include("../menu.php");
+// Se incluye el archivo menú desde una ruta absoluta
+include_once($_SERVER['DOCUMENT_ROOT'] . "/home/menu.php");
 
 ?>
