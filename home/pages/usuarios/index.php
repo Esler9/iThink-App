@@ -109,7 +109,7 @@ if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
                 if($result){
                   while($row = mysqli_fetch_array($result)) {
                     echo "<tr>";
-                      echo "<td>" . $row['id'] . "</td>";
+                      echo "<td>" . $row['Codigo'] . "</td>";
                       echo "<td>" . htmlspecialchars($row['User']) . "</td>";
                       echo "<td>" . htmlspecialchars($row['email']) . "</td>";
                       echo "<td>" . htmlspecialchars($row['state']) . "</td>";
