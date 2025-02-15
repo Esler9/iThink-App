@@ -3,23 +3,23 @@ session_start();
 $User = $_SESSION["username"];
 $cod_user = $_SESSION['cod_user'];
 
-include($_SERVER['DOCUMENT_ROOT'].'/home/Setting.php');
+include('../Setting.php');
 
 if ($mantenimiento == true) {
-  header('Location: /home/mantenimiento.php');
+  header('location:../mantenimiento.php');
   exit;
 }
 
 if (!isset($User)) {
-  header('Location: /home/login.php');
+  header('location:login.php');
   exit();
 }
 
-include($_SERVER['DOCUMENT_ROOT'].'/home/conexion.php');
-include($_SERVER['DOCUMENT_ROOT'].'/home/vistas/logica/ac_permiso.php');
+include("../conexion.php");
+include("logica/ac_permiso.php");
 
 // Obtención de tiendas a las que tiene acceso el usuario
-$sql = "SELECT cod_tienda FROM `asignacion_tienda` WHERE cod_user = $cod_user";
+$sql = "SELECT cod_tienda FROM `asignacion_tienda` where cod_user = $cod_user";
 $consulta = mysqli_query($conn, $sql);
 while ($fila = mysqli_fetch_array($consulta)) {
   $marcas[] = $fila['cod_tienda'];
