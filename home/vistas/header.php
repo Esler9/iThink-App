@@ -1,24 +1,29 @@
 <?php
 session_start();
 
-$User    = $_SESSION["username"];
-$cod_user = $_SESSION["cod_user"];
+// Definir la ruta absoluta del proyecto y la URL base (ajusta según tu entorno)
+define("BASE_PATH", "C:/xampp/htdocs/App.ithinkguatemala.com/home");
+define("BASE_URL", "/App.ithinkguatemala.com/home");
 
-// Incluir archivos utilizando rutas absolutas basadas en DOCUMENT_ROOT
-require_once($_SERVER["DOCUMENT_ROOT"] . "/App.ithinkguatemala.com/home/Setting.php");
+$User    = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
+$cod_user = isset($_SESSION["cod_user"]) ? $_SESSION["cod_user"] : null;
+
+// Incluir archivo de configuración usando rutas absolutas
+require_once(BASE_PATH . "/Setting.php");
 
 if ($mantenimiento === true) {
-    header("Location: /App.ithinkguatemala.com/home/mantenimiento.php");
+    header("Location: " . BASE_URL . "/mantenimiento.php");
     exit;
 }
 
-if (!isset($User)) {
-    header("Location: /App.ithinkguatemala.com/home/login.php");
+if (!$User) {
+    header("Location: " . BASE_URL . "/login.php");
     exit();
 }
 
-require_once($_SERVER["DOCUMENT_ROOT"] . "/App.ithinkguatemala.com/home/conexion.php");
-require_once($_SERVER["DOCUMENT_ROOT"] . "/App.ithinkguatemala.com/home/vistas/logica/ac_permiso.php");
+// Incluir archivos necesarios usando rutas absolutas
+require_once(BASE_PATH . "/conexion.php");
+require_once(BASE_PATH . "/vistas/logica/ac_permiso.php");
 
 // Obtención de tiendas a las que tiene acceso el usuario
 $sql = "SELECT cod_tienda FROM asignacion_tienda WHERE cod_user = $cod_user";
