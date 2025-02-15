@@ -3,7 +3,7 @@ session_start();
 $User = $_SESSION["username"];
 $cod_user = $_SESSION['cod_user'];
 
-include('../::/Setting.php');
+include('../../Setting.php');
 
 if ($mantenimiento == true) {
   header('location:../../mantenimiento.php');
