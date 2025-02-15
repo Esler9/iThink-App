@@ -43,7 +43,7 @@ if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
   <!-- Incluimos el Sidebar de raíz -->
-  <?php include("sidebar.php"); ?>
+  <?php include("../sidebar.php"); ?>
 
   <!-- Content Wrapper. Contenido de la Página -->
   <div class="content-wrapper">
