@@ -1,4 +1,8 @@
 RewriteEngine On
+
+# Si no es un archivo o directorio existente
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^([^\.]+)$ $1.php [L]  # Cambia .php a la extensión que quieras eliminar
+
+# Reescribe internamente la URL agregando la extensión .php
+RewriteRule ^([^\.]+)$ $1.php [L]
