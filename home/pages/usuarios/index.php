@@ -104,18 +104,18 @@ if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
               </thead>
               <tbody>
                 <?php 
-                $sql = "SELECT * FROM usuarios ORDER BY id ASC";
+                $sql = "SELECT * FROM Usuarios ORDER BY id ASC";
                 $result = mysqli_query($conn, $sql);
                 if($result){
                   while($row = mysqli_fetch_array($result)) {
                     echo "<tr>";
                       echo "<td>" . $row['id'] . "</td>";
-                      echo "<td>" . htmlspecialchars($row['nombre']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['User']) . "</td>";
                       echo "<td>" . htmlspecialchars($row['email']) . "</td>";
-                      echo "<td>" . htmlspecialchars($row['rol']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['state']) . "</td>";
                       echo "<td class='text-right'>";
-                        echo "<a href='editar.php?id=" . $row['id'] . "' class='btn btn-info btn-sm'><i class='fas fa-edit'></i> Editar</a> ";
-                        echo "<a href='eliminar.php?id=" . $row['id'] . "' class='btn btn-danger btn-sm' onclick=\"return confirm('¿Desea eliminar este usuario?');\"><i class='fas fa-trash-alt'></i> Eliminar</a>";
+                        echo "<a href='editar.php?id=" . $row['Codigo'] . "' class='btn btn-info btn-sm'><i class='fas fa-edit'></i> Editar</a> ";
+                        echo "<a href='eliminar.php?id=" . $row['Codigo'] . "' class='btn btn-danger btn-sm' onclick=\"return confirm('¿Desea eliminar este usuario?');\"><i class='fas fa-trash-alt'></i> Eliminar</a>";
                       echo "</td>";
                     echo "</tr>";
                   }
