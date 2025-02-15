@@ -23,7 +23,7 @@ if (!empty($marcas)) {
   $_SESSION['tiendas'] = $tiendas;
 }
 $tiendas = $_SESSION['tiendas'];
-?>
+
 
 // Validar permiso para ver usuarios
 if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
