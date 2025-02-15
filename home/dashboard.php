@@ -108,7 +108,7 @@ $tiendas = $_SESSION['tiendas'];
                 <div class="icon">
                   <i class="fas fa-solid fa-exclamation"></i>
                 </div>
-                <a href="pages/tables/pendientes.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="pages/liberaciones/pendientes.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           <?php endif; ?>
@@ -130,7 +130,7 @@ $tiendas = $_SESSION['tiendas'];
                 <div class="icon">
                   <i class="fas fa-check"></i>
                 </div>
-                <a href="pages/tables/aprobadas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="pages/liberaciones/aprobadas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           <?php endif; ?>
@@ -152,7 +152,7 @@ $tiendas = $_SESSION['tiendas'];
                 <div class="icon">
                   <i class="fas fa-flag-checkered"></i>
                 </div>
-                <a href="pages/tables/finalizadas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="pages/liberaciones/finalizadas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           <?php endif; ?>
