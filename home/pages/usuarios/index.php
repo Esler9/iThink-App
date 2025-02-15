@@ -7,14 +7,13 @@ if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
 
 $User = $_SESSION["username"];
 $cod_user = $_SESSION['cod_user'];
-$page = 3;  // Se pueden usar si deseas validar algún permiso específico
-$pageend = 4;
+
 
 include("../../../conexion.php");
 include("../../logica/ac_permiso.php");
 
 // Validar permiso para ver usuarios
-if (!Tiene_permiso($permisos_user, 'ver-usuarios')) {
+if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
   echo "<script>
           alert('No tienes acceso a esta página.');
           window.location.href = '/home/dashboard.php';
