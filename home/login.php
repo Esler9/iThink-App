@@ -68,7 +68,7 @@ $rememberedUser = isset($_COOKIE['remember_user']) ? $_COOKIE['remember_user'] :
                 </div>
 
                 <?php if (error_loguear()) : ?>
-                    <div class="alert alert-danger" role="alert">
+                    <div class="alert alert-danger text-white" role="alert" style="background-color: #dc3545; color: #ffffff;">
                         <i class="fas fa-exclamation-triangle"></i> Inicio de Sesión Inválido
                     </div>
                 <?php endif; ?>
