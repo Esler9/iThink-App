@@ -73,6 +73,31 @@ $rememberedUser = isset($_COOKIE['remember_user']) ? $_COOKIE['remember_user'] :
                     </div>
                 <?php endif; ?>
 
+                <?php 
+                if (isset($_GET['error'])):
+                    $errorCode = $_GET['error'];
+                    switch($errorCode){
+                        case 1:
+                            $mensaje = "Contraseña incorrecta.";
+                            break;
+                        case 2:
+                            $mensaje = "Faltan datos.";
+                            break;
+                        case 3:
+                            $mensaje = "Token CSRF inválido.";
+                            break;
+                        case 4:
+                            $mensaje = "Usuario no encontrado.";
+                            break;
+                        default:
+                            $mensaje = "Inicio de Sesión Inválido.";
+                    }
+                ?>
+                    <div class="alert alert-danger text-white" role="alert" style="background-color: #dc3545; color: #ffffff;">
+                        <i class="fas fa-exclamation-triangle"></i> <?php echo $mensaje; ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="row">
                     <div class="col-8">
                         <div class="icheck-primary">
