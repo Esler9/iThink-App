@@ -46,7 +46,7 @@ $rememberedUser = isset($_COOKIE['remember_user']) ? $_COOKIE['remember_user'] :
         <div class="card-body login-card-body">
             <p class="login-box-msg">Inicia Sesión</p>
 
-            <form action="<?php echo isset($_GET['linkre']) ? 'logica/loguear.php?linkre=' . htmlspecialchars($_GET['linkre']) : 'logica/loguear.php'; ?>" method="POST">
+            <form action="logica/loguear.php" method="POST">
                 <!-- Token CSRF -->
                 <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
 
