@@ -5,6 +5,8 @@ error_log("Contenido de POST: " . print_r($_POST, true)); // Depuración
 
 include("../../conexion.php");
 
+// Verifica si el mantenimiento está activo
+
 // Verifica si los datos del formulario están presentes
 if (!isset($_POST['usuario']) || !isset($_POST['pass']) || !isset($_POST['csrf_token'])) {
     header("Location: ../login.php?error=2"); // Error si faltan datos
