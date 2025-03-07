@@ -1,76 +1,87 @@
 <?php
 session_start();
 
-error_log("Contenido de POST: " . print_r($_POST, true)); // Depuración
+error_log("Contenido de POST: " . print_r($_POST, true)); // Para depuración (desactivar en producción)
 
 include("../../conexion.php");
 
-// Verifica si el mantenimiento está activo
-
-// Verifica si los datos del formulario están presentes
+// Validar que se hayan recibido todos los campos requeridos
 if (!isset($_POST['usuario']) || !isset($_POST['pass']) || !isset($_POST['csrf_token'])) {
-    header("Location: ../login.php?error=2"); // Error si faltan datos
+    header("Location: ../login.php?error=2"); // Error: faltan datos
     exit();
 }
 
-// Verifica el token CSRF para proteger contra ataques CSRF
+// Verificar que el token CSRF enviado coincida con el almacenado en la sesión
 if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    header("Location: ../login.php?error=3"); // Error de token CSRF
+    header("Location: ../login.php?error=3"); // Error: token CSRF inválido
     exit();
 }
 
+// Escapar datos para prevenir inyección SQL
 $usuario = mysqli_real_escape_string($conn, $_POST['usuario']);
 $pass = mysqli_real_escape_string($conn, $_POST['pass']);
 
-// Consulta para obtener la información del usuario
+// Preparar consulta para obtener la información del usuario
 $sql = "SELECT `Codigo`, `User`, `State`, `cod_tienda`, `Password` 
         FROM Usuarios 
         WHERE User = ?";
 $stmt = mysqli_prepare($conn, $sql);
+if (!$stmt) {
+    error_log("Error en mysqli_prepare: " . mysqli_error($conn));
+    header("Location: ../login.php?error=2");
+    exit();
+}
 mysqli_stmt_bind_param($stmt, 's', $usuario);
 mysqli_stmt_execute($stmt);
 $resultado = mysqli_stmt_get_result($stmt);
 
 if ($row = mysqli_fetch_array($resultado)) {
-    // Verifica la contraseña (se asume hashing)
+    // Verificar la contraseña utilizando password_verify
     if (password_verify($pass, $row['Password'])) {
+        // Configurar variables de sesión
         $_SESSION['username'] = $usuario;
         $_SESSION['cod_user'] = $row['Codigo'];
         $_SESSION['state'] = $row['State'];
 
-        // Consulta de tiendas asignadas al usuario
-        $sql_tiendas = "SELECT cod_tienda FROM `asignacion_tienda` WHERE cod_user = ?";
+        // Consulta para obtener las tiendas asignadas al usuario
+        $sql_tiendas = "SELECT cod_tienda FROM asignacion_tienda WHERE cod_user = ?";
         $stmt_tiendas = mysqli_prepare($conn, $sql_tiendas);
-        mysqli_stmt_bind_param($stmt_tiendas, 'i', $row['Codigo']);
-        mysqli_stmt_execute($stmt_tiendas);
-        $resultado_tiendas = mysqli_stmt_get_result($stmt_tiendas);
-
-        $marcas = [];
-        while ($fila = mysqli_fetch_array($resultado_tiendas)) {
-            $marcas[] = $fila['cod_tienda'];
-        }
-
-        if (!empty($marcas)) {
-            $_SESSION['tiendas'] = implode(', ', $marcas);
+        if ($stmt_tiendas) {
+            mysqli_stmt_bind_param($stmt_tiendas, 'i', $row['Codigo']);
+            mysqli_stmt_execute($stmt_tiendas);
+            $resultado_tiendas = mysqli_stmt_get_result($stmt_tiendas);
+            $marcas = [];
+            while ($fila = mysqli_fetch_array($resultado_tiendas)) {
+                $marcas[] = $fila['cod_tienda'];
+            }
+            if (!empty($marcas)) {
+                $_SESSION['tiendas'] = implode(', ', $marcas);
+            }
+            mysqli_stmt_close($stmt_tiendas);
+        } else {
+            error_log("Error en mysqli_prepare (tiendas): " . mysqli_error($conn));
         }
 
         $_SESSION['tienda_user'] = $row['cod_tienda'];
 
-        // Maneja la opción "Recuérdame"
+        // Manejo de la opción "Recuérdame"
         if (isset($_POST['remember'])) {
             setcookie('remember_user', $usuario, time() + (86400 * 30), "/");
         } else {
             setcookie('remember_user', '', time() - 3600, "/");
         }
 
+        // Redirigir al usuario a la página de destino (dashboard u otra)
         $linkre = isset($_GET['linkre']) ? $_GET['linkre'] : '../dashboard.php';
         header("Location: $linkre");
         exit();
     } else {
+        // Contraseña incorrecta
         header("Location: ../login.php?error=1");
         exit();
     }
 } else {
+    // Usuario no encontrado
     header("Location: ../login.php?error=4");
     exit();
 }
