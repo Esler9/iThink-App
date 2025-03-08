@@ -125,4 +125,4 @@ $rememberedUser = isset($_COOKIE['remember_user']) ? $_COOKIE['remember_user'] :
 
     <!-- Script para mostrar/ocultar contraseña -->
     <script>
-        function togglePassword() {
+        function togglePassword() {}
