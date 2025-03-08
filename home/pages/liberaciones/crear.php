@@ -72,36 +72,49 @@ include("../../logica/ac_permiso.php");
               </div>
               <!-- /.card-header -->
               <div class="card-body">
-
-            
-              <form action="../../logica/accion?accion=0" method="POST">
-                <div class="card-body">
-                <div class="form-group">
-                    <label for="c_imei">Imei:</label>
-                    <input type="text" id="c_imei" name="c_imei" class="form-control" 
-                           placeholder="Ingrese IMEI (15 dígitos que comienzan con 35)" 
-                            maxlength="15" required 
-                           title="El IMEI debe contener 15 dígitos numéricos y comenzar con 35">
+                <form id="crearConsultaForm" action="../../logica/accion?accion=0" method="POST" novalidate>
+                  <div class="card-body">
+                    <div class="form-group">
+                      <label for="c_imei">IMEI:</label>
+                      <input type="text" id="c_imei" name="c_imei" class="form-control" 
+                             placeholder="Ingrese IMEI (15 dígitos que comienzan con 35)"
+                          
+                             maxlength="15" required 
+                             title="El IMEI debe contener 15 dígitos numéricos y comenzar con 35">
+                      <div class="invalid-feedback">
+                        Por favor, ingrese un IMEI válido que tenga 15 dígitos y comience con 35.
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="model">Modelo:</label>
+                      <input type="text" name="model" id="model" class="form-control" 
+                             placeholder="Ingrese el modelo" required>
+                      <div class="invalid-feedback">
+                        El modelo es requerido.
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="name">Nombre:</label>
+                      <input type="text" name="name" id="name" class="form-control" 
+                             placeholder="Ingrese el nombre" required>
+                      <div class="invalid-feedback">
+                        El nombre es requerido.
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="celular">Celular:</label>
+                      <input type="text" name="celular" id="celular" class="form-control" 
+                             placeholder="Ingrese el celular" required>
+                      <div class="invalid-feedback">
+                        El celular es requerido.
+                      </div>
+                    </div>
                   </div>
-                  <div class="form-group">
-                    <label for="model">Modelo:</label>
-                    <input  type="text" name="model"class="form-control" placeholder="Escriba Precio de Liberacion" required>
+                  <!-- /.card-body -->
+                  <div class="card-footer">
+                    <button type="submit" class="btn btn-lg btn-primary">Crear</button>
                   </div>
-                  <div class="form-group">
-                    <label for="name">Nombre:</label>
-                    <input  type="text" name="name"class="form-control" placeholder="Escriba Precio de Liberacion" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="Celular">Celular: </label>
-                    <input  type="text" name="celular"class="form-control" placeholder="Escriba Precio de Liberacion" required>
-                  </div>
-       
-                </div>
-                <!-- /.card-body -->
-                <div class="card-footer">
-                  <button type="submit" class="btn-lg btn-primary" data-toggle="modal" data-target="#modal-default">Crear</button>
-                </div>
-              </form>
+                </form>
               </div>
               <!-- /.card-body -->
             </div>
@@ -209,32 +222,60 @@ include("../../logica/ac_permiso.php");
 </script>
 
 <script>
+// Algoritmo de Luhn para validar el IMEI
 function isValidIMEI(imei) {
-    let sum = 0;
-    let doubleDigit = false;
-    // Recorre el número de derecha a izquierda
-    for (let i = imei.length - 1; i >= 0; i--) {
-        let digit = parseInt(imei.charAt(i), 10);
-        if (doubleDigit) {
-            digit *= 2;
-            if (digit > 9) {
-                digit -= 9;
-            }
-        }
-        sum += digit;
-        doubleDigit = !doubleDigit;
+  let sum = 0;
+  let doubleDigit = false;
+  for (let i = imei.length - 1; i >= 0; i--) {
+    let digit = parseInt(imei.charAt(i), 10);
+    if (doubleDigit) {
+      digit *= 2;
+      if (digit > 9) {
+        digit -= 9;
+      }
     }
-    return (sum % 10 === 0);
+    sum += digit;
+    doubleDigit = !doubleDigit;
+  }
+  return (sum % 10 === 0);
 }
 
-document.getElementById('c_imei').addEventListener('blur', function() {
-    var imei = this.value;
-    if(imei.length === 15) {
-        if (!isValidIMEI(imei)) {
-            alert('El IMEI no es válido según el algoritmo de Luhn.');
-            this.focus();
-        }
+// Activar validación de Bootstrap en el formulario
+(function() {
+  'use strict';
+  var form = document.getElementById('crearConsultaForm');
+  form.addEventListener('submit', function(event) {
+    // Resetear validación custom por IMEI
+    var imeiInput = document.getElementById('c_imei');
+    
+    // Validación HTML5 (pattern, required, etc.)
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
     }
+    
+    // Validación adicional: algoritmo Luhn para el IMEI
+    if (imeiInput.value.length === 15 && !isValidIMEI(imeiInput.value)) {
+      imeiInput.classList.add('is-invalid');
+      imeiInput.nextElementSibling.textContent = 'El IMEI no es válido según el algoritmo de Luhn.';
+      event.preventDefault();
+      event.stopPropagation();
+    } else {
+      imeiInput.classList.remove('is-invalid');
+    }
+
+    form.classList.add('was-validated');
+  }, false);
+})();
+
+// Validación en tiempo real al perder el foco del campo IMEI
+document.getElementById('c_imei').addEventListener('blur', function() {
+  var imei = this.value;
+  if (imei.length === 15 && !isValidIMEI(imei)) {
+    this.classList.add('is-invalid');
+  } else {
+    this.classList.remove('is-invalid');
+  }
 });
 </script>
 </body>
