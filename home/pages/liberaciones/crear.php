@@ -82,7 +82,7 @@ include("../../logica/ac_permiso.php");
                              maxlength="15" required 
                              title="El IMEI debe contener 15 dígitos numéricos y comenzar con 35">
                       <div class="invalid-feedback">
-                        Por favor, ingrese un IMEI válido que tenga 15 dígitos y comience con 35.
+                        Por favor, ingrese un IMEI válido que tenga 15 dígitos 
                       </div>
                     </div>
                     <div class="form-group">
