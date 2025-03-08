@@ -77,12 +77,11 @@ include("../../logica/ac_permiso.php");
                     <div class="form-group">
                       <label for="c_imei">IMEI:</label>
                       <input type="text" id="c_imei" name="c_imei" class="form-control" 
-                             placeholder="Ingrese IMEI (15 dígitos que comienzan con 35)"
-                          
-                             maxlength="15" required 
-                             title="El IMEI debe contener 15 dígitos numéricos y comenzar con 35">
+                             placeholder="Ingrese IMEI (15 dígitos)"
+                             pattern="^\d{15}$" maxlength="15" required 
+                             title="El IMEI debe contener 15 dígitos numéricos">
                       <div class="invalid-feedback">
-                        Por favor, ingrese un IMEI válido que tenga 15 dígitos 
+                        Por favor, ingrese un IMEI válido que tenga 15 dígitos.
                       </div>
                     </div>
                     <div class="form-group">
