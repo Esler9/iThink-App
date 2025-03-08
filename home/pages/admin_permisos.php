@@ -4,6 +4,30 @@
 $grupos = $conn->query("SELECT * FROM grupo_permiso");
 $color_msj = 0;
 
+session_start();
+
+include ('../../Setting.php');
+
+if($mantenimiento == true ){
+  header('location:../../mantenimiento.php');
+  exit;}
+
+// Verificar que las variables de sesión estén configuradas
+if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
+  header('Location: ../../login.php');
+  exit();
+}
+
+$User = htmlspecialchars($_SESSION["username"]);
+$cod_user = htmlspecialchars($_SESSION['cod_user']);
+$page = 2;
+
+include("../logica/ac_permiso.php");
+include("../datos/dt_permisos.php");
+
+
+
+
 // Manejo de formulario
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $codigo = $_POST['codigo'] ?? null;
@@ -65,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <div class="wrapper">
         
+<?php include("sidebar.php"); ?>
     
         <!-- Content Wrapper. Contiene el contenido de la página -->
         <div class="content-wrapper">
