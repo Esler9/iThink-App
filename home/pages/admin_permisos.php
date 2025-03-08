@@ -86,10 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Formulario de Permisos</title>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-<?php include("sidebar.php"); ?>
-<div class="wrapper">
-        
-
+    <!-- Abrir wrapper principal -->
+    <div class="wrapper">
+        <!-- Incluir el sidebar dentro del wrapper -->
+        <?php include("sidebar.php"); ?>
     
         <!-- Content Wrapper. Contiene el contenido de la página -->
         <div class="content-wrapper">
@@ -99,10 +99,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <?php echo htmlspecialchars($_GET['msg']); ?>
                     </div>
                 <?php endif; ?>
-
+    
                 <!-- Botón para mostrar el formulario de crear permiso -->
                 <button id="crearPermisoBtn" class="btn btn-primary mb-3">Crear Permiso</button>
-
+    
                 <!-- Formulario oculto inicialmente para crear permiso -->
                 <div id="formularioPermiso" style="display: none;">
                     <h1>Crear Permiso</h1>
@@ -111,12 +111,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <label for="nombre_permiso">Nombre del Permiso:</label>
                             <input type="text" name="nombre_permiso" class="form-control" required>
                         </div>
-
+    
                         <div class="form-group">
                             <label for="des_permiso">Descripción:</label>
                             <textarea name="des_permiso" class="form-control"></textarea>
                         </div>
-
+    
                         <div class="form-group">
                             <label for="group_permiso">Grupo de Permiso:</label>
                             <select name="group_permiso" class="form-control" required>
@@ -127,13 +127,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <?php endwhile; ?>
                             </select>
                         </div>
-
+    
                         <button type="submit" class="btn btn-primary mt-3">Crear</button>
                     </form>
                 </div>
-
+    
                 <h2>Permisos Existentes</h2>
-
+    
                 <table id="permisoTable" class="table table-striped">
                     <thead>
                         <tr>
@@ -150,20 +150,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $result = $conn->query("SELECT p.codigo, p.nombre_permiso, p.des_permiso, g.nombre_grupo_p, p.slug FROM Permiso p JOIN grupo_permiso g ON p.group_permiso = g.codigo");
                         while ($permiso_existente = $result->fetch_assoc()):
                         ?>
-                            <tr>
-                                <td><?php echo $permiso_existente['codigo']; ?></td>
-                                <td><?php echo $permiso_existente['nombre_permiso']; ?></td>
-                                <td><?php echo $permiso_existente['des_permiso']; ?></td>
-                                <td><?php echo $permiso_existente['nombre_grupo_p']; ?></td>
-                                <td><?php echo $permiso_existente['slug']; ?></td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm editPermisoBtn" data-codigo="<?php echo $permiso_existente['codigo']; ?>"
-                                            data-nombre="<?php echo $permiso_existente['nombre_permiso']; ?>"
-                                            data-descripcion="<?php echo $permiso_existente['des_permiso']; ?>"
-                                            data-grupo="<?php echo $permiso_existente['nombre_grupo_p']; ?>">Editar
-                                    </button>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td><?php echo $permiso_existente['codigo']; ?></td>
+                            <td><?php echo $permiso_existente['nombre_permiso']; ?></td>
+                            <td><?php echo $permiso_existente['des_permiso']; ?></td>
+                            <td><?php echo $permiso_existente['nombre_grupo_p']; ?></td>
+                            <td><?php echo $permiso_existente['slug']; ?></td>
+                            <td>
+                                <button class="btn btn-warning btn-sm editPermisoBtn" data-codigo="<?php echo $permiso_existente['codigo']; ?>"
+                                        data-nombre="<?php echo $permiso_existente['nombre_permiso']; ?>"
+                                        data-descripcion="<?php echo $permiso_existente['des_permiso']; ?>"
+                                        data-grupo="<?php echo $permiso_existente['nombre_grupo_p']; ?>">Editar
+                                </button>
+                            </td>
+                        </tr>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
