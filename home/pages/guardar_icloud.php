@@ -94,7 +94,7 @@ $result = $conn->query($sql);
         <div class="container-fluid">
             <div class="container mt-5">
                 <h2 class="text-center">Agregar Cuenta de iCloud</h2>
-                <form id="icloudForm" action="/home/logica/accion_icloud" method="POST">
+                <form id="icloudForm" action="/home/logica/accion_icloud.php" method="POST">
                     <div class="form-group">
                         <label for="name">Nombre:</label>
                         <input type="text" class="form-control" name="name" required>

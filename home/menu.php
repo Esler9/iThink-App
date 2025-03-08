@@ -26,7 +26,11 @@
                     <i class="fas fa-search"></i>
                 </a>
                 <div class="navbar-search-block">
+<<<<<<< HEAD
                     <form class="form-inline" action="/home/Liberaciones/liberaciones/buscar" method="GET">
+=======
+                    <form class="form-inline" action="/home/pages/liberaciones/buscar.php" method="GET">
+>>>>>>> parent of 035640b (Actualizar rutas de acción en formularios para eliminar extensiones de archivo)
                         <div class="input-group input-group-sm">
                             <input class="form-control form-control-navbar" name="search" type="search" placeholder="Buscar" aria-label="Search">
                             <div class="input-group-append">

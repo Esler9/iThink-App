@@ -75,7 +75,8 @@ $rememberedUser = isset($_COOKIE['remember_user']) ? $_COOKIE['remember_user'] :
                     </div>
                 <?php endif; ?>
 
-                <!-- Formulario de Login -->                <form action="/home/logica/loguear" method="POST">
+                <!-- Formulario de Login -->
+                <form action="/home/logica/loguear" method="POST">
                     <!-- Token CSRF -->
                     <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
 

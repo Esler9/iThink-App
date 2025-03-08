@@ -2,7 +2,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <!-- Agregamos enctype para permitir la subida de archivos -->
-      <form id="editProfileForm" action="/home/logica/actualizar_usuario" method="post" enctype="multipart/form-data">
+      <form id="editProfileForm" action="/home/logica/actualizar_usuario.php" method="post" enctype="multipart/form-data">
         <div class="modal-header">
           <h5 class="modal-title" id="modal_userLabel">Editar Perfil</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
