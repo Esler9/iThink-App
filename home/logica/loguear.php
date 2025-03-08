@@ -1,34 +1,55 @@
 <?php
 session_start();
 
-error_log("DEBUG: Inicio de loguear.php");
-error_log("DEBUG: Contenido de POST: " . print_r($_POST, true));
+$DEBUG_MODE = true; // Cambia a false en producción
+$debugMessages = [];
+
+$debugMessages[] = "DEBUG: Inicio de loguear.php";
+$debugMessages[] = "DEBUG: Contenido de POST: " . print_r($_POST, true);
 
 include("../../conexion.php");
 
 // Verificar si cada variable se recibió y generar mensajes de depuración
 if (!isset($_POST['usuario'])) {
-    error_log("DEBUG: Variable 'usuario' no recibida en POST.");
+    $msg = "DEBUG: Variable 'usuario' no recibida en POST.";
+    error_log($msg);
+    $debugMessages[] = $msg;
 }
 if (!isset($_POST['pass'])) {
-    error_log("DEBUG: Variable 'pass' no recibida en POST.");
+    $msg = "DEBUG: Variable 'pass' no recibida en POST.";
+    error_log($msg);
+    $debugMessages[] = $msg;
 }
 if (!isset($_POST['csrf_token'])) {
-    error_log("DEBUG: Variable 'csrf_token' no recibida en POST.");
+    $msg = "DEBUG: Variable 'csrf_token' no recibida en POST.";
+    error_log($msg);
+    $debugMessages[] = $msg;
 }
 
 // Validar que se hayan recibido todos los campos requeridos
 if (!isset($_POST['usuario']) || !isset($_POST['pass']) || !isset($_POST['csrf_token'])) {
-    error_log("DEBUG: Faltan datos en POST. usuario:" . (isset($_POST['usuario']) ? "si" : "no") .
+    $msg = "DEBUG: Faltan datos en POST. usuario:" . (isset($_POST['usuario']) ? "si" : "no") .
         ", pass:" . (isset($_POST['pass']) ? "si" : "no") .
-        ", csrf_token:" . (isset($_POST['csrf_token']) ? "si" : "no"));
+        ", csrf_token:" . (isset($_POST['csrf_token']) ? "si" : "no");
+    error_log($msg);
+    $debugMessages[] = $msg;
+    if ($DEBUG_MODE) {
+        echo "<pre>" . implode("\n", $debugMessages) . "</pre>";
+        exit();
+    }
     header("Location: ../login.php?error=2"); // Error: faltan datos
     exit();
 }
 
 // Verificar que el token CSRF enviado coincida con el almacenado en la sesión
 if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    error_log("DEBUG: Token CSRF inválido. POST: " . $_POST['csrf_token'] . " | Sesión: " . $_SESSION['csrf_token']);
+    $msg = "DEBUG: Token CSRF inválido. POST: " . $_POST['csrf_token'] . " | Sesión: " . (isset($_SESSION['csrf_token']) ? $_SESSION['csrf_token'] : 'no token');
+    error_log($msg);
+    $debugMessages[] = $msg;
+    if ($DEBUG_MODE) {
+        echo "<pre>" . implode("\n", $debugMessages) . "</pre>";
+        exit();
+    }
     header("Location: ../login.php?error=3"); // Error: token CSRF inválido
     exit();
 }
@@ -43,7 +64,13 @@ $sql = "SELECT `Codigo`, `User`, `State`, `cod_tienda`, `Password`
         WHERE User = ?";
 $stmt = mysqli_prepare($conn, $sql);
 if (!$stmt) {
-    error_log("DEBUG: Error en mysqli_prepare: " . mysqli_error($conn));
+    $msg = "DEBUG: Error en mysqli_prepare: " . mysqli_error($conn);
+    error_log($msg);
+    $debugMessages[] = $msg;
+    if ($DEBUG_MODE) {
+        echo "<pre>" . implode("\n", $debugMessages) . "</pre>";
+        exit();
+    }
     header("Location: ../login.php?error=5"); // Error: fallo en la preparación de la consulta
     exit();
 }
@@ -75,7 +102,9 @@ if ($row = mysqli_fetch_array($resultado)) {
             }
             mysqli_stmt_close($stmt_tiendas);
         } else {
-            error_log("Error en mysqli_prepare (tiendas): " . mysqli_error($conn));
+            $msg = "DEBUG: Error en mysqli_prepare (tiendas): " . mysqli_error($conn);
+            error_log($msg);
+            $debugMessages[] = $msg;
         }
 
         $_SESSION['tienda_user'] = $row['cod_tienda'];
@@ -92,12 +121,24 @@ if ($row = mysqli_fetch_array($resultado)) {
         header("Location: $linkre");
         exit();
     } else {
-        // Contraseña incorrecta
+        $msg = "DEBUG: Contraseña incorrecta para usuario: " . $usuario;
+        error_log($msg);
+        $debugMessages[] = $msg;
+        if ($DEBUG_MODE) {
+            echo "<pre>" . implode("\n", $debugMessages) . "</pre>";
+            exit();
+        }
         header("Location: ../login.php?error=1");
         exit();
     }
 } else {
-    // Usuario no encontrado
+    $msg = "DEBUG: Usuario no encontrado: " . $usuario;
+    error_log($msg);
+    $debugMessages[] = $msg;
+    if ($DEBUG_MODE) {
+        echo "<pre>" . implode("\n", $debugMessages) . "</pre>";
+        exit();
+    }
     header("Location: ../login.php?error=4");
     exit();
 }
