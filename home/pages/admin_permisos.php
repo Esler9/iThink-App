@@ -61,9 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Formulario de Permisos</title>
 </head>
 <body>
-<?php
-// Include the sidebar  
-include "../sidebar.php"; ?>
+<?php include("sidebar.php"); ?>
 
     <div class="container mt-5">
         <?php if (isset($_GET['msg'])): ?>
