@@ -1,7 +1,4 @@
-<?php
-
-session_start();
-include '../../conexion.php';
+<?php include '../../conexion.php';
 
 // Obtener grupos de permisos
 $grupos = $conn->query("SELECT * FROM grupo_permiso");
@@ -51,26 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $stmt->close();
 }
-
-include ('../../Setting.php');
-
-if($mantenimiento == true ){
-  header('location:../../mantenimiento.php');
-  exit;}
-
-// Verificar que las variables de sesión estén configuradas
-if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
-  header('Location: ../../login.php');
-  exit();
-}
-
-$User = htmlspecialchars($_SESSION["username"]);
-$cod_user = htmlspecialchars($_SESSION['cod_user']);
-$page = 2;
-
-include("../logica/ac_permiso.php");
-include("../datos/dt_permisos.php");
-
 ?>
 
 <!DOCTYPE html>
@@ -82,21 +59,10 @@ include("../datos/dt_permisos.php");
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Formulario de Permisos</title>
-    <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
-  <!-- DataTables -->
-  <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-  <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="../dist/css/adminlte.min.css">
-  <link rel="stylesheet" href="../dist/css/app.css">
 </head>
 <body>
 
-<?php include("sidebar.php"); ?>
+
     <div class="container mt-5">
         <?php if (isset($_GET['msg'])): ?>
             <div class="alert <?php echo $color_msj == 1 ? 'alert-success' : 'alert-danger'; ?>" role="alert">
