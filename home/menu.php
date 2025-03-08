@@ -26,7 +26,7 @@
                     <i class="fas fa-search"></i>
                 </a>
                 <div class="navbar-search-block">
-                    <form class="form-inline" action="/home/pages/liberaciones/buscar.php" method="GET">
+                    <form class="form-inline" action="/home/pages/liberaciones/buscar" method="GET">
                         <div class="input-group input-group-sm">
                             <input class="form-control form-control-navbar" name="search" type="search" placeholder="Buscar" aria-label="Search">
                             <div class="input-group-append">

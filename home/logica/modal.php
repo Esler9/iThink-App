@@ -359,7 +359,7 @@
             <!-- Cuerpo del Modal -->
             <div class="modal-body">
                 <!-- Formulario para reiniciar -->
-                <form action="../../logica/accion.php" method="POST">
+                <form action="../../logica/accion" method="POST">
                     <input type="hidden" name="accion" value="2.1">
                     <input type="hidden" name="imei" value="<?php echo urlencode($row['serie']); ?>">
                     <div class="card-body">
