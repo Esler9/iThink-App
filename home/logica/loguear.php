@@ -7,7 +7,7 @@ include("../../conexion.php");
 
 // Validar que se hayan recibido todos los campos requeridos
 if (!isset($_POST['usuario']) || !isset($_POST['pass']) || !isset($_POST['csrf_token'])) {
-    header("Location: ../login.php?error=2"); // Error: faltan datos
+    header("Location: ../login.php?error=6"); // Error: faltan datos
     exit();
 }
 
