@@ -1,16 +1,12 @@
-<?php include '../../conexion.php';
-
-// Obtener grupos de permisos
-$grupos = $conn->query("SELECT * FROM grupo_permiso");
-$color_msj = 0;
-
+<?php 
 session_start();
-
+include '../../conexion.php';
 include ('../../Setting.php');
 
-if($mantenimiento == true ){
+if($mantenimiento == true){
   header('location:../../mantenimiento.php');
-  exit;}
+  exit();
+}
 
 // Verificar que las variables de sesión estén configuradas
 if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
@@ -22,13 +18,11 @@ $User = htmlspecialchars($_SESSION["username"]);
 $cod_user = htmlspecialchars($_SESSION['cod_user']);
 $page = 2;
 
+// Otras inclusiones y manejo de formularios...
 include("../logica/ac_permiso.php");
 include("../datos/dt_permisos.php");
 
-
-
-
-// Manejo de formulario
+// Manejo de formulario de permisos...
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $codigo = $_POST['codigo'] ?? null;
     $nombre_permiso = $_POST['nombre_permiso'];
@@ -73,16 +67,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->close();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <link rel="icon" href="/home/dist/img/logo_ithinkguatemala.png" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Estilos de Bootstrap y DataTables -->
+    <!-- Estilos de Bootstrap, DataTables y AdminLTE -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/home/dist/css/adminlte.min.css">
     <title>Formulario de Permisos</title>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -111,12 +105,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <label for="nombre_permiso">Nombre del Permiso:</label>
                             <input type="text" name="nombre_permiso" class="form-control" required>
                         </div>
-    
                         <div class="form-group">
                             <label for="des_permiso">Descripción:</label>
                             <textarea name="des_permiso" class="form-control"></textarea>
                         </div>
-    
                         <div class="form-group">
                             <label for="group_permiso">Grupo de Permiso:</label>
                             <select name="group_permiso" class="form-control" required>
@@ -127,13 +119,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <?php endwhile; ?>
                             </select>
                         </div>
-    
                         <button type="submit" class="btn btn-primary mt-3">Crear</button>
                     </form>
                 </div>
     
                 <h2>Permisos Existentes</h2>
-    
                 <table id="permisoTable" class="table table-striped">
                     <thead>
                         <tr>
@@ -157,10 +147,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <td><?php echo $permiso_existente['nombre_grupo_p']; ?></td>
                             <td><?php echo $permiso_existente['slug']; ?></td>
                             <td>
-                                <button class="btn btn-warning btn-sm editPermisoBtn" data-codigo="<?php echo $permiso_existente['codigo']; ?>"
+                                <button class="btn btn-warning btn-sm editPermisoBtn" 
+                                        data-codigo="<?php echo $permiso_existente['codigo']; ?>"
                                         data-nombre="<?php echo $permiso_existente['nombre_permiso']; ?>"
                                         data-descripcion="<?php echo $permiso_existente['des_permiso']; ?>"
-                                        data-grupo="<?php echo $permiso_existente['nombre_grupo_p']; ?>">Editar
+                                        data-grupo="<?php echo $permiso_existente['nombre_grupo_p']; ?>">
+                                    Editar
                                 </button>
                             </td>
                         </tr>
@@ -171,59 +163,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
         <!-- /.content-wrapper -->
-    
-        <!-- Modal de edición -->
-        <div class="modal fade" id="editPermisoModal" tabindex="-1" aria-labelledby="editPermisoLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form method="POST" id="editPermisoForm">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editPermisoLabel">Editar Permiso</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <input type="hidden" name="codigo" id="editCodigo">
-
-                            <div class="form-group">
-                                <label for="editNombrePermiso">Nombre del Permiso:</label>
-                                <input type="text" name="nombre_permiso" id="editNombrePermiso" class="form-control" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="editDesPermiso">Descripción:</label>
-                                <textarea name="des_permiso" id="editDesPermiso" class="form-control"></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="editGroupPermiso">Grupo de Permiso:</label>
-                                <select name="group_permiso" id="editGroupPermiso" class="form-control" required>
-                                    <?php
-                                    // Se vuelve a consultar para llenar el select
-                                    $grupos = $conn->query("SELECT * FROM grupo_permiso");
-                                    while ($grupo = $grupos->fetch_assoc()):
-                                    ?>
-                                        <option value="<?php echo $grupo['codigo']; ?>"><?php echo $grupo['nombre_grupo_p']; ?></option>
-                                    <?php endwhile; ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    
+        <!-- Aquí puedes incluir modals adicionales u otros componentes -->
     </div>
     <!-- /.wrapper -->
     
-    <!-- JavaScript -->
+    <!-- Scripts JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/home/dist/js/adminlte.min.js"></script>
     
     <script>
         $(document).ready(function() {
@@ -235,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $('#formularioPermiso').toggle();
             });
     
-            // Delegación de eventos para el botón de editar
+            // Delegar eventos para el botón de editar
             $('#permisoTable').on('click', '.editPermisoBtn', function() {
                 var codigo = $(this).data('codigo');
                 var nombre = $(this).data('nombre');
@@ -248,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $('#editDesPermiso').val(descripcion);
                 $('#editGroupPermiso').val(grupo);
     
-                // Mostrar el modal
+                // Mostrar el modal de edición (asegúrate de tener el modal en la página)
                 $('#editPermisoModal').modal('show');
             });
         });
