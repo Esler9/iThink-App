@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Formulario de Permisos</title>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-<?php include("sidebar.php"); ?>   
+
 <div class="wrapper">
         
     
