@@ -193,7 +193,7 @@ HTML;
     $content .= <<<HTML
     </div>
     <div class="cta">
-        <a href="https://app.ithinkguatemala.com/home/Liberaciones/tables/buscar.php?search={$datos['imei']}" target="_blank">$ctaText</a>
+        <a href="https://app.ithinkguatemala.com/home/pages/tables/buscar.php?search={$datos['imei']}" target="_blank">$ctaText</a>
     </div>
 </div>
 HTML;

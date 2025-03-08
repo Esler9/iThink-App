@@ -27,10 +27,14 @@
                 </a>
                 <div class="navbar-search-block">
 <<<<<<< HEAD
+<<<<<<< HEAD
                     <form class="form-inline" action="/home/Liberaciones/liberaciones/buscar" method="GET">
 =======
                     <form class="form-inline" action="/home/pages/liberaciones/buscar.php" method="GET">
 >>>>>>> parent of 035640b (Actualizar rutas de acción en formularios para eliminar extensiones de archivo)
+=======
+                    <form class="form-inline" action="/home/pages/liberaciones/buscar" method="GET">
+>>>>>>> parent of f0c236a (Renombrar "Pages" a "Liberaciones" en archivos SCSS, HTML y PHP para mejorar la consistencia del proyecto)
                         <div class="input-group input-group-sm">
                             <input class="form-control form-control-navbar" name="search" type="search" placeholder="Buscar" aria-label="Search">
                             <div class="input-group-append">
@@ -112,41 +116,41 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/liberaciones/crear.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/crear.php" class="nav-link">
                                     <i class="fas fa-plus nav-icon"></i>
                                     <p>Crear Consulta</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/liberaciones/consultas.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/consultas.php" class="nav-link">
                                     <i class="fas fa-question-circle nav-icon"></i>
                                     <p>Consultas</p>
                                     <span class="badge badge-info right"><?php echo $con; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/liberaciones/pendientes.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/pendientes.php" class="nav-link">
                                     <i class="fas fa-exclamation-triangle nav-icon"></i>
                                     <p>Pendientes</p>
                                     <span class="badge badge-danger right"><?php echo $pen; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/liberaciones/aprobadas.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/aprobadas.php" class="nav-link">
                                     <i class="fas fa-check-circle nav-icon"></i>
                                     <p>Aprobadas</p>
                                     <span class="badge badge-success right"><?php echo $apro; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/liberaciones/finalizadas.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/finalizadas.php" class="nav-link">
                                     <i class="fas fa-handshake nav-icon"></i>
                                     <p>Finalizadas</p>
                                     <span class="badge badge-warning right"><?php echo $fin; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/liberaciones/rechazadas.php" class="nav-link">
+                                <a href="/home/pages/liberaciones/rechazadas.php" class="nav-link">
                                     <i class="fas fa-times-circle nav-icon"></i>
                                     <p>Rechazadas</p>
                                     <span class="badge badge-danger right"><?php echo $recha; ?></span>
@@ -158,7 +162,7 @@
                     <!-- iCloud (Permisos) -->
                     <?php if(Tiene_permiso($permisos_user, 'ver-icloud')) { ?>
                     <li class="nav-item has-treeview">
-                        <a href="/home/Liberaciones/permisos_view.php" class="nav-link">
+                        <a href="/home/pages/permisos_view.php" class="nav-link">
                             <i class="nav-icon fas fa-cloud"></i>
                             <p>
                                 iCloud
@@ -167,13 +171,13 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/guardar_icloud.php" class="nav-link">
+                                <a href="/home/pages/guardar_icloud.php" class="nav-link">
                                     <i class="fas fa-cloud-upload-alt nav-icon"></i>
                                     <p>Guardar iCloud</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/admin_permisos.php" class="nav-link">
+                                <a href="/home/pages/admin_permisos.php" class="nav-link">
                                     <i class="fas fa-envelope nav-icon"></i>
                                     <p>Enviar Correo a iCloud</p>
                                 </a>
@@ -194,13 +198,13 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/clientes/clientes.php" class="nav-link">
+                                <a href="/home/pages/clientes/clientes.php" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i>
                                     <p>Lista de Clientes</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/clientes/seguimiento.php" class="nav-link">
+                                <a href="/home/pages/clientes/seguimiento.php" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i>
                                     <p>Seguimientos de Clientes</p>
                                 </a>
@@ -221,7 +225,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/form_garantia.php" class="nav-link">
+                                <a href="/home/pages/form_garantia.php" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i>
                                     <p>Iniciar Garantía</p>
                                 </a>
@@ -233,7 +237,7 @@
                     <!-- Permisos -->
                     <?php if(Tiene_permiso($permisos_user, 'ver_permiso')) { ?>
                     <li class="nav-item has-treeview">
-                        <a href="/home/Liberaciones/permisos_view.php" class="nav-link">
+                        <a href="/home/pages/permisos_view.php" class="nav-link">
                             <i class="nav-icon fas fa-user-shield"></i>
                             <p>
                                 Permisos
@@ -242,13 +246,13 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/permisos_view.php" class="nav-link">
+                                <a href="/home/pages/permisos_view.php" class="nav-link">
                                     <i class="fas fa-users nav-icon"></i>
                                     <p>Permisos para Grupos</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/admin_permisos.php" class="nav-link">
+                                <a href="/home/pages/admin_permisos.php" class="nav-link">
                                     <i class="fas fa-user-cog nav-icon"></i>
                                     <p>Administrar Permisos</p>
                                 </a>
@@ -269,13 +273,13 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/empleados/lista.php" class="nav-link">
+                                <a href="/home/pages/empleados/lista.php" class="nav-link">
                                     <i class="fas fa-list nav-icon"></i>
                                     <p>Listado de Empleados</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/empleados/nuevo.php" class="nav-link">
+                                <a href="/home/pages/empleados/nuevo.php" class="nav-link">
                                     <i class="fas fa-user-plus nav-icon"></i>
                                     <p>Nuevo Empleado</p>
                                 </a>
@@ -294,13 +298,13 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/horarios/configurar.php" class="nav-link">
+                                <a href="/home/pages/horarios/configurar.php" class="nav-link">
                                     <i class="fas fa-cog nav-icon"></i>
                                     <p>Configurar Horarios</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/horarios/marcar.php" class="nav-link">
+                                <a href="/home/pages/horarios/marcar.php" class="nav-link">
                                     <i class="fas fa-edit nav-icon"></i>
                                     <p>Marcar Asistencia</p>
                                 </a>
@@ -319,13 +323,13 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/tares/lista.php" class="nav-link">
+                                <a href="/home/pages/tares/lista.php" class="nav-link">
                                     <i class="fas fa-list nav-icon"></i>
                                     <p>Listado de Tares</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/tares/nuevo.php" class="nav-link">
+                                <a href="/home/pages/tares/nuevo.php" class="nav-link">
                                     <i class="fas fa-plus nav-icon"></i>
                                     <p>Nueva Tarea</p>
                                 </a>
@@ -344,13 +348,13 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/usuarios/index.php" class="nav-link">
+                                <a href="/home/pages/usuarios/index.php" class="nav-link">
                                     <i class="fas fa-list nav-icon"></i>
                                     <p>Listado de Usuarios</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/Liberaciones/usuarios/nuevo.php" class="nav-link">
+                                <a href="/home/pages/usuarios/nuevo.php" class="nav-link">
                                     <i class="fas fa-user-plus nav-icon"></i>
                                     <p>Nuevo Usuario</p>
                                 </a>

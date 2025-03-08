@@ -39,7 +39,7 @@ childProcess.exec('java -version', (error, stdout, stderr) => {
     `--filterpattern "${ignores}"`,
     './*.html',
     'docs_html/',
-    'Liberaciones/'
+    'pages/'
   ]
 
   // For the 32-bit Java we need to pass `-Xss512k`

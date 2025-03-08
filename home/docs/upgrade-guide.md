@@ -55,7 +55,7 @@ Like above the biggest change is the Main Sidebar contains now the Logo and the 
 Old sample entry
 ```html
 <li>
-  <a href="Liberaciones/widgets.html">
+  <a href="pages/widgets.html">
     <i class="fa fa-th"></i> <span>Widgets</span>
     <span class="pull-right-container">
       <small class="label pull-right bg-green">new</small>
@@ -68,7 +68,7 @@ Old sample entry
 New sample entry
 ```html
 <li class="nav-item">
-  <a href="Liberaciones/widgets.html" class="nav-link">
+  <a href="pages/widgets.html" class="nav-link">
     <i class="nav-icon fas fa-th"></i>
     <p>
       Widgets

@@ -84,9 +84,9 @@ if (isset($_GET['accion'])) {
                 $body = correo_enviar("consulta", $datos);
                 reenviarCorreo($correos, $imei, $body);
 
-                header("location:../Liberaciones/tables/crear.php?alert=0&imei=$imei&model=$model&name=$name&celular=$celular");
+                header("location:../pages/tables/crear.php?alert=0&imei=$imei&model=$model&name=$name&celular=$celular");
             } else {
-                header("location:../Liberaciones/tables/crear.php?alert=33&imei=$imei");
+                header("location:../pages/tables/crear.php?alert=33&imei=$imei");
             }
             break;
 
@@ -104,7 +104,7 @@ if (isset($_GET['accion'])) {
             ]);
             $body = correo_enviar("pendiente", $datos);
             reenviarCorreo($correos, $imei, $body);
-            header("location:../Liberaciones/tables/consultas.php?alert=1&imei=$imei");
+            header("location:../pages/tables/consultas.php?alert=1&imei=$imei");
             break;
 
         case "5.1":
@@ -113,7 +113,7 @@ if (isset($_GET['accion'])) {
             mysqli_query($conn, $sql);
             $body = correo_enviar("rechazado", $datosCommon);
             reenviarCorreo($correos, $imei, $body);
-            header("location:../Liberaciones/tables/consultas.php?alert=5&imei=$imei");
+            header("location:../pages/tables/consultas.php?alert=5&imei=$imei");
             break;
 
         case "2":
@@ -122,7 +122,7 @@ if (isset($_GET['accion'])) {
             mysqli_query($conn, $sql);
             $body = correo_enviar("aprobado", $datosCommon);
             reenviarCorreo($correos, $imei, $body);
-            header("location:../Liberaciones/tables/pendientes.php?alert=2&imei=$imei");
+            header("location:../pages/tables/pendientes.php?alert=2&imei=$imei");
             break;
 
         case "2.1":
@@ -138,7 +138,7 @@ if (isset($_GET['accion'])) {
             ]);
             $body = correo_enviar("consultaReiniciada", $datos);
             reenviarCorreo($correos, $imei, $body);
-            header("location:../Liberaciones/tables/rechazadas.php?alert=2.1&imei=$imei");
+            header("location:../pages/tables/rechazadas.php?alert=2.1&imei=$imei");
             break;
 
         case "5.2":
@@ -147,7 +147,7 @@ if (isset($_GET['accion'])) {
             mysqli_query($conn, $sql);
             $body = correo_enviar("rechazado", $datosCommon);
             reenviarCorreo($correos, $imei, $body);
-            header("location:../Liberaciones/tables/pendientes.php?alert=5&imei=$imei");
+            header("location:../pages/tables/pendientes.php?alert=5&imei=$imei");
             break;
 
         case "5.3":
@@ -156,7 +156,7 @@ if (isset($_GET['accion'])) {
             mysqli_query($conn, $sql);
             $body = correo_enviar("rechazado", $datosCommon);
             reenviarCorreo($correos, $imei, $body);
-            header("location:../Liberaciones/tables/aprobadas.php?alert=5&imei=$imei");
+            header("location:../pages/tables/aprobadas.php?alert=5&imei=$imei");
             break;
 
         case "5.4":
@@ -165,7 +165,7 @@ if (isset($_GET['accion'])) {
             mysqli_query($conn, $sql);
             $body = correo_enviar("rechazada", $datosCommon);
             reenviarCorreo($correos, $imei, $body);
-            header("location:../Liberaciones/tables/finalizadas.php?alert=5&imei=$imei");
+            header("location:../pages/tables/finalizadas.php?alert=5&imei=$imei");
             break;
 
         case "3":
@@ -174,7 +174,7 @@ if (isset($_GET['accion'])) {
             mysqli_query($conn, $sql);
             $body = correo_enviar("iniciado", $datosCommon);
             reenviarCorreo($correos, $imei, $body);
-            header("location:../Liberaciones/tables/aprobadas.php?alert=3&imei=$imei");
+            header("location:../pages/tables/aprobadas.php?alert=3&imei=$imei");
             break;
 
         case "4":
@@ -183,7 +183,7 @@ if (isset($_GET['accion'])) {
             mysqli_query($conn, $sql);
             $body = correo_enviar("finalizado", $datosCommon);
             reenviarCorreo($correos, $imei, $body);
-            header("location:../Liberaciones/tables/aprobadas.php?alert=4&imei=$imei");
+            header("location:../pages/tables/aprobadas.php?alert=4&imei=$imei");
             break;
 
         default:

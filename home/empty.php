@@ -125,7 +125,7 @@ include("../../logica/ac_permiso.php");
 <script src="/home/dist/js/adminlte.js"></script>
 
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="/home/dist/js/Liberaciones/dashboard.js"></script>
+<script src="/home/dist/js/pages/dashboard.js"></script>
 
 
 </body>
