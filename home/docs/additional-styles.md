@@ -31,7 +31,7 @@ $theme-colors: map-merge((
 @import '~admin-lte/build/scss/parts/core';
 @import '~admin-lte/build/scss/parts/components';
 @import '~admin-lte/build/scss/parts/extra-components';
-@import '~admin-lte/build/scss/parts/pages';
+@import '~admin-lte/build/scss/parts/Liberaciones';
 @import '~admin-lte/build/scss/parts/plugins';
 @import '~admin-lte/build/scss/parts/miscellaneous';
 

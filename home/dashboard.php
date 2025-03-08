@@ -57,7 +57,7 @@ include('vistas/header.php');
                 <div class="icon">
                   <i class="fas fa-solid fa-question"></i>
                 </div>
-                <a href="pages/liberaciones/consultas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="Liberaciones/liberaciones/consultas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           <?php endif; ?>
@@ -79,7 +79,7 @@ include('vistas/header.php');
                 <div class="icon">
                   <i class="fas fa-solid fa-exclamation"></i>
                 </div>
-                <a href="pages/liberaciones/pendientes.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="Liberaciones/liberaciones/pendientes.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           <?php endif; ?>
@@ -101,7 +101,7 @@ include('vistas/header.php');
                 <div class="icon">
                   <i class="fas fa-check"></i>
                 </div>
-                <a href="pages/liberaciones/aprobadas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="Liberaciones/liberaciones/aprobadas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           <?php endif; ?>
@@ -123,7 +123,7 @@ include('vistas/header.php');
                 <div class="icon">
                   <i class="fas fa-flag-checkered"></i>
                 </div>
-                <a href="pages/liberaciones/finalizadas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="Liberaciones/liberaciones/finalizadas.php" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           <?php endif; ?>

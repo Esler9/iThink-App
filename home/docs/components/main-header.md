@@ -9,7 +9,7 @@ title: Main Header Component
 
 
 > ##### Tip!
-> If you go through the example pages and would like to copy a component, right-click on the component and choose "inspect element" to get to the HTML quicker than scanning the HTML page.
+> If you go through the example Liberaciones and would like to copy a component, right-click on the component and choose "inspect element" to get to the HTML quicker than scanning the HTML page.
 {: .quote-info}
 
 The main header contains the navbar. Construction of the navbar differs slightly from Bootstrap because it has components that Bootstrap doesn't provide. The navbar can be constructed in two ways. This is an example for the normal navbar and next we will provide an example for the top nav layout with a logo too.
@@ -289,7 +289,7 @@ The main header contains the navbar. Construction of the navbar differs slightly
 > To use this main header instead of the regular one, you must add the `layout-top-nav` class to the body tag.
 {: .quote-orange}
 
-Top navbar example can be found in this [demo page](https://adminlte.io/themes/dev/AdminLTE/pages/layout/top-nav.html). 
+Top navbar example can be found in this [demo page](https://adminlte.io/themes/dev/AdminLTE/Liberaciones/layout/top-nav.html). 
 
 
 <nav class="navbar navbar-expand navbar-light navbar-white">

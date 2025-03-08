@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-header("location: /home/pages/permisos_view.php")
+header("location: /home/Liberaciones/permisos_view.php")
 
 
 ?>

@@ -20,4 +20,4 @@ AdminLTE is an open source project that is licensed under the [MIT license](http
 <h5 class="text-bold text-dark mt-3">What You <span class="text-warning">Must</span> Do When Using AdminLTE</h5>
 
 - Include the license notice in all copies of the work.
-- Include the copyright notice in all copies of the work. This applies to everything except the notice in the footer of the HTML example pages.
+- Include the copyright notice in all copies of the work. This applies to everything except the notice in the footer of the HTML example Liberaciones.

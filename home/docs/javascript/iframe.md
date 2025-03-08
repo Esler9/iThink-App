@@ -101,7 +101,7 @@ $('.content-wrapper').IFrame({
 |autoIframeMode | Boolean | true | Whether to automatically add `.iframe-mode` to `body` if page is loaded via iframe.
 |autoItemActive | Boolean | true | Whether to automatically set the sidebar menu item active based on the active iframe.
 |autoShowNewTab | Boolean | true | Whether to automatically display created tab.
-|autoDarkMode | Boolean | false | Whether to automatically enable dark-mode in iframe pages.
+|autoDarkMode | Boolean | false | Whether to automatically enable dark-mode in iframe Liberaciones.
 |allowDuplicates | Boolean | true | Whether to allow creation of duplicate tab/iframe.
 |allowReload | Boolean | true | Whether to allow reload non duplicate tab/iframes.
 |loadingScreen | Boolean/Number | true | [Boolean] Whether to enable iframe loading screen; [Number] Set loading screen hide delay.
