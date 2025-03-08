@@ -1,4 +1,7 @@
-<?php include '../../conexion.php';
+<?php
+
+session_start();
+include '../../conexion.php';
 
 // Obtener grupos de permisos
 $grupos = $conn->query("SELECT * FROM grupo_permiso");
