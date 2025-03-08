@@ -28,7 +28,7 @@ $sql = "SELECT `Codigo`, `User`, `State`, `cod_tienda`, `Password`
 $stmt = mysqli_prepare($conn, $sql);
 if (!$stmt) {
     error_log("Error en mysqli_prepare: " . mysqli_error($conn));
-    header("Location: ../login.php?error=2");
+    header("Location: ../login.php?error=5"); // Error: fallo en la preparación de la consulta
     exit();
 }
 mysqli_stmt_bind_param($stmt, 's', $usuario);
