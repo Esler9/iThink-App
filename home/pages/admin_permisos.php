@@ -86,10 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Formulario de Permisos</title>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-
+<?php include("sidebar.php"); ?>
 <div class="wrapper">
         
-<?php include("sidebar.php"); ?>
+
     
         <!-- Content Wrapper. Contiene el contenido de la página -->
         <div class="content-wrapper">
