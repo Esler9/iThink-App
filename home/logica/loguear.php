@@ -1,18 +1,34 @@
 <?php
 session_start();
 
-error_log("Contenido de POST: " . print_r($_POST, true)); // Para depuración (desactivar en producción)
+error_log("DEBUG: Inicio de loguear.php");
+error_log("DEBUG: Contenido de POST: " . print_r($_POST, true));
 
 include("../../conexion.php");
 
+// Verificar si cada variable se recibió y generar mensajes de depuración
+if (!isset($_POST['usuario'])) {
+    error_log("DEBUG: Variable 'usuario' no recibida en POST.");
+}
+if (!isset($_POST['pass'])) {
+    error_log("DEBUG: Variable 'pass' no recibida en POST.");
+}
+if (!isset($_POST['csrf_token'])) {
+    error_log("DEBUG: Variable 'csrf_token' no recibida en POST.");
+}
+
 // Validar que se hayan recibido todos los campos requeridos
 if (!isset($_POST['usuario']) || !isset($_POST['pass']) || !isset($_POST['csrf_token'])) {
-    header("Location: ../login.php?error=6"); // Error: faltan datos
+    error_log("DEBUG: Faltan datos en POST. usuario:" . (isset($_POST['usuario']) ? "si" : "no") .
+        ", pass:" . (isset($_POST['pass']) ? "si" : "no") .
+        ", csrf_token:" . (isset($_POST['csrf_token']) ? "si" : "no"));
+    header("Location: ../login.php?error=2"); // Error: faltan datos
     exit();
 }
 
 // Verificar que el token CSRF enviado coincida con el almacenado en la sesión
 if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    error_log("DEBUG: Token CSRF inválido. POST: " . $_POST['csrf_token'] . " | Sesión: " . $_SESSION['csrf_token']);
     header("Location: ../login.php?error=3"); // Error: token CSRF inválido
     exit();
 }
@@ -27,7 +43,7 @@ $sql = "SELECT `Codigo`, `User`, `State`, `cod_tienda`, `Password`
         WHERE User = ?";
 $stmt = mysqli_prepare($conn, $sql);
 if (!$stmt) {
-    error_log("Error en mysqli_prepare: " . mysqli_error($conn));
+    error_log("DEBUG: Error en mysqli_prepare: " . mysqli_error($conn));
     header("Location: ../login.php?error=5"); // Error: fallo en la preparación de la consulta
     exit();
 }
