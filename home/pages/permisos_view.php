@@ -82,7 +82,7 @@ $grupos = Traer_grupo_usuario($conn);
           <!-- Permisos a la derecha -->
           <div class="col-md-8">
             <h4>Permisos</h4>
-            <form id="permissionsForm" method="POST" action="../datos/process_permision.php">
+            <form id="permissionsForm" method="POST" action="../datos/process_permision">
               <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
               </div>

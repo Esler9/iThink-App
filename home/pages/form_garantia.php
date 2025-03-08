@@ -61,7 +61,7 @@ include('../Funcion.php');
             <i class="fas fa-search"></i>
           </a>
           <div class="navbar-search-block">
-            <form class="form-inline" action="buscar.php" method="GET">
+            <form class="form-inline" action="buscar" method="GET">
               <div class="input-group input-group-sm">
                 <input class="form-control form-control-navbar" name="search" type="search" placeholder="buscar" aria-label="Search">
                 <div class="input-group-append">

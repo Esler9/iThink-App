@@ -142,7 +142,7 @@ if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
 <div class="modal fade" id="modalNuevoUsuario" tabindex="-1" role="dialog" aria-labelledby="modalNuevoUsuarioLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form id="nuevoUsuarioForm" action="nuevo_usuario.php" method="post">
+      <form id="nuevoUsuarioForm" action="nuevo_usuario" method="post">
         <div class="modal-header">
           <h5 class="modal-title" id="modalNuevoUsuarioLabel">Crear Nuevo Usuario</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">

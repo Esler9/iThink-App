@@ -30,7 +30,7 @@
 <<<<<<< HEAD
                     <form class="form-inline" action="/home/Liberaciones/liberaciones/buscar" method="GET">
 =======
-                    <form class="form-inline" action="/home/pages/liberaciones/buscar.php" method="GET">
+                    <form class="form-inline" action="/home/pages/liberaciones/buscar" method="GET">
 >>>>>>> parent of 035640b (Actualizar rutas de acción en formularios para eliminar extensiones de archivo)
 =======
                     <form class="form-inline" action="/home/pages/liberaciones/buscar" method="GET">
