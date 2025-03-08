@@ -78,7 +78,10 @@ include("../../logica/ac_permiso.php");
                 <div class="card-body">
                 <div class="form-group">
                     <label for="c_imei">Imei:</label>
-                    <input  type="number" name="c_imei"class="form-control"  minlength="15"  placeholder="Escriba Precio de Liberacion" required>
+                    <input type="text" id="c_imei" name="c_imei" class="form-control" 
+                           placeholder="Ingrese IMEI (15 dígitos que comienzan con 35)" 
+                            maxlength="15" required 
+                           title="El IMEI debe contener 15 dígitos numéricos y comenzar con 35">
                   </div>
                   <div class="form-group">
                     <label for="model">Modelo:</label>
@@ -203,6 +206,36 @@ include("../../logica/ac_permiso.php");
     
     ?>
 
+</script>
+
+<script>
+function isValidIMEI(imei) {
+    let sum = 0;
+    let doubleDigit = false;
+    // Recorre el número de derecha a izquierda
+    for (let i = imei.length - 1; i >= 0; i--) {
+        let digit = parseInt(imei.charAt(i), 10);
+        if (doubleDigit) {
+            digit *= 2;
+            if (digit > 9) {
+                digit -= 9;
+            }
+        }
+        sum += digit;
+        doubleDigit = !doubleDigit;
+    }
+    return (sum % 10 === 0);
+}
+
+document.getElementById('c_imei').addEventListener('blur', function() {
+    var imei = this.value;
+    if(imei.length === 15) {
+        if (!isValidIMEI(imei)) {
+            alert('El IMEI no es válido según el algoritmo de Luhn.');
+            this.focus();
+        }
+    }
+});
 </script>
 </body>
 
