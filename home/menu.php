@@ -26,15 +26,8 @@
                     <i class="fas fa-search"></i>
                 </a>
                 <div class="navbar-search-block">
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    <form class="form-inline" action="/home/Liberaciones/liberaciones/buscar" method="GET">
-=======
                     <form class="form-inline" action="/home/pages/liberaciones/buscar" method="GET">
->>>>>>> parent of 035640b (Actualizar rutas de acción en formularios para eliminar extensiones de archivo)
-=======
-                    <form class="form-inline" action="/home/pages/liberaciones/buscar" method="GET">
->>>>>>> parent of f0c236a (Renombrar "Pages" a "Liberaciones" en archivos SCSS, HTML y PHP para mejorar la consistencia del proyecto)
+
                         <div class="input-group input-group-sm">
                             <input class="form-control form-control-navbar" name="search" type="search" placeholder="Buscar" aria-label="Search">
                             <div class="input-group-append">
