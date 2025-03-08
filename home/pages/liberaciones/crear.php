@@ -102,10 +102,17 @@ include("../../logica/ac_permiso.php");
                     </div>
                     <div class="form-group">
                       <label for="celular">Celular:</label>
-                      <input type="text" name="celular" id="celular" class="form-control" 
-                             placeholder="Ingrese el celular" required>
-                      <div class="invalid-feedback">
-                        El celular es requerido.
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">+502</span>
+                        </div>
+                        <input type="text" name="celular" id="celular" class="form-control" 
+                               placeholder="Ingrese 8 dígitos" required
+                               pattern="^\d{8}$" maxlength="8"
+                               title="El celular debe contener 8 dígitos">
+                        <div class="invalid-feedback">
+                          El celular es requerido y debe tener 8 dígitos.
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -244,19 +251,31 @@ function isValidIMEI(imei) {
   'use strict';
   var form = document.getElementById('crearConsultaForm');
   form.addEventListener('submit', function(event) {
-    // Resetear validación custom por IMEI
+    // Reiniciar validación custom por IMEI
     var imeiInput = document.getElementById('c_imei');
     
     // Validación HTML5 (pattern, required, etc.)
     if (!form.checkValidity()) {
+      // Mostrar alerta personalizada
+      document.getElementById('customAlert').style.display = 'block';
+      setTimeout(function(){
+          document.getElementById('customAlert').style.display = 'none';
+      }, 3000);
+      
       event.preventDefault();
       event.stopPropagation();
     }
     
-    // Validación adicional: algoritmo Luhn para el IMEI
+    // Validación adicional: algoritmo de Luhn para el IMEI
     if (imeiInput.value.length === 15 && !isValidIMEI(imeiInput.value)) {
       imeiInput.classList.add('is-invalid');
       imeiInput.nextElementSibling.textContent = 'El IMEI no es válido según el algoritmo de Luhn.';
+      // Mostrar alerta personalizada
+      document.getElementById('customAlert').style.display = 'block';
+      setTimeout(function(){
+          document.getElementById('customAlert').style.display = 'none';
+      }, 3000);
+      
       event.preventDefault();
       event.stopPropagation();
     } else {
@@ -277,6 +296,13 @@ document.getElementById('c_imei').addEventListener('blur', function() {
   }
 });
 </script>
+
+<div id="customAlert" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+     z-index: 9999; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 30px 40px;
+     font-size: 24px; text-align: center; border-radius: 5px;">
+  La información ingresada es incorrecta o falta, por favor verifíquela.
+</div>
+
 </body>
 
 </php>
