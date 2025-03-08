@@ -166,7 +166,7 @@ if(!isset($User)){
               <div class="card-body">
 
             
-              <form action="../../logica/accion.php?accion=1&imei=<?php echo $row['serie'];?>" method="POST">
+              <form action="../../logica/accion?accion=1&imei=<?php echo $row['serie'];?>" method="POST">
                 <div class="card-body">
                 <div class="form-group">
                     <label for="name">Imei:</label>

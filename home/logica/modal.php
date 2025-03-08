@@ -28,7 +28,7 @@
                     <!-- CUERPO DEL MODAL -->
                     <div class="modal-body">
                         <!-- Formulario para enviar datos a 'accion.php' -->
-                        <form action="../../logica/accion.php?accion=8&imei=<?php echo urlencode($row['serie']); ?>" method="POST">
+                        <form action="../../logica/accion?accion=8&imei=<?php echo urlencode($row['serie']); ?>" method="POST">
                             <div class="card-body">
                                 <!-- Información del IMEI -->
                                 <div class="form-group">
@@ -136,7 +136,7 @@
             <!-- CUERPO DEL MODAL -->
             <div class="modal-body">
                 <!-- Formulario para enviar datos a 'accion.php' con acción específica y número de serie -->
-                <form action="../../logica/accion.php?accion=1&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
+                <form action="../../logica/accion?accion=1&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
                     <div class="card-body">
                         <!-- Mostrar información del IMEI -->
                         <div class="form-group">
@@ -224,7 +224,7 @@
             </div>
             <div class="modal-body">
                 <!-- Formulario para enviar datos al archivo accion.php con acción específica y número de serie -->
-                <form action="../../logica/accion.php?accion=5.1&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
+                <form action="../../logica/accion?accion=5.1&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
                     <div class="card-body">
                         <!-- Mostrar información del IMEI -->
                         <div class="form-group">
@@ -290,7 +290,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="../../logica/accion.php?accion=2&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
+                <form action="../../logica/accion?accion=2&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
                     <div class="card-body">
                         <div class="form-group">
                             <label>Imei:</label>
@@ -430,7 +430,7 @@
             
             <!-- Modal Body -->
             <div class="modal-body">
-                <form action="../../logica/accion.php?accion=<?php echo (int)$row['cod_estado']; ?>&imei=<?php echo urlencode($row['serie']); ?>" 
+                <form action="../../logica/accion?accion=<?php echo (int)$row['cod_estado']; ?>&imei=<?php echo urlencode($row['serie']); ?>" 
                       id="<?php echo ($row['cod_estado'] == $page ? 'start-' : 'end-') . htmlspecialchars($row['serie'], ENT_QUOTES, 'UTF-8'); ?>" 
                       method="POST">
                     

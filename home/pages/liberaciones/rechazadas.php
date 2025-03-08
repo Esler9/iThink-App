@@ -171,7 +171,7 @@ include("../../logica/ac_permiso.php");
                                         </div>
                                         <div class="modal-body">
 
-                                         <form action="../../logica/accion.php?accion=8&imei=<?php echo $row['serie'];?>" id="ver-<?php echo $row['serie'];?>" method="POST">
+                                         <form action="../../logica/accion?accion=8&imei=<?php echo $row['serie'];?>" id="ver-<?php echo $row['serie'];?>" method="POST">
                                              <div class="card-body">
                                                       <div class="form-group">
                                                           <label for="name">Imei:</label>
@@ -253,7 +253,7 @@ include("../../logica/ac_permiso.php");
                                         </div>
                                         <div class="modal-body">
 
-                                         <form action="../../logica/accion.php?accion=2.1&imei=<?php echo $row['serie'];?>" id="redo-<?php echo $row['serie'];?>" method="POST">
+                                         <form action="../../logica/accion?accion=2.1&imei=<?php echo $row['serie'];?>" id="redo-<?php echo $row['serie'];?>" method="POST">
                                              <div class="card-body">
                                                       <div class="form-group">
                                                           <label for="name">Imei:</label>

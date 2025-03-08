@@ -74,7 +74,7 @@ include("../../logica/ac_permiso.php");
               <div class="card-body">
 
             
-              <form action="../../logica/accion.php?accion=0" method="POST">
+              <form action="../../logica/accion?accion=0" method="POST">
                 <div class="card-body">
                 <div class="form-group">
                     <label for="c_imei">Imei:</label>

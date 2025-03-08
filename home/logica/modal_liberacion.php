@@ -15,7 +15,7 @@ while ($row = mysqli_fetch_array($result)) {?>
           </div>
           <div class="modal-body">
 
-           <form action="../../logica/accion.php?accion=8&imei=<?php echo $row['serie'];?>" id="ver-<?php echo $row['serie'];?>" method="POST">
+           <form action="../../logica/accion?accion=8&imei=<?php echo $row['serie'];?>" id="ver-<?php echo $row['serie'];?>" method="POST">
                <div class="card-body">
                         <div class="form-group">
                             <label for="name">Imei:</label>
@@ -96,7 +96,7 @@ while ($row = mysqli_fetch_array($result)) {?>
           </div>
           <div class="modal-body">
 
-              <form action="../../logica/accion.php?accion=1&imei=<?php echo $row['serie'];?>"  id="inform-<?php echo $row['serie'];?>" method="POST">
+              <form action="../../logica/accion?accion=1&imei=<?php echo $row['serie'];?>"  id="inform-<?php echo $row['serie'];?>" method="POST">
                 <div class="card-body">
                   <div class="form-group">
                       <label for="name">Imei:</label>
@@ -164,7 +164,7 @@ while ($row = mysqli_fetch_array($result)) {?>
           </div>
           <div class="modal-body">
 
-           <form action="../../logica/accion.php?accion=5.1&imei=<?php echo $row['serie'];?>" id="rechazar-<?php echo $row['serie'];?>" method="POST">
+           <form action="../../logica/accion?accion=5.1&imei=<?php echo $row['serie'];?>" id="rechazar-<?php echo $row['serie'];?>" method="POST">
                <div class="card-body">
                         <div class="form-group">
                             <label for="name">Imei:</label>
