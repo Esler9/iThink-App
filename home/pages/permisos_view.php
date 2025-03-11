@@ -23,6 +23,28 @@ include("../datos/dt_permisos.php");
 
 // Obtener los grupos de usuarios
 $grupos = Traer_grupo_usuario($conn);
+
+// Construir el arreglo de permisos por grupo de manera centralizada
+$groupPermissionsArray = [];
+foreach ($grupos as $grupo) {
+    $permisos = traer_permisos($conn, $grupo['codigo']);
+    $permissionsGrouped = [];
+    foreach ($permisos as $permiso) {
+        $grupoPermiso = $permiso['group_permiso'];
+        if (!isset($permissionsGrouped[$grupoPermiso])) {
+            $permissionsGrouped[$grupoPermiso] = [
+                'nombre' => $permiso['nombre_grupo_p'],
+                'permisos' => []
+            ];
+        }
+        $permissionsGrouped[$grupoPermiso]['permisos'][] = [
+            'id'    => $permiso['codigo'],
+            'label' => $permiso['nombre_permiso'],
+            'check' => $permiso['active'] == 1 ? 'checked' : ''
+        ];
+    }
+    $groupPermissionsArray[$grupo['codigo']] = $permissionsGrouped;
+}
 ?>
 
 <head>
@@ -111,62 +133,27 @@ action="../datos/process_permision.php"        <form id="permissionsForm" method
 <script src="../dist/js/adminlte.min.js"></script>
 
 <script>
- const groupPermissions = {
-    <?php foreach ($grupos as $index => $grupo): ?>
-      '<?php echo $grupo['codigo']; ?>': <?php 
-        $permisos = traer_permisos($conn, $grupo['codigo']);
-        $permissionsGrouped = [];
-
-        foreach ($permisos as $permiso) {
-          $grupoPermiso = $permiso['group_permiso'];
-          if (!isset($permissionsGrouped[$grupoPermiso])) {
-            $permissionsGrouped[$grupoPermiso] = [
-              'nombre' => $permiso['nombre_grupo_p'],
-              'permisos' => []
-            ];
-          }
-          $permissionsGrouped[$grupoPermiso]['permisos'][] = [
-            'id' => $permiso['codigo'],
-            'label' => $permiso['nombre_permiso'],
-            'check' => $permiso['active'] == 1 ? 'checked' : ''
-          ];
-        }
-        echo json_encode($permissionsGrouped);
-
-        // Evitar agregar una coma después del último elemento
-        if ($index !== array_key_last($grupos)) {
-            echo ',';
-        }
-      ?>
-    <?php endforeach; ?>
-};
-
-  // Cargar permisos al hacer clic en un grupo
-  $('#groupList').on('click', 'li', function(event) {
-    event.preventDefault();
-    const selectedGroup = $(this).data('group');
-
-    if (!$(this).hasClass('active')) {
-      loadPermissions(selectedGroup);
-      $('#groupList li').removeClass('active');
-      $(this).addClass('active');
-    }
-  });
-
-  // Función para cargar los permisos en el contenedor
+  // Se asigna el arreglo de permisos generado en PHP al objeto JavaScript.
+  const groupPermissions = <?php echo json_encode($groupPermissionsArray, JSON_UNESCAPED_UNICODE); ?>;
+  
+  /**
+   * Carga los permisos del grupo seleccionado y los inyecta en el contenedor.
+   *
+   * @param {string} group - Código del grupo seleccionado.
+   */
   function loadPermissions(group) {
     const permissionsGrouped = groupPermissions[group];
     let html = '';
 
     for (const [grupoPermisoId, grupoPermiso] of Object.entries(permissionsGrouped)) {
       html += `
-        <div class="permission-group mb-3">
-          <h5>${grupoPermiso.nombre}</h5>
-          <div class="permissions-list" style="border: 1px solid #007bff; border-radius: 5px; padding: 10px;">
+        <div class="permission-group mb-4">
+          <h5 class="text-primary">${grupoPermiso.nombre}</h5>
+          <div class="permissions-list border p-3 rounded">
       `;
       grupoPermiso.permisos.forEach(permission => {
         html += `
-          <div class="custom-control custom-checkbox">
+          <div class="custom-control custom-checkbox mb-2">
             <input type="checkbox" class="custom-control-input" id="${permission.id}" name="permiso[${group}][${permission.id}]" ${permission.check}>
             <label class="custom-control-label" for="${permission.id}">${permission.label}</label>
           </div>
@@ -177,6 +164,17 @@ action="../datos/process_permision.php"        <form id="permissionsForm" method
 
     $('#permissionsContainer').html(html);
   }
+
+  // Asignar manejador de eventos a la lista de grupos para cargar los permisos correspondientes.
+  $('#groupList').on('click', 'li', function(event) {
+    event.preventDefault();
+    const selectedGroup = $(this).data('group');
+    if (!$(this).hasClass('active')) {
+      loadPermissions(selectedGroup);
+      $('#groupList li').removeClass('active');
+      $(this).addClass('active');
+    }
+  });
 </script>
 </body>
 </php>
