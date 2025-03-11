@@ -45,6 +45,8 @@ foreach ($grupos as $grupo) {
     }
     $groupPermissionsArray[$grupo['codigo']] = $permissionsGrouped;
 }
+
+$updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizados si es necesario.
 ?>
 
 <head>
