@@ -73,10 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-
-
-
-header("location: /home/pages/permisos_view.php")
-
+header('Content-Type: application/json');
+echo json_encode(['status' => 'success', 'updatedPermissions' => $updatedPermissionsArray]);
+exit();
 
 ?>
