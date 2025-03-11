@@ -66,6 +66,15 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
   <!-- Theme style -->
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <link rel="stylesheet" href="../dist/css/app.css">
+  <style>
+    .floating-alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      min-width: 250px;
+    }
+  </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 
@@ -204,9 +213,9 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
             }
             loadPermissions(selectedGroup);
           }
-          // Mostrar notificación de éxito.
+          // Mostrar notificación de éxito de manera flotante.
           $('#msgContainer').html(
-            '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+            '<div class="alert floating-alert alert-success alert-dismissible fade show" role="alert">' +
               'Configuración guardada correctamente.' +
               '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
                 '<span aria-hidden="true">&times;</span>' +
@@ -215,12 +224,12 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
           );
           // Cerrar la alerta automáticamente después de 3 segundos.
           setTimeout(function() {
-            $(".alert").alert('close');
+            $(".floating-alert").alert('close');
           }, 3000);
         },
         error: function() {
           $('#msgContainer').html(
-            '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+            '<div class="alert floating-alert alert-danger alert-dismissible fade show" role="alert">' +
               'Ha ocurrido un error al guardar los cambios.' +
               '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
                 '<span aria-hidden="true">&times;</span>' +
@@ -228,7 +237,7 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
             '</div>'
           );
           setTimeout(function() {
-            $(".alert").alert('close');
+            $(".floating-alert").alert('close');
           }, 3000);
         }
       });
