@@ -104,9 +104,6 @@ foreach ($grupos as $grupo) {
           <!-- Permisos a la derecha -->
           <div class="col-md-8">
             <form id="permissionsForm" method="POST" action="../datos/process_permision">
-              <div class="text-center mt-4">
-                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-              </div>
               <div class="card mt-3">
                 <div class="card-header">
                   <h5 class="card-title mb-0">Permisos</h5>
@@ -114,6 +111,9 @@ foreach ($grupos as $grupo) {
                 <div class="card-body" id="permissionsContainer" style="max-height: 400px; overflow-y: auto;">
                   <p class="text-muted">Selecciona un grupo para ver y editar sus permisos.</p>
                 </div>
+              </div>
+              <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
               </div>
             </form>
           </div>
