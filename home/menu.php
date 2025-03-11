@@ -308,30 +308,52 @@
                     </li>
                     <?php } ?>
 
-                    <!-- Tares -->
+                    <!-- Menú Tareas (si tiene permiso para ver-tareas) -->
+                    <?php if(Tiene_permiso($permisos_user, 'ver-tareas')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-tasks"></i>
                             <p>
-                                Tares
+                                Tareas
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            <?php if(Tiene_permiso($permisos_user, 'crear-tarea')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/tares/crear.php" class="nav-link">
+                                    <i class="fas fa-plus nav-icon"></i>
+                                    <p>Crear Tarea</p>
+                                </a>
+                            </li>
+                            <?php } ?>
+                            <?php if(Tiene_permiso($permisos_user, 'editar-tarea')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/tares/editar.php" class="nav-link">
+                                    <i class="fas fa-edit nav-icon"></i>
+                                    <p>Editar Tarea</p>
+                                </a>
+                            </li>
+                            <?php } ?>
+                            <?php if(Tiene_permiso($permisos_user, 'eliminar-tarea')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/tares/eliminar.php" class="nav-link">
+                                    <i class="fas fa-trash nav-icon"></i>
+                                    <p>Eliminar Tarea</p>
+                                </a>
+                            </li>
+                            <?php } ?>
+                            <?php if(Tiene_permiso($permisos_user, 'ver-tareas')) { ?>
                             <li class="nav-item">
                                 <a href="/home/pages/tares/lista.php" class="nav-link">
                                     <i class="fas fa-list nav-icon"></i>
-                                    <p>Listado de Tares</p>
+                                    <p>Ver Tareas</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="/home/pages/tares/nuevo.php" class="nav-link">
-                                    <i class="fas fa-plus nav-icon"></i>
-                                    <p>Nueva Tarea</p>
-                                </a>
-                            </li>
+                            <?php } ?>
                         </ul>
                     </li>
+                    <?php } ?>
 
                     <!-- Usuarios -->
                     <li class="nav-item has-treeview">
