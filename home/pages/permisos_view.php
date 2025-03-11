@@ -103,7 +103,7 @@ foreach ($grupos as $grupo) {
 
           <!-- Permisos a la derecha -->
           <div class="col-md-8">
-action="../datos/process_permision.php"        <form id="permissionsForm" method="POST" action="../datos/process_permision.php">
+      <form id="permissionsForm" method="POST" action="../datos/process_permision">
               <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
               </div>
