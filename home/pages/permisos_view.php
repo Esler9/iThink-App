@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <?php 
 session_start();
 
@@ -45,6 +46,8 @@ foreach ($grupos as $grupo) {
     }
     $groupPermissionsArray[$grupo['codigo']] = $permissionsGrouped;
 }
+
+$updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizados si es necesario.
 ?>
 
 <head>
@@ -61,7 +64,7 @@ foreach ($grupos as $grupo) {
   <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+  <link rel="stylesheet" href("../dist/css/adminlte.min.css">
   <link rel="stylesheet" href="../dist/css/app.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -234,3 +237,16 @@ foreach ($grupos as $grupo) {
 </script>
 </body>
 </php>
+
+<?php
+// ...
+// Procesamiento y actualización de permisos aquí...
+
+// Asegúrate de definir $updatedPermissionsArray, por ejemplo:
+$updatedPermissionsArray = isset($updatedPermissionsArray) ? $updatedPermissionsArray : [];
+
+// Enviar la respuesta JSON sin output extra.
+header('Content-Type: application/json');
+echo json_encode(['status' => 'success', 'updatedPermissions' => $updatedPermissionsArray]);
+exit();
+?>
