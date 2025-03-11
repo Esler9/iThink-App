@@ -1,4 +1,4 @@
-<!DOCTYPE php>
+<!DOCTYPE html>
 <?php 
 session_start();
 $User = $_SESSION["username"];
