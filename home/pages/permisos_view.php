@@ -237,3 +237,15 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
 </script>
 </body>
 </php>
+
+<?php
+// Procesamiento y actualización de permisos aquí...
+
+// Asegúrate de definir $updatedPermissionsArray, por ejemplo:
+$updatedPermissionsArray = isset($updatedPermissionsArray) ? $updatedPermissionsArray : [];
+
+// Enviar la respuesta JSON sin output extra.
+header('Content-Type: application/json');
+echo json_encode(['status' => 'success', 'updatedPermissions' => $updatedPermissionsArray]);
+exit();
+?>
