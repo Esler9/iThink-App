@@ -61,7 +61,7 @@ foreach ($grupos as $grupo) {
   <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href("../dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <link rel="stylesheet" href="../dist/css/app.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -103,18 +103,12 @@ foreach ($grupos as $grupo) {
 
           <!-- Permisos a la derecha -->
           <div class="col-md-8">
-            <form id="permissionsForm" method="POST" action="../datos/process_permision">
+      <form id="permissionsForm" method="POST" action="../datos/process_permision">
               <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
               </div>
-              <!-- Contenedor fijo para la lista de permisos -->
-              <div class="card mt-3">
-                <div class="card-header">
-                  <h5 class="card-title mb-0">Permisos</h5>
-                </div>
-                <div class="card-body" id="permissionsContainer" style="min-height: 300px;">
-                  <p class="text-muted">Selecciona un grupo para ver y editar sus permisos.</p>
-                </div>
+              <div id="permissionsContainer">
+                <p class="text-muted">Selecciona un grupo para ver y editar sus permisos.</p>
               </div>
             </form>
           </div>
@@ -171,39 +165,15 @@ foreach ($grupos as $grupo) {
     $('#permissionsContainer').html(html);
   }
 
-  $(document).ready(function() {
-    // Asignar manejador de eventos a la lista de grupos para cargar los permisos correspondientes.
-    $('#groupList').on('click', 'li', function(event) {
-      event.preventDefault();
-      const selectedGroup = $(this).data('group');
-      if (!$(this).hasClass('active')) {
-        loadPermissions(selectedGroup);
-        $('#groupList li').removeClass('active');
-        $(this).addClass('active');
-      }
-    });
-
-    // Enviar el formulario vía AJAX sin recargar la página.
-    $('#permissionsForm').on('submit', function(e) {
-      e.preventDefault();
-      $.ajax({
-        url: '../datos/process_permision',
-        type: 'POST',
-        data: $(this).serialize(),
-        success: function(response) {
-          // Opcional: mostrar un mensaje o actualizar la interfaz según la respuesta.
-          alert('Cambios guardados correctamente.');
-          // Si deseas recargar los permisos del grupo actualmente seleccionado:
-          const selectedGroup = $('#groupList li.active').data('group');
-          if (selectedGroup) {
-            loadPermissions(selectedGroup);
-          }
-        },
-        error: function() {
-          alert('Ha ocurrido un error al guardar los cambios.');
-        }
-      });
-    });
+  // Asignar manejador de eventos a la lista de grupos para cargar los permisos correspondientes.
+  $('#groupList').on('click', 'li', function(event) {
+    event.preventDefault();
+    const selectedGroup = $(this).data('group');
+    if (!$(this).hasClass('active')) {
+      loadPermissions(selectedGroup);
+      $('#groupList li').removeClass('active');
+      $(this).addClass('active');
+    }
   });
 </script>
 </body>
