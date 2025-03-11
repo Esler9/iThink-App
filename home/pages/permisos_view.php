@@ -78,7 +78,9 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 
-<?php include("sidebar.php"); ?>
+<div id="sidebarContainer">
+  <?php include("sidebar.php"); ?>
+</div>
 
 <div class="content-wrapper">
   <section class="content-header">
@@ -207,7 +209,7 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
         success: function(response) {
           const selectedGroup = $('#groupList li.active').data('group');
           
-          // Mostrar notificación de éxito de manera flotante.
+          // Mostrar notificación de éxito flotante.
           $('#msgContainer').html(
             '<div class="alert floating-alert alert-success alert-dismissible fade show" role="alert">' +
               'Configuración guardada correctamente.' +
@@ -216,6 +218,10 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
               '</button>' +
             '</div>'
           );
+          
+          // Recargar el sidebar con los nuevos permisos.
+          $('#sidebarContainer').load('sidebar.php');
+          
           // Cerrar la alerta automáticamente después de 3 segundos.
           setTimeout(function() {
             $(".floating-alert").alert('close');
