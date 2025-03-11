@@ -190,8 +190,8 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
     const groupPermissions = <?php echo json_encode($groupPermissionsArray, JSON_UNESCAPED_UNICODE); ?>;
     
     /**
-     * Carga los permisos del grupo seleccionado, filtrándolos según el texto de búsqueda,
-     * e inyecta el resultado en el contenedor.
+     * Carga los permisos del grupo seleccionado, mostrando u ocultando aquellos que
+     * no coinciden con el texto de búsqueda, sin eliminarlos del DOM para conservar su estado.
      *
      * @param {string} group - Código del grupo seleccionado.
      */
@@ -200,28 +200,27 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
       const permissionsGrouped = groupPermissions[group];
       let html = '';
   
+      // Recorrer cada grupo de permisos
       for (const [grupoPermisoId, grupoPermiso] of Object.entries(permissionsGrouped)) {
-        // Filtrar permisos de acuerdo al texto ingresado
-        let filteredPermissions = grupoPermiso.permisos.filter(permission => {
-          return permission.label.toLowerCase().includes(searchQuery);
-        });
+        // Renderizar el encabezado del grupo solo si al menos un permiso existe (siempre se renderiza el grupo)
+        html += `
+          <div class="permission-group mb-4">
+            <h5 class="text-primary">${grupoPermiso.nombre}</h5>
+            <div class="permissions-list border p-3 rounded">
+        `;
   
-        if(filteredPermissions.length > 0) {
+        // Recorrer todos los permisos y ocultar (con style) los que no coinciden con el criterio
+        grupoPermiso.permisos.forEach(permission => {
+          // Si el label coincide con el término de búsqueda, se muestra normal; si no, se oculta pero permanece en el DOM
+          const displayStyle = permission.label.toLowerCase().includes(searchQuery) ? '' : 'display: none;';
           html += `
-            <div class="permission-group mb-4">
-              <h5 class="text-primary">${grupoPermiso.nombre}</h5>
-              <div class="permissions-list border p-3 rounded">
+            <div class="custom-control custom-checkbox mb-2" style="${displayStyle}">
+              <input type="checkbox" class="custom-control-input" id="${permission.id}" name="permiso[${group}][${permission.id}]" ${permission.check}>
+              <label class="custom-control-label" for="${permission.id}">${permission.label}</label>
+            </div>
           `;
-          filteredPermissions.forEach(permission => {
-            html += `
-              <div class="custom-control custom-checkbox mb-2">
-                <input type="checkbox" class="custom-control-input" id="${permission.id}" name="permiso[${group}][${permission.id}]" ${permission.check}>
-                <label class="custom-control-label" for="${permission.id}">${permission.label}</label>
-              </div>
-            `;
-          });
-          html += '</div></div>';
-        }
+        });
+        html += '</div></div>';
       }
       $('#permissionsContainer').html(html);
     }
