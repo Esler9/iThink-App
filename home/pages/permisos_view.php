@@ -74,6 +74,26 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
       z-index: 9999;
       min-width: 250px;
     }
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    /* Contenedor principal de toda la página */
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+    /* Contenedor principal del contenido (este crecerá para ocupar espacio) */
+    .content-wrapper {
+      flex: 1;
+    }
+    /* Si deseas personalizar el footer */
+    .main-footer {
+      background-color: #f4f6f9;
+      padding: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
