@@ -145,6 +145,16 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
                   <div class="card mt-3">
                     <div class="card-header">
                       <h5 class="card-title mb-0">Permisos</h5>
+                      <div class="card-tools">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                          <input type="text" id="permissionSearch" class="form-control" placeholder="Buscar">
+                          <div class="input-group-append">
+                            <button class="btn btn-secondary btn-sm" type="button">
+                              <i class="fas fa-search"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     <div class="card-body" id="permissionsContainer" style="max-height: 400px; overflow-y: auto;">
                       <p class="text-muted">Selecciona un grupo para ver y editar sus permisos.</p>
