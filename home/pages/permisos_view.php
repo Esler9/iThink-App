@@ -206,13 +206,7 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
         data: $(this).serialize(),
         success: function(response) {
           const selectedGroup = $('#groupList li.active').data('group');
-          if (selectedGroup) {
-            // Solo actualiza groupPermissions si se reciben datos actualizados
-            if(response.updatedPermissions && Object.keys(response.updatedPermissions).length > 0){
-              groupPermissions[selectedGroup] = response.updatedPermissions;
-            }
-            loadPermissions(selectedGroup);
-          }
+          
           // Mostrar notificación de éxito de manera flotante.
           $('#msgContainer').html(
             '<div class="alert floating-alert alert-success alert-dismissible fade show" role="alert">' +
