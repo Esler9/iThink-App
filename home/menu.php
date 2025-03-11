@@ -356,6 +356,7 @@
                     <?php } ?>
 
                     <!-- Usuarios -->
+                    <?php if(Tiene_permiso($permisos_user, 'ver-usuarios')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-users-cog"></i>
@@ -365,20 +366,25 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            <?php if(Tiene_permiso($permisos_user, 'ver-usuarios')) { ?>
                             <li class="nav-item">
                                 <a href="/home/pages/usuarios/index.php" class="nav-link">
                                     <i class="fas fa-list nav-icon"></i>
                                     <p>Listado de Usuarios</p>
                                 </a>
                             </li>
+                            <?php } ?>
+                            <?php if(Tiene_permiso($permisos_user, 'crear-usuario')) { ?>
                             <li class="nav-item">
-                                <a href="/home/pages/usuarios/nuevo.php" class="nav-link">
+                                <a href="/home/pages/usuarios/crear.php" class="nav-link">
                                     <i class="fas fa-user-plus nav-icon"></i>
                                     <p>Nuevo Usuario</p>
                                 </a>
                             </li>
+                            <?php } ?>
                         </ul>
                     </li>
+                    <?php } ?>
 
                     <?php if(Tiene_permiso($permisos_user, 'crear-usuario') || Tiene_permiso($permisos_user, 'editar-usuario') || Tiene_permiso($permisos_user, 'eliminar-usuario')) { ?>
                     <!-- Usuarios Avanzados -->
