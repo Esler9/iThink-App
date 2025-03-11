@@ -197,34 +197,25 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
      * @param {string} group - Código del grupo seleccionado.
      */
     function loadPermissions(group) {
-      const searchQuery = $('#permissionSearch').val().toLowerCase();
       const permissionsGrouped = groupPermissions[group];
       let html = '';
 
       // Recorrer cada grupo de permisos
       for (const [grupoPermisoId, grupoPermiso] of Object.entries(permissionsGrouped)) {
-        // Filtrar permisos cuyo label incluya el término de búsqueda
-        const filteredPermissions = grupoPermiso.permisos.filter(permission =>
-          permission.label.toLowerCase().includes(searchQuery)
-        );
-
-        // Solo renderizar el grupo si hay permisos que mostrar
-        if(filteredPermissions.length > 0) {
+        html += `
+          <div class="permission-group mb-4" data-grouppermiso="${grupoPermisoId}">
+            <h5 class="text-primary">${grupoPermiso.nombre}</h5>
+            <div class="permissions-list border p-3 rounded">
+        `;
+        grupoPermiso.permisos.forEach(permission => {
           html += `
-            <div class="permission-group mb-4">
-              <h5 class="text-primary">${grupoPermiso.nombre}</h5>
-              <div class="permissions-list border p-3 rounded">
+            <div class="custom-control custom-checkbox mb-2 permission-item">
+              <input type="checkbox" class="custom-control-input" id="${permission.id}" name="permiso[${group}][${permission.id}]" ${permission.check}>
+              <label class="custom-control-label" for="${permission.id}">${permission.label}</label>
+            </div>
           `;
-          filteredPermissions.forEach(permission => {
-            html += `
-              <div class="custom-control custom-checkbox mb-2">
-                <input type="checkbox" class="custom-control-input" id="${permission.id}" name="permiso[${group}][${permission.id}]" ${permission.check}>
-                <label class="custom-control-label" for="${permission.id}">${permission.label}</label>
-              </div>
-            `;
-          });
-          html += '</div></div>';
-        }
+        });
+        html += '</div></div>';
       }
       $('#permissionsContainer').html(html);
     }
@@ -247,6 +238,30 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
         if (selectedGroup) {
           loadPermissions(selectedGroup);
         }
+      });
+
+      $('#permissionSearch').on('keyup', function() {
+        const searchQuery = $(this).val().toLowerCase();
+        
+        // Recorrer cada permiso
+        $('.permission-item').each(function() {
+          const labelText = $(this).find('label').text().toLowerCase();
+          // Mostrar el elemento si coincide el texto, ocultar si no
+          if(labelText.includes(searchQuery)){
+            $(this).show();
+          } else {
+            $(this).hide();
+          }
+        });
+        
+        // Para cada grupo, si ninguno de sus permisos está visible, ocultarlo; de lo contrario, mostrarlo
+        $('.permission-group').each(function() {
+          if($(this).find('.permission-item:visible').length === 0) {
+            $(this).hide();
+          } else {
+            $(this).show();
+          }
+        });
       });
   
       // Enviar formulario vía AJAX y actualizar sidebar con la respuesta.
