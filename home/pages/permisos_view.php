@@ -61,7 +61,7 @@ foreach ($grupos as $grupo) {
   <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+  <link rel="stylesheet" href("../dist/css/adminlte.min.css">
   <link rel="stylesheet" href="../dist/css/app.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -103,12 +103,18 @@ foreach ($grupos as $grupo) {
 
           <!-- Permisos a la derecha -->
           <div class="col-md-8">
-      <form id="permissionsForm" method="POST" action="../datos/process_permision">
+            <form id="permissionsForm" method="POST" action="../datos/process_permision">
               <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
               </div>
-              <div id="permissionsContainer">
-                <p class="text-muted">Selecciona un grupo para ver y editar sus permisos.</p>
+              <!-- Contenedor fijo para la lista de permisos -->
+              <div class="card mt-3">
+                <div class="card-header">
+                  <h5 class="card-title mb-0">Permisos</h5>
+                </div>
+                <div class="card-body" id="permissionsContainer" style="min-height: 300px;">
+                  <p class="text-muted">Selecciona un grupo para ver y editar sus permisos.</p>
+                </div>
               </div>
             </form>
           </div>
