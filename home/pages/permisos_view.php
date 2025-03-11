@@ -207,8 +207,8 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
         success: function(response) {
           const selectedGroup = $('#groupList li.active').data('group');
           if (selectedGroup) {
-            // Suponiendo que el endpoint retorna los permisos actualizados para el grupo.
-            if(response.updatedPermissions){
+            // Solo actualiza groupPermissions si se reciben datos actualizados
+            if(response.updatedPermissions && Object.keys(response.updatedPermissions).length > 0){
               groupPermissions[selectedGroup] = response.updatedPermissions;
             }
             loadPermissions(selectedGroup);
