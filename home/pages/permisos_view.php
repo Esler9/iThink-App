@@ -166,12 +166,11 @@ foreach ($grupos as $grupo) {
       });
       html += '</div></div>';
     }
-
     $('#permissionsContainer').html(html);
   }
 
   $(document).ready(function() {
-    // Asignar manejador de eventos a la lista de grupos para cargar los permisos correspondientes.
+    // Cargar permisos al seleccionar un grupo.
     $('#groupList').on('click', 'li', function(event) {
       event.preventDefault();
       const selectedGroup = $(this).data('group');
@@ -182,19 +181,22 @@ foreach ($grupos as $grupo) {
       }
     });
 
-    // Enviar el formulario vía AJAX sin recargar la página.
+    // Enviar formulario vía AJAX y actualizar checkbox con la respuesta.
     $('#permissionsForm').on('submit', function(e) {
       e.preventDefault();
       $.ajax({
         url: '../datos/process_permision',
         type: 'POST',
+        dataType: 'json', // Se espera respuesta en JSON.
         data: $(this).serialize(),
         success: function(response) {
-          // Opcional: mostrar un mensaje o actualizar la interfaz según la respuesta.
           alert('Cambios guardados correctamente.');
-          // Si deseas recargar los permisos del grupo actualmente seleccionado:
           const selectedGroup = $('#groupList li.active').data('group');
           if (selectedGroup) {
+            // Suponiendo que el endpoint retorna los permisos actualizados para el grupo.
+            if(response.updatedPermissions){
+              groupPermissions[selectedGroup] = response.updatedPermissions;
+            }
             loadPermissions(selectedGroup);
           }
         },
