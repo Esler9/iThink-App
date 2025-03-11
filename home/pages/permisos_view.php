@@ -190,29 +190,38 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
     const groupPermissions = <?php echo json_encode($groupPermissionsArray, JSON_UNESCAPED_UNICODE); ?>;
     
     /**
-     * Carga los permisos del grupo seleccionado y los inyecta en el contenedor.
+     * Carga los permisos del grupo seleccionado, filtrándolos según el texto de búsqueda,
+     * e inyecta el resultado en el contenedor.
      *
      * @param {string} group - Código del grupo seleccionado.
      */
     function loadPermissions(group) {
+      const searchQuery = $('#permissionSearch').val().toLowerCase();
       const permissionsGrouped = groupPermissions[group];
       let html = '';
   
       for (const [grupoPermisoId, grupoPermiso] of Object.entries(permissionsGrouped)) {
-        html += `
-          <div class="permission-group mb-4">
-            <h5 class="text-primary">${grupoPermiso.nombre}</h5>
-            <div class="permissions-list border p-3 rounded">
-        `;
-        grupoPermiso.permisos.forEach(permission => {
-          html += `
-            <div class="custom-control custom-checkbox mb-2">
-              <input type="checkbox" class="custom-control-input" id="${permission.id}" name="permiso[${group}][${permission.id}]" ${permission.check}>
-              <label class="custom-control-label" for="${permission.id}">${permission.label}</label>
-            </div>
-          `;
+        // Filtrar permisos de acuerdo al texto ingresado
+        let filteredPermissions = grupoPermiso.permisos.filter(permission => {
+          return permission.label.toLowerCase().includes(searchQuery);
         });
-        html += '</div></div>';
+  
+        if(filteredPermissions.length > 0) {
+          html += `
+            <div class="permission-group mb-4">
+              <h5 class="text-primary">${grupoPermiso.nombre}</h5>
+              <div class="permissions-list border p-3 rounded">
+          `;
+          filteredPermissions.forEach(permission => {
+            html += `
+              <div class="custom-control custom-checkbox mb-2">
+                <input type="checkbox" class="custom-control-input" id="${permission.id}" name="permiso[${group}][${permission.id}]" ${permission.check}>
+                <label class="custom-control-label" for="${permission.id}">${permission.label}</label>
+              </div>
+            `;
+          });
+          html += '</div></div>';
+        }
       }
       $('#permissionsContainer').html(html);
     }
@@ -229,7 +238,15 @@ $updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizad
         }
       });
   
-      // Enviar formulario vía AJAX y actualizar checkbox con la respuesta.
+      // Actualizar la lista de permisos al escribir en el campo de búsqueda.
+      $('#permissionSearch').on('keyup', function() {
+        const selectedGroup = $('#groupList li.active').data('group');
+        if (selectedGroup) {
+          loadPermissions(selectedGroup);
+        }
+      });
+  
+      // Enviar formulario vía AJAX y actualizar sidebar con la respuesta.
       $('#permissionsForm').on('submit', function(e) {
         e.preventDefault();
         $.ajax({
