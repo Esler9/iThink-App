@@ -101,6 +101,9 @@ foreach ($grupos as $grupo) {
             </ul>
           </div>
 
+          <!-- Puedes colocar este contenedor encima del formulario de permisos -->
+          <div id="msgContainer"></div>
+
           <!-- Permisos a la derecha -->
           <div class="col-md-8">
             <form id="permissionsForm" method="POST" action="../datos/process_permision">
@@ -190,7 +193,6 @@ foreach ($grupos as $grupo) {
         dataType: 'json', // Se espera respuesta en JSON.
         data: $(this).serialize(),
         success: function(response) {
-          alert('Cambios guardados correctamente.');
           const selectedGroup = $('#groupList li.active').data('group');
           if (selectedGroup) {
             // Suponiendo que el endpoint retorna los permisos actualizados para el grupo.
@@ -199,9 +201,32 @@ foreach ($grupos as $grupo) {
             }
             loadPermissions(selectedGroup);
           }
+          // Mostrar notificación de éxito.
+          $('#msgContainer').html(
+            '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+              'Configuración guardada correctamente.' +
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span>' +
+              '</button>' +
+            '</div>'
+          );
+          // Cerrar la alerta automáticamente después de 3 segundos.
+          setTimeout(function() {
+            $(".alert").alert('close');
+          }, 3000);
         },
         error: function() {
-          alert('Ha ocurrido un error al guardar los cambios.');
+          $('#msgContainer').html(
+            '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+              'Ha ocurrido un error al guardar los cambios.' +
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span>' +
+              '</button>' +
+            '</div>'
+          );
+          setTimeout(function() {
+            $(".alert").alert('close');
+          }, 3000);
         }
       });
     });
