@@ -1,7 +1,4 @@
-
-
-
-    <?php
+<?php
     // Ejecutar consulta SQL
     $result = mysqli_query($conn, $sql);
     if (!$result) {
@@ -136,7 +133,7 @@
             <!-- CUERPO DEL MODAL -->
             <div class="modal-body">
                 <!-- Formulario para enviar datos a 'accion.php' con acción específica y número de serie -->
-                <form action="../../logica/accion?accion=1&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
+                <form action="../../logica/accion?accion=1&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST" class="modal-form">
                     <div class="card-body">
                         <!-- Mostrar información del IMEI -->
                         <div class="form-group">
@@ -178,13 +175,13 @@
                         <!-- Campo para ingresar el precio -->
                         <div class="form-group">
                             <label for="precio">Precio:</label>
-                            <input type="text" name="precio" class="form-control" placeholder="Escriba Precio de Liberación">
+                            <input type="text" name="precio" class="form-control" placeholder="Escriba Precio de Liberación" required>
                         </div>
 
                         <!-- Campo para ingresar el tiempo estimado -->
                         <div class="form-group">
                             <label for="tiempo">Tiempo:</label>
-                            <input type="text" name="tiempo" class="form-control" placeholder="Escriba Tiempo Estimado">
+                            <input type="text" name="tiempo" class="form-control" placeholder="Escriba Tiempo Estimado" required>
                         </div>
 
                         <!-- Campo de texto para observaciones -->
