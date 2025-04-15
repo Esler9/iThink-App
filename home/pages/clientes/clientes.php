@@ -74,7 +74,7 @@ $tiendas = $_SESSION['tiendas'];
 
     <!-- Formulario para Agregar Nuevo Cliente -->
     <h2 class="text-info">Agregar Cliente</h2>
-    <form method="POST" action="cliente_acciones.php?func=1&id=0">
+    <form method="POST" action="cliente_acciones?func=1&id=0">
       <div class="form-group">
         <label for="nombre">Nombre:</label>
         <input type="text" class="form-control" id="nombre" name="nombre" required>

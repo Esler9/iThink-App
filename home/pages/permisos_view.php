@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <?php 
 session_start();
 
@@ -23,6 +24,30 @@ include("../datos/dt_permisos.php");
 
 // Obtener los grupos de usuarios
 $grupos = Traer_grupo_usuario($conn);
+
+// Construir el arreglo de permisos por grupo de manera centralizada
+$groupPermissionsArray = [];
+foreach ($grupos as $grupo) {
+    $permisos = traer_permisos($conn, $grupo['codigo']);
+    $permissionsGrouped = [];
+    foreach ($permisos as $permiso) {
+        $grupoPermiso = $permiso['group_permiso'];
+        if (!isset($permissionsGrouped[$grupoPermiso])) {
+            $permissionsGrouped[$grupoPermiso] = [
+                'nombre' => $permiso['nombre_grupo_p'],
+                'permisos' => []
+            ];
+        }
+        $permissionsGrouped[$grupoPermiso]['permisos'][] = [
+            'id'    => $permiso['codigo'],
+            'label' => $permiso['nombre_permiso'],
+            'check' => $permiso['active'] == 1 ? 'checked' : ''
+        ];
+    }
+    $groupPermissionsArray[$grupo['codigo']] = $permissionsGrouped;
+}
+
+$updatedPermissionsArray = []; // Asegúrate de asignarle los valores actualizados si es necesario.
 ?>
 
 <head>
@@ -41,143 +66,262 @@ $grupos = Traer_grupo_usuario($conn);
   <!-- Theme style -->
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <link rel="stylesheet" href="../dist/css/app.css">
+  <style>
+    .floating-alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      min-width: 250px;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    /* Contenedor principal de toda la página */
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+    /* Contenedor principal del contenido (este crecerá para ocupar espacio) */
+    .content-wrapper {
+      flex: 1;
+    }
+    /* Si deseas personalizar el footer */
+    .main-footer {
+      background-color: #f4f6f9;
+      padding: 10px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-
-<?php include("sidebar.php"); ?>
-
-<div class="content-wrapper">
-  <section class="content-header">
-    <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-6">
-          <h1>Permisos de Grupos</h1>
-        </div>
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="../dashboard.php">Home</a></li>
-            <li class="breadcrumb-item active">Permisos</li>
-          </ol>
-        </div>
-      </div>
+  <div class="wrapper">
+    
+    <div id="sidebarContainer">
+      <?php include("sidebar.php"); ?>
     </div>
-  </section>
-
-  <section class="content">
-    <div class="container-fluid">
-      <div class="container mt-5">
-        <div class="row">
-          <!-- Lista de grupos a la izquierda -->
-          <div class="col-md-4">
-            <h4>Grupos de Usuarios</h4>
-            <ul id="groupList" class="list-group">
-              <?php foreach ($grupos as $grupo): ?>
-                <li class="list-group-item" data-group="<?php echo htmlspecialchars($grupo['codigo']); ?>">
-                  <?php echo htmlspecialchars($grupo['nombre_grupo']); ?>
-                </li>
-              <?php endforeach; ?>
-            </ul>
-          </div>
-
-          <!-- Permisos a la derecha -->
-          <div class="col-md-8">
-            <h4>Permisos</h4>
-            <form id="permissionsForm" method="POST" action="../datos/process_permision.php">
-              <div class="text-center mt-4">
-                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-              </div>
-              <div id="permissionsContainer">
-                <p class="text-muted">Selecciona un grupo para ver y editar sus permisos.</p>
-              </div>
-            </form>
+  
+    <div class="content-wrapper">
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Permisos de Grupos</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="../dashboard.php">Home</a></li>
+                <li class="breadcrumb-item active">Permisos</li>
+              </ol>
+            </div>
           </div>
         </div>
+      </section>
+  
+      <section class="content">
+        <div class="container-fluid">
+          <div class="container mt-5">
+            <div class="row">
+              <!-- Lista de grupos a la izquierda -->
+              <div class="col-md-4">
+                <h4>Grupos de Usuarios</h4>
+                <ul id="groupList" class="list-group">
+                  <?php foreach ($grupos as $grupo): ?>
+                    <li class="list-group-item" data-group="<?php echo htmlspecialchars($grupo['codigo']); ?>">
+                      <?php echo htmlspecialchars($grupo['nombre_grupo']); ?>
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+  
+              <!-- Puedes colocar este contenedor encima del formulario de permisos -->
+              <div id="msgContainer"></div>
+  
+              <!-- Permisos a la derecha -->
+              <div class="col-md-8">
+                <form id="permissionsForm" method="POST" action="../datos/process_permision">
+                  <div class="card mt-3">
+                    <div class="card-header">
+                      <h5 class="card-title mb-0">Permisos</h5>
+                      <div class="card-tools">
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                          <input type="text" id="permissionSearch" class="form-control" placeholder="Buscar">
+                          <div class="input-group-append">
+                            <button class="btn btn-secondary btn-sm" type="button">
+                              <i class="fas fa-search"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body" id="permissionsContainer" style="max-height: 400px; overflow-y: auto;">
+                      <p class="text-muted">Selecciona un grupo para ver y editar sus permisos.</p>
+                    </div>
+                  </div>
+                  <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  
+    <footer class="main-footer">
+      <div class="float-right d-none d-sm-block">
+        <b>Version</b> 1
       </div>
-    </div>
-  </section>
+      <strong>Copyright &copy; 2023 <a href="https://hexasystems.com">Hexa Systems</a>.</strong> Todos los derechos reservados.
+    </footer>
+  
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+  
+  </div> <!-- Fin del wrapper -->
+  <!-- Scripts JS -->
+  <script src="../plugins/jquery/jquery.min.js"></script>
+  <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../dist/js/adminlte.min.js"></script>
+  <script>
+    // Se asigna el arreglo de permisos generado en PHP al objeto JavaScript.
+    const groupPermissions = <?php echo json_encode($groupPermissionsArray, JSON_UNESCAPED_UNICODE); ?>;
+    
+    /**
+     * Carga los permisos del grupo seleccionado, mostrando sólo aquellos que coinciden
+     * con el texto de búsqueda. Si un grupo no tiene ningún permiso que coincida,
+     * su contenedor no se renderiza.
+     *
+     * @param {string} group - Código del grupo seleccionado.
+     */
+    function loadPermissions(group) {
+      const permissionsGrouped = groupPermissions[group];
+      let html = '';
 
-  <footer class="main-footer">
-    <div class="float-right d-none d-sm-block">
-      <b>Version</b> 1
-    </div>
-    <strong>Copyright &copy; 2023 <a href="https://hexasystems.com">Hexa Systems</a>.</strong> Todos los derechos reservados.
-  </footer>
-
-  <aside class="control-sidebar control-sidebar-dark"></aside>
-</div>
-
-<!-- Scripts JS -->
-<script src="../plugins/jquery/jquery.min.js"></script>
-<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="../dist/js/adminlte.min.js"></script>
-
-<script>
- const groupPermissions = {
-    <?php foreach ($grupos as $index => $grupo): ?>
-      '<?php echo $grupo['codigo']; ?>': <?php 
-        $permisos = traer_permisos($conn, $grupo['codigo']);
-        $permissionsGrouped = [];
-
-        foreach ($permisos as $permiso) {
-          $grupoPermiso = $permiso['group_permiso'];
-          if (!isset($permissionsGrouped[$grupoPermiso])) {
-            $permissionsGrouped[$grupoPermiso] = [
-              'nombre' => $permiso['nombre_grupo_p'],
-              'permisos' => []
-            ];
-          }
-          $permissionsGrouped[$grupoPermiso]['permisos'][] = [
-            'id' => $permiso['codigo'],
-            'label' => $permiso['nombre_permiso'],
-            'check' => $permiso['active'] == 1 ? 'checked' : ''
-          ];
-        }
-        echo json_encode($permissionsGrouped);
-
-        // Evitar agregar una coma después del último elemento
-        if ($index !== array_key_last($grupos)) {
-            echo ',';
-        }
-      ?>
-    <?php endforeach; ?>
-};
-
-  // Cargar permisos al hacer clic en un grupo
-  $('#groupList').on('click', 'li', function(event) {
-    event.preventDefault();
-    const selectedGroup = $(this).data('group');
-
-    if (!$(this).hasClass('active')) {
-      loadPermissions(selectedGroup);
-      $('#groupList li').removeClass('active');
-      $(this).addClass('active');
-    }
-  });
-
-  // Función para cargar los permisos en el contenedor
-  function loadPermissions(group) {
-    const permissionsGrouped = groupPermissions[group];
-    let html = '';
-
-    for (const [grupoPermisoId, grupoPermiso] of Object.entries(permissionsGrouped)) {
-      html += `
-        <div class="permission-group mb-3">
-          <h5>${grupoPermiso.nombre}</h5>
-          <div class="permissions-list" style="border: 1px solid #007bff; border-radius: 5px; padding: 10px;">
-      `;
-      grupoPermiso.permisos.forEach(permission => {
+      // Recorrer cada grupo de permisos
+      for (const [grupoPermisoId, grupoPermiso] of Object.entries(permissionsGrouped)) {
         html += `
-          <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" id="${permission.id}" name="permiso[${group}][${permission.id}]" ${permission.check}>
-            <label class="custom-control-label" for="${permission.id}">${permission.label}</label>
-          </div>
+          <div class="permission-group mb-4" data-grouppermiso="${grupoPermisoId}">
+            <h5 class="text-primary">${grupoPermiso.nombre}</h5>
+            <div class="permissions-list border p-3 rounded">
         `;
-      });
-      html += '</div></div>';
+        grupoPermiso.permisos.forEach(permission => {
+          html += `
+            <div class="custom-control custom-checkbox mb-2 permission-item">
+              <input type="checkbox" class="custom-control-input" id="${permission.id}" name="permiso[${group}][${permission.id}]" ${permission.check}>
+              <label class="custom-control-label" for="${permission.id}">${permission.label}</label>
+            </div>
+          `;
+        });
+        html += '</div></div>';
+      }
+      $('#permissionsContainer').html(html);
     }
+  
+    $(document).ready(function() {
+      // Cargar permisos al seleccionar un grupo.
+      $('#groupList').on('click', 'li', function(event) {
+        event.preventDefault();
+        const selectedGroup = $(this).data('group');
+        if (!$(this).hasClass('active')) {
+          loadPermissions(selectedGroup);
+          $('#groupList li').removeClass('active');
+          $(this).addClass('active');
+        }
+      });
+  
+      // Actualizar la lista de permisos al escribir en el campo de búsqueda.
+      $('#permissionSearch').on('keyup', function() {
+        const selectedGroup = $('#groupList li.active').data('group');
+        if (selectedGroup) {
+          loadPermissions(selectedGroup);
+        }
+      });
 
-    $('#permissionsContainer').html(html);
-  }
-</script>
+      $('#permissionSearch').on('keyup', function() {
+        const searchQuery = $(this).val().toLowerCase();
+        
+        // Recorrer cada permiso
+        $('.permission-item').each(function() {
+          const labelText = $(this).find('label').text().toLowerCase();
+          // Mostrar el elemento si coincide el texto, ocultar si no
+          if(labelText.includes(searchQuery)){
+            $(this).show();
+          } else {
+            $(this).hide();
+          }
+        });
+        
+        // Para cada grupo, si ninguno de sus permisos está visible, ocultarlo; de lo contrario, mostrarlo
+        $('.permission-group').each(function() {
+          if($(this).find('.permission-item:visible').length === 0) {
+            $(this).hide();
+          } else {
+            $(this).show();
+          }
+        });
+      });
+  
+      // Enviar formulario vía AJAX y actualizar sidebar con la respuesta.
+      $('#permissionsForm').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+          url: '../datos/process_permision',
+          type: 'POST',
+          dataType: 'json', // Se espera respuesta en JSON.
+          data: $(this).serialize(),
+          success: function(response) {
+            const selectedGroup = $('#groupList li.active').data('group');
+            
+            // Mostrar notificación de éxito flotante.
+            $('#msgContainer').html(
+              '<div class="alert floating-alert alert-success alert-dismissible fade show" role="alert">' +
+                'Configuración guardada correctamente.' +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                  '<span aria-hidden="true">&times;</span>' +
+                '</button>' +
+              '</div>'
+            );
+            
+            // Recargar el sidebar con los nuevos permisos.
+            $('#sidebarContainer').load('sidebar.php');
+            
+            // Cerrar la alerta automáticamente después de 3 segundos.
+            setTimeout(function() {
+              $(".floating-alert").alert('close');
+            }, 3000);
+          },
+          error: function() {
+            $('#msgContainer').html(
+              '<div class="alert floating-alert alert-danger alert-dismissible fade show" role="alert">' +
+                'Ha ocurrido un error al guardar los cambios.' +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                  '<span aria-hidden="true">&times;</span>' +
+                '</button>' +
+              '</div>'
+            );
+            setTimeout(function() {
+              $(".floating-alert").alert('close');
+            }, 3000);
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </php>
+
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Procesamiento y actualización de permisos...
+    
+    // Asegúrate de definir $updatedPermissionsArray correctamente.
+    $updatedPermissionsArray = isset($updatedPermissionsArray) ? $updatedPermissionsArray : [];
+
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'success', 'updatedPermissions' => $updatedPermissionsArray]);
+    exit();
+}
+?>

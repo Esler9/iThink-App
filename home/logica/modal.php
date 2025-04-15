@@ -1,7 +1,4 @@
-
-
-
-    <?php
+<?php
     // Ejecutar consulta SQL
     $result = mysqli_query($conn, $sql);
     if (!$result) {
@@ -28,7 +25,7 @@
                     <!-- CUERPO DEL MODAL -->
                     <div class="modal-body">
                         <!-- Formulario para enviar datos a 'accion.php' -->
-                        <form action="../../logica/accion.php?accion=8&imei=<?php echo urlencode($row['serie']); ?>" method="POST">
+                        <form action="../../logica/accion?accion=8&imei=<?php echo urlencode($row['serie']); ?>" method="POST">
                             <div class="card-body">
                                 <!-- Información del IMEI -->
                                 <div class="form-group">
@@ -136,7 +133,7 @@
             <!-- CUERPO DEL MODAL -->
             <div class="modal-body">
                 <!-- Formulario para enviar datos a 'accion.php' con acción específica y número de serie -->
-                <form action="../../logica/accion.php?accion=1&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
+                <form action="../../logica/accion?accion=1&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST" class="modal-form">
                     <div class="card-body">
                         <!-- Mostrar información del IMEI -->
                         <div class="form-group">
@@ -178,13 +175,13 @@
                         <!-- Campo para ingresar el precio -->
                         <div class="form-group">
                             <label for="precio">Precio:</label>
-                            <input type="text" name="precio" class="form-control" placeholder="Escriba Precio de Liberación">
+                            <input type="text" name="precio" class="form-control" placeholder="Escriba Precio de Liberación" required>
                         </div>
 
                         <!-- Campo para ingresar el tiempo estimado -->
                         <div class="form-group">
                             <label for="tiempo">Tiempo:</label>
-                            <input type="text" name="tiempo" class="form-control" placeholder="Escriba Tiempo Estimado">
+                            <input type="text" name="tiempo" class="form-control" placeholder="Escriba Tiempo Estimado" required>
                         </div>
 
                         <!-- Campo de texto para observaciones -->
@@ -224,7 +221,7 @@
             </div>
             <div class="modal-body">
                 <!-- Formulario para enviar datos al archivo accion.php con acción específica y número de serie -->
-                <form action="../../logica/accion.php?accion=5.1&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
+                <form action="../../logica/accion?accion=5.1&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
                     <div class="card-body">
                         <!-- Mostrar información del IMEI -->
                         <div class="form-group">
@@ -290,7 +287,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="../../logica/accion.php?accion=2&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
+                <form action="../../logica/accion?accion=2&imei=<?php echo htmlspecialchars($row['serie']); ?>" method="POST">
                     <div class="card-body">
                         <div class="form-group">
                             <label>Imei:</label>
@@ -359,7 +356,7 @@
             <!-- Cuerpo del Modal -->
             <div class="modal-body">
                 <!-- Formulario para reiniciar -->
-                <form action="../../logica/accion.php" method="POST">
+                <form action="../../logica/accion" method="POST">
                     <input type="hidden" name="accion" value="2.1">
                     <input type="hidden" name="imei" value="<?php echo urlencode($row['serie']); ?>">
                     <div class="card-body">
@@ -430,7 +427,7 @@
             
             <!-- Modal Body -->
             <div class="modal-body">
-                <form action="../../logica/accion.php?accion=<?php echo (int)$row['cod_estado']; ?>&imei=<?php echo urlencode($row['serie']); ?>" 
+                <form action="../../logica/accion?accion=<?php echo (int)$row['cod_estado']; ?>&imei=<?php echo urlencode($row['serie']); ?>" 
                       id="<?php echo ($row['cod_estado'] == $page ? 'start-' : 'end-') . htmlspecialchars($row['serie'], ENT_QUOTES, 'UTF-8'); ?>" 
                       method="POST">
                     

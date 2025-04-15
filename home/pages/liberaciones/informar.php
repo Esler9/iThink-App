@@ -51,7 +51,7 @@ if(!isset($User)){
             <i class="fas fa-search"></i>
           </a>
           <div class="navbar-search-block">
-            <form class="form-inline" action="buscar.php" method="GET">
+            <form class="form-inline" action="buscar" method="GET">
               <div class="input-group input-group-sm">
                 <input class="form-control form-control-navbar" name="search" type="search" placeholder="buscar" aria-label="Search">
                 <div class="input-group-append">
@@ -166,7 +166,7 @@ if(!isset($User)){
               <div class="card-body">
 
             
-              <form action="../../logica/accion.php?accion=1&imei=<?php echo $row['serie'];?>" method="POST">
+              <form action="../../logica/accion?accion=1&imei=<?php echo $row['serie'];?>" method="POST">
                 <div class="card-body">
                 <div class="form-group">
                     <label for="name">Imei:</label>
