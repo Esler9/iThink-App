@@ -17,11 +17,6 @@ function reenviarCorreo($listaCorreos, $imei, $body) {
     }
 }
 
-// Validación general: accion e imei son obligatorios
-if (!isset($_GET['accion']) || empty($_GET['accion']) || !isset($_GET['imei']) || empty($_GET['imei'])) {
-    echo "Error: Datos necesarios no proporcionados.";
-    exit();
-}
 
 $accion = $_GET['accion'];
 $imei   = $_GET['imei'];
