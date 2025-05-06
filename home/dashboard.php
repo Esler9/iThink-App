@@ -134,15 +134,16 @@ include('vistas/header.php');
 
         <!-- Gráfico Donut -->
         <?php if (Tiene_permiso($permisos_user, 'ver-graficos-lb')): ?>
-          <div class="card card-danger">
+          <div class="card card-danger collapsed-card">
             <div class="card-header">
-              <h3 class="card-title">Grafico de Liberaciones</h3>
+              <h3 class="card-title">Gráfico de Liberaciones</h3>
               <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                  <i class="fas fa-plus"></i>
+                </button>
               </div>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="display: none;">
               <canvas id="donutChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
             </div>
           </div>
