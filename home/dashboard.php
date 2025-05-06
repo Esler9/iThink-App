@@ -196,77 +196,73 @@ include('vistas/header.php');
           <div class="card-header">
             <h3 class="card-title">Liberaciones - Últimos 7 Días</h3>
           </div>
-          <!-- Caja con scroll en caso de muchos registros -->
-          <div class="card-body table-responsive p-0" style="max-height: 300px;">
-            <table class="table table-head-fixed text-nowrap">
-              <thead>
-                <tr>
-                  <th>IMEI</th>
-                  <th>Modelo</th>
-                  <th>Cliente</th>
-                  <th>Última actualización</th>
-                  <th>Estado</th>
-                  <th>Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-  <?php 
-    while($row = mysqli_fetch_assoc($resultLatest)):
-      $estadoCod = (int)$row['cod_estado'];
-      
-      // Obtén el nombre y la URL del estado desde el mapeo obtenido de la BD,
-      // o usa el código si no se encuentra en el arreglo.
-      $estadoNombre = isset($estadoMapping[$estadoCod]) ? $estadoMapping[$estadoCod]['nombre'] : $row['cod_estado'];
-      $estadoUrl = isset($estadoMapping[$estadoCod]) ? $estadoMapping[$estadoCod]['url'] : '#';
-
-      // Asigna una clase de botón y un ícono según el estado,
-      // usando colores asociados:
-      switch($estadoCod) {
-          case 1: 
-            $btnClass = 'btn-info';    // Consultas - Color Info (#17a2b8)
-            $btnIcon = 'fas fa-question-circle';
-            break;
-          case 2:
-            $btnClass = 'btn-warning';  // Pendientes - Color Warning (#ffc107)
-            $btnIcon = 'fas fa-hourglass-half';
-            break;
-          case 3:
-            $btnClass = 'btn-success';  // Aprobadas - Color Success (#28a745)
-            $btnIcon = 'fas fa-thumbs-up';
-            break;
-          case 4:
-            $btnClass = 'btn-primary';  // En Proceso - Color Primary (#007bff)
-            $btnIcon = 'fas fa-cogs';
-            break;
-          case 5:
-            $btnClass = 'btn-secondary';  // Finalizadas - Color Secondary (#6c757d)
-            $btnIcon = 'fas fa-flag-checkered';
-            break;
-          case 6:
-            $btnClass = 'btn-danger';   // Rechazadas - Color Danger (#dc3545)
-            $btnIcon = 'fas fa-times-circle';
-            break;
-          default:
-            $btnClass = 'btn-dark';
-            $btnIcon = 'fas fa-info-circle';
-            break;
-      }
-  ?>
-  <tr>
-    <td><?php echo htmlspecialchars($row['serie']); ?></td>
-    <td><?php echo htmlspecialchars($row['modelo']); ?></td>
-    <td><?php echo htmlspecialchars($row['Nombre_Cliente']); ?></td>
-    <td><?php echo htmlspecialchars($row['date_update']); ?></td>
-    <td><?php echo htmlspecialchars($estadoNombre); ?></td>
-    <td>
-      <a href="<?php echo $estadoUrl; ?>?imei=<?php echo urlencode($row['serie']); ?>" class="btn <?php echo $btnClass; ?> btn-sm">
-        <i class="<?php echo $btnIcon; ?>"></i> <?php echo htmlspecialchars($estadoNombre); ?>
-      </a>
-    </td>
-  </tr>
-  <?php endwhile; ?>
-</tbody>
-            </table>
+          <div class="card-body">
+            <!-- Contenedor responsive para la tabla -->
+            <div class="table-responsive">
+              <table class="table table-head-fixed text-nowrap">
+                <thead>
+                  <tr>
+                    <th>IMEI</th>
+                    <th>Modelo</th>
+                    <th>Cliente</th>
+                    <th>Última actualización</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php 
+                    while($row = mysqli_fetch_assoc($resultLatest)):
+                      $estadoCod = (int)$row['cod_estado'];
+                      $estadoNombre = isset($estadoMapping[$estadoCod]) ? $estadoMapping[$estadoCod]['nombre'] : $row['cod_estado'];
+                      $estadoUrl = isset($estadoMapping[$estadoCod]) ? $estadoMapping[$estadoCod]['url'] : '#';
+                      switch($estadoCod) {
+                          case 1: 
+                            $btnClass = 'btn-info';
+                            $btnIcon = 'fas fa-question-circle';
+                            break;
+                          case 2:
+                            $btnClass = 'btn-warning';
+                            $btnIcon = 'fas fa-hourglass-half';
+                            break;
+                          case 3:
+                            $btnClass = 'btn-success';
+                            $btnIcon = 'fas fa-thumbs-up';
+                            break;
+                          case 4:
+                            $btnClass = 'btn-primary';
+                            $btnIcon = 'fas fa-cogs';
+                            break;
+                          case 5:
+                            $btnClass = 'btn-secondary';
+                            $btnIcon = 'fas fa-flag-checkered';
+                            break;
+                          case 6:
+                            $btnClass = 'btn-danger';
+                            $btnIcon = 'fas fa-times-circle';
+                            break;
+                          default:
+                            $btnClass = 'btn-dark';
+                            $btnIcon = 'fas fa-info-circle';
+                            break;
+                      }
+                  ?>
+                  <tr>
+                    <td><?php echo htmlspecialchars($row['serie']); ?></td>
+                    <td><?php echo htmlspecialchars($row['modelo']); ?></td>
+                    <td><?php echo htmlspecialchars($row['Nombre_Cliente']); ?></td>
+                    <td><?php echo htmlspecialchars($row['date_update']); ?></td>
+                    <td><?php echo htmlspecialchars($estadoNombre); ?></td>
+                    <td>
+                      <a href="<?php echo $estadoUrl; ?>?imei=<?php echo urlencode($row['serie']); ?>" class="btn <?php echo $btnClass; ?> btn-sm">
+                        <i class="<?php echo $btnIcon; ?>"></i> <?php echo htmlspecialchars($estadoNombre); ?>
+                      </a>
+                    </td>
+                  </tr>
+                  <?php endwhile; ?>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
