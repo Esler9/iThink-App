@@ -148,6 +148,43 @@ include('vistas/header.php');
           </div>
         <?php endif; ?>
 
+        <?php
+        // Consulta para obtener liberaciones actualizadas en los últimos 7 días
+        $sqlLatest = "SELECT * FROM liberacion WHERE date_update >= DATE_SUB(NOW(), INTERVAL 7 DAY) ORDER BY date_update DESC";
+        $resultLatest = mysqli_query($conn, $sqlLatest);
+        ?>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Liberaciones - Últimos 7 Días</h3>
+          </div>
+          <!-- Caja con scroll en caso de muchos registros -->
+          <div class="card-body table-responsive p-0" style="max-height: 300px;">
+            <table class="table table-head-fixed text-nowrap">
+              <thead>
+                <tr>
+                  <th>IMEI</th>
+                  <th>Modelo</th>
+                  <th>Cliente</th>
+                  <th>Última actualización</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php while($row = mysqli_fetch_assoc($resultLatest)): ?>
+                  <tr>
+                    <td><?php echo htmlspecialchars($row['serie']); ?></td>
+                    <td><?php echo htmlspecialchars($row['modelo']); ?></td>
+                    <td><?php echo htmlspecialchars($row['Nombre_Cliente']); ?></td>
+                    <td><?php echo htmlspecialchars($row['date_update']); ?></td>
+                    <td><?php echo htmlspecialchars($row['cod_estado']); ?></td>
+                  </tr>
+                <?php endwhile; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </section>
   </div>
