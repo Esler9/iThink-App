@@ -154,6 +154,42 @@ include('vistas/header.php');
         $resultLatest = mysqli_query($conn, $sqlLatest);
         ?>
 
+        <?php
+        // Consulta para obtener los estados desde la base de datos
+        $sqlEstados = "SELECT codigo_estado, Descripcion FROM Estado";
+        $resultEstados = mysqli_query($conn, $sqlEstados);
+        $estadoMapping = [];
+        while ($estadoData = mysqli_fetch_assoc($resultEstados)) {
+          $codigo = (int)$estadoData['codigo_estado'];
+          $estadoMapping[$codigo]['nombre'] = $estadoData['Descripcion'];
+          
+          // Asignar URL según el código de estado (ajusta estas condiciones a tu lógica)
+          switch ($codigo) {
+            case 1:
+              $estadoMapping[$codigo]['url'] = 'pages/liberaciones/consultas.php';
+              break;
+            case 2:
+              $estadoMapping[$codigo]['url'] = 'pages/liberaciones/pendientes.php';
+              break;
+            case 3:
+              $estadoMapping[$codigo]['url'] = 'pages/liberaciones/aprobadas.php';
+              break;
+            case 4:
+              $estadoMapping[$codigo]['url'] = 'pages/liberaciones/proceso.php';
+              break;
+            case 5:
+              $estadoMapping[$codigo]['url'] = 'pages/liberaciones/finalizadas.php';
+              break;
+            case 6:
+              $estadoMapping[$codigo]['url'] = 'pages/liberaciones/rechazadas.php';
+              break;
+            default:
+              $estadoMapping[$codigo]['url'] = '#';
+              break;
+          }
+        }
+        ?>
+
         <!-- Tabla de Liberaciones - Últimos 7 Días -->
         <div class="card">
           <div class="card-header">
@@ -174,19 +210,11 @@ include('vistas/header.php');
               </thead>
               <tbody>
                 <?php 
-                  // Definición del mapeo: código de estado -> [nombre, URL destino]
-                  $estadoMapping = [
-                    1 => ['nombre' => 'Consultas', 'url' => 'pages/liberaciones/consultas.php'],
-                    2 => ['nombre' => 'Pendientes', 'url' => 'pages/liberaciones/pendientes.php'],
-                    3 => ['nombre' => 'Aprobadas', 'url' => 'pages/liberaciones/aprobadas.php'],
-                    4 => ['nombre' => 'En Proceso', 'url' => 'pages/liberaciones/proceso.php'],
-                    5 => ['nombre' => 'Finalizadas', 'url' => 'pages/liberaciones/finalizadas.php'],
-                    6 => ['nombre' => 'Rechazadas', 'url' => 'pages/liberaciones/rechazadas.php']
-                  ];
                   while($row = mysqli_fetch_assoc($resultLatest)):
-                    $estado = (int)$row['cod_estado'];
-                    $estadoNombre = isset($estadoMapping[$estado]) ? $estadoMapping[$estado]['nombre'] : $row['cod_estado'];
-                    $estadoUrl = isset($estadoMapping[$estado]) ? $estadoMapping[$estado]['url'] : '#';
+                    $estadoCod = (int)$row['cod_estado'];
+                    // Usa el mapeo dinámico; si no se encuentra, usa el código como texto
+                    $estadoNombre = isset($estadoMapping[$estadoCod]) ? $estadoMapping[$estadoCod]['nombre'] : $row['cod_estado'];
+                    $estadoUrl = isset($estadoMapping[$estadoCod]) ? $estadoMapping[$estadoCod]['url'] : '#';
                 ?>
                 <tr>
                   <td><?php echo htmlspecialchars($row['serie']); ?></td>
