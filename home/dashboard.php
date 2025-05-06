@@ -154,6 +154,7 @@ include('vistas/header.php');
         $resultLatest = mysqli_query($conn, $sqlLatest);
         ?>
 
+        <!-- Tabla de Liberaciones - Últimos 7 Días -->
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">Liberaciones - Últimos 7 Días</h3>
@@ -168,17 +169,37 @@ include('vistas/header.php');
                   <th>Cliente</th>
                   <th>Última actualización</th>
                   <th>Estado</th>
+                  <th>Acción</th>
                 </tr>
               </thead>
               <tbody>
-                <?php while($row = mysqli_fetch_assoc($resultLatest)): ?>
-                  <tr>
-                    <td><?php echo htmlspecialchars($row['serie']); ?></td>
-                    <td><?php echo htmlspecialchars($row['modelo']); ?></td>
-                    <td><?php echo htmlspecialchars($row['Nombre_Cliente']); ?></td>
-                    <td><?php echo htmlspecialchars($row['date_update']); ?></td>
-                    <td><?php echo htmlspecialchars($row['cod_estado']); ?></td>
-                  </tr>
+                <?php 
+                  // Definición del mapeo: código de estado -> [nombre, URL destino]
+                  $estadoMapping = [
+                    1 => ['nombre' => 'Consultas', 'url' => 'pages/liberaciones/consultas.php'],
+                    2 => ['nombre' => 'Pendientes', 'url' => 'pages/liberaciones/pendientes.php'],
+                    3 => ['nombre' => 'Aprobadas', 'url' => 'pages/liberaciones/aprobadas.php'],
+                    4 => ['nombre' => 'En Proceso', 'url' => 'pages/liberaciones/proceso.php'],
+                    5 => ['nombre' => 'Finalizadas', 'url' => 'pages/liberaciones/finalizadas.php'],
+                    6 => ['nombre' => 'Rechazadas', 'url' => 'pages/liberaciones/rechazadas.php']
+                  ];
+                  while($row = mysqli_fetch_assoc($resultLatest)):
+                    $estado = (int)$row['cod_estado'];
+                    $estadoNombre = isset($estadoMapping[$estado]) ? $estadoMapping[$estado]['nombre'] : $row['cod_estado'];
+                    $estadoUrl = isset($estadoMapping[$estado]) ? $estadoMapping[$estado]['url'] : '#';
+                ?>
+                <tr>
+                  <td><?php echo htmlspecialchars($row['serie']); ?></td>
+                  <td><?php echo htmlspecialchars($row['modelo']); ?></td>
+                  <td><?php echo htmlspecialchars($row['Nombre_Cliente']); ?></td>
+                  <td><?php echo htmlspecialchars($row['date_update']); ?></td>
+                  <td><?php echo htmlspecialchars($estadoNombre); ?></td>
+                  <td>
+                    <a href="<?php echo $estadoUrl; ?>?imei=<?php echo urlencode($row['serie']); ?>" class="btn btn-primary btn-sm">
+                      <?php echo htmlspecialchars($estadoNombre); ?>
+                    </a>
+                  </td>
+                </tr>
                 <?php endwhile; ?>
               </tbody>
             </table>
