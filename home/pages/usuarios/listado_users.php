@@ -184,13 +184,13 @@ while ($u = mysqli_fetch_assoc($res_users)) {
             data-id-group="<?php echo htmlspecialchars($id_group);?>"
             data-cod-tienda="<?php echo htmlspecialchars($cod_tienda);?>"
             data-state="<?php echo htmlspecialchars($state);?>"
-            title="Editar" <?php if(!Tiene_permiso($permisos_user,'editar-usuarios')) echo ''; ?>><i class="fas fa-edit"></i></button>
+            title="Editar" <?php if(!Tiene_permiso($permisos_user,'editar-usuario')) echo 'disabled'; ?>><i class="fas fa-edit"></i></button>
 
           <button
             class="btn btn-sm btn-danger btn-delete"
             data-codigo="<?php echo htmlspecialchars($codigo);?>"
             data-user="<?php echo htmlspecialchars($user);?>"
-            title="Eliminar" <?php if(!Tiene_permiso($permisos_user,'eliminar-usuarios')) echo ''; ?>><i class="fas fa-trash"></i></button>
+            title="Eliminar" <?php if(!Tiene_permiso($permisos_user,'eliminar-usuario')) echo 'disabled'; ?>><i class="fas fa-trash"></i></button>
         </td>
       </tr>
 <?php } // end while ?>
