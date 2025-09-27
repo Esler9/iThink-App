@@ -1,57 +1,100 @@
-<?php
-include("../../../conexion.php");
-include("../../logica/ac_permiso.php");
-
-// Si conexion.php no define $conn, usar fallback (opcional)
-if (!isset($conn)) {
-    $host = 'localhost';
-    $user = 'root';
-    $password = '';
-    $dbname = 'nombre_de_tu_base_de_datos';
-    $conn = new mysqli($host, $user, $password, $dbname);
-}
-
-if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
-}
-
-// Consulta para obtener los usuarios
-$sql = "SELECT id, nombre, email FROM usuarios";
-$result = $conn->query($sql);
-?>
-
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Listado de Usuarios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        table { border-collapse: collapse; width: 60%; margin: 20px auto; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 32px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+        }
+        th {
+            background: #0078d4;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background: #f0f4fa;
+        }
+        tr:hover {
+            background: #e6f7ff;
+        }
+        .btn {
+            padding: 6px 16px;
+            background: #0078d4;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #005fa3;
+        }
     </style>
 </head>
 <body>
-    <h2 style="text-align:center;">Listado de Usuarios</h2>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Email</th>
-        </tr>
-        <?php
-        if ($result && $result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                echo "<tr>
-                        <td>{$row['id']}</td>
-                        <td>{$row['nombre']}</td>
-                        <td>{$row['email']}</td>
-                      </tr>";
-            }
-        } else {
-            echo "<tr><td colspan='3'>No hay usuarios registrados.</td></tr>";
-        }
-        $conn->close();
-        ?>
-    </table>
+    <div class="container">
+        <h1>Listado de Usuarios</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Ana Pérez</td>
+                    <td>ana.perez@email.com</td>
+                    <td>Administrador</td>
+                    <td>
+                        <a href="#" class="btn">Editar</a>
+                        <a href="#" class="btn">Eliminar</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Carlos Gómez</td>
+                    <td>carlos.gomez@email.com</td>
+                    <td>Usuario</td>
+                    <td>
+                        <a href="#" class="btn">Editar</a>
+                        <a href="#" class="btn">Eliminar</a>
+                    </td>
+                </tr>
+                <!-- Más usuarios aquí -->
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
