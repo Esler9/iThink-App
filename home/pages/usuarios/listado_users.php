@@ -7,11 +7,13 @@ if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
   exit();
 }
 
+$User = $_SESSION["username"];
+$cod_user = $_SESSION['cod_user'];
+
 include("../../../conexion.php");
 include("../../logica/ac_permiso.php"); 
 
-$User = $_SESSION["username"];
-$cod_user = $_SESSION['cod_user'];
+
 
 
 // Validar permiso
