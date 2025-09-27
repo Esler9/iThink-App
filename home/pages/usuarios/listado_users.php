@@ -254,40 +254,108 @@ while ($u = mysqli_fetch_assoc($res_users)) {
 <!-- incluir modales justo antes de los scripts -->
 <?php include("modal-users.php"); ?>
 
-<!-- JS para manejar toggle email_active -->
+<!-- JS: inicializar DataTables, toggle y handlers de modales -->
 <script>
-  $(document).on('change', '.toggle-email', function(){
-    var $cb = $(this);
-    var codigo = $cb.data('codigo');
-    var val = $cb.is(':checked') ? 1 : 0;
-    // Desactivar temporalmente checkbox hasta respuesta
-    $cb.prop('disabled', true);
-    $.post('toggle_email_active.php', { Codigo: codigo, email_active: val }, function(resp){
-      try {
-        var j = typeof resp === "object" ? resp : JSON.parse(resp);
-        if (j.success) {
-          // opcional: mostrar toast o alerta breve
-          // usando AdminLTE Toasts si está disponible:
-          if (typeof $(document).Toasts === 'function') {
-            $(document).Toasts('create', { class: 'bg-success', title: 'Email', body: j.message });
-          } else {
-            alert(j.message);
+  $(function () {
+    // Inicializar DataTable (si no está ya)
+    if ($.fn.DataTable) {
+      $("#example1").DataTable({
+        responsive: true,
+        lengthChange: true,
+        pageLength: 25,
+        autoWidth: false,
+        buttons: ["copy","csv","excel","pdf","print","colvis"],
+        language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" }
+      }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    }
+
+    // Toggle email_active (AJAX)
+    $(document).on('change', '.toggle-email', function(){
+      var $cb = $(this);
+      var codigo = $cb.data('codigo');
+      var val = $cb.is(':checked') ? 1 : 0;
+      $cb.prop('disabled', true);
+      $.post('toggle_email_active.php', { Codigo: codigo, email_active: val })
+        .done(function(resp){
+          var j;
+          try { j = (typeof resp === 'object') ? resp : JSON.parse(resp); }
+          catch(e){ alert('Respuesta inesperada del servidor'); $cb.prop('checked', !val); return; }
+          if (!j.success) { alert('Error: '+j.message); $cb.prop('checked', !val); }
+          else {
+            if (typeof $(document).Toasts === 'function') {
+              $(document).Toasts('create',{ class: 'bg-success', title: 'Email', body: j.message });
+            }
           }
-        } else {
-          alert('Error: ' + j.message);
-          // revertir estado
-          $cb.prop('checked', !val);
-        }
-      } catch(e) {
-        alert('Respuesta inesperada del servidor.');
-        $cb.prop('checked', !val);
-      }
-      $cb.prop('disabled', false);
-    }).fail(function(){
-      alert('Error de conexión. Intente de nuevo.');
-      $cb.prop('checked', !val);
-      $cb.prop('disabled', false);
+        })
+        .fail(function(){ alert('Error de conexión'); $cb.prop('checked', !val); })
+        .always(function(){ $cb.prop('disabled', false); });
     });
+
+    // Helpers para leer data-* con jQuery .data()
+    function getBtnData($btn){
+      // jQuery normaliza data-xxx-yyy a camelCase: xxxYyy
+      return {
+        codigo: $btn.data('codigo'),
+        user: $btn.data('user'),
+        codEmpleado: $btn.data('codEmpleado'),
+        email: $btn.data('email'),
+        emailActive: $btn.data('emailActive'),
+        idGroup: $btn.data('idGroup'),
+        grupo: $btn.data('grupo'),
+        codTienda: $btn.data('codTienda'),
+        tienda: $btn.data('tienda'),
+        state: $btn.data('state')
+      };
+    }
+
+    // Abrir Ver
+    $(document).on('click', '.btn-view', function(e){
+      e.preventDefault();
+      var d = getBtnData($(this));
+      $('#v_codigo').text(d.codigo || '');
+      $('#v_user').text(d.user || '');
+      $('#v_cod_empleado').text(d.codEmpleado || '');
+      $('#v_email').text(d.email || '');
+      $('#v_email_active').text((parseInt(d.emailActive) === 1) ? 'Si' : 'No');
+      $('#v_grupo').text(d.grupo || d.idGroup || '');
+      $('#v_tienda').text(d.tienda || d.codTienda || '');
+      $('#v_state').text((parseInt(d.state) === 1) ? 'Activo' : ((parseInt(d.state) === 0) ? 'Inactivo' : (d.state || '')));
+      $('#viewUserModal').modal('show');
+    });
+
+    // Abrir Editar
+    $(document).on('click', '.btn-edit', function(e){
+      e.preventDefault();
+      var d = getBtnData($(this));
+      $('#e_codigo').val(d.codigo || '');
+      $('#e_user').val(d.user || '');
+      $('#e_cod_empleado').val(d.codEmpleado || '');
+      $('#e_email').val(d.email || '');
+      // checkbox control (bootstrap switch)
+      $('#e_email_active').prop('checked', parseInt(d.emailActive) === 1);
+      $('#e_id_group').val(d.idGroup || '');
+      $('#e_cod_tienda').val(d.codTienda || '');
+      $('#e_state').val(d.state || '');
+      $('#e_password').val('');
+      $('#editUserModal').modal('show');
+    });
+
+    // Abrir Eliminar
+    $(document).on('click', '.btn-delete', function(e){
+      e.preventDefault();
+      var $btn = $(this);
+      var d = getBtnData($btn);
+      $('#d_codigo').val(d.codigo || '');
+      $('#d_user').text(d.user || '');
+      $('#d_codigo_txt').text(d.codigo || '');
+      $('#deleteUserModal').modal('show');
+    });
+
+    // Evitar errores JS que corten ejecución: mostrar errores en consola
+    window.onerror = function(msg, url, line, col, error) {
+      console.error('JS error:', msg, 'at', url+':'+line+':'+col, error);
+      return false;
+    };
   });
 </script>
 </body>
