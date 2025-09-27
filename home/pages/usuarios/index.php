@@ -1,14 +1,19 @@
 <?php 
 include("../../vistas/header.php");
 
-
 // Validar permiso para ver usuarios
-if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
-  echo "<script>
-          alert('No tienes acceso a esta página.');
-          window.location.href = '/home/dashboard.php';
-        </script>";
-  exit();
+if (!Tiene_permiso($permisos_user, 'ver-usuarios')) {
+  // Intentar redirigir con header si es posible, si no usar JS
+  if (!headers_sent()) {
+    header('Location: ../../dashboard.php');
+    exit();
+  } else {
+    echo "<script>
+            alert('No tienes acceso a esta página.');
+            window.location.href = '../../dashboard.php';
+          </script>";
+    exit();
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -83,21 +88,25 @@ if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
                 <?php 
                 $sql = "SELECT * FROM Usuarios ORDER BY Codigo ASC";
                 $result = mysqli_query($conn, $sql);
-                if($result){
-                  while($row = mysqli_fetch_array($result)) {
-                    echo "<tr>";
-                      echo "<td>" . $row['Codigo'] . "</td>";
-                      echo "<td>" . htmlspecialchars($row['User']) . "</td>";
-                      echo "<td>" . htmlspecialchars($row['email']) . "</td>";
-                      echo "<td>" . htmlspecialchars($row['state']) . "</td>";
-                      echo "<td class='text-right'>";
-                        echo "<a href='editar.php?id=" . $row['Codigo'] . "' class='btn btn-info btn-sm'><i class='fas fa-edit'></i> Editar</a> ";
-                        echo "<a href='eliminar.php?id=" . $row['Codigo'] . "' class='btn btn-danger btn-sm' onclick=\"return confirm('¿Desea eliminar este usuario?');\"><i class='fas fa-trash-alt'></i> Eliminar</a>";
-                      echo "</td>";
-                    echo "</tr>";
+                if ($result) {
+                  if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_array($result)) {
+                      echo "<tr>";
+                        echo "<td>" . htmlspecialchars($row['Codigo']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['User']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['email']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['state']) . "</td>";
+                        echo "<td class='text-right'>";
+                          echo "<a href='editar.php?id=" . urlencode($row['Codigo']) . "' class='btn btn-info btn-sm'><i class='fas fa-edit'></i> Editar</a> ";
+                          echo "<a href='eliminar.php?id=" . urlencode($row['Codigo']) . "' class='btn btn-danger btn-sm' onclick=\"return confirm('¿Desea eliminar este usuario?');\"><i class='fas fa-trash-alt'></i> Eliminar</a>";
+                        echo "</td>";
+                      echo "</tr>";
+                    }
+                  } else {
+                    echo "<tr><td colspan='5'>No se encontraron usuarios.</td></tr>";
                   }
                 } else {
-                  echo "<tr><td colspan='5'>No se encontraron usuarios.</td></tr>";
+                  echo "<tr><td colspan='5'>Error en la consulta: " . htmlspecialchars(mysqli_error($conn)) . "</td></tr>";
                 }
                 ?>
               </tbody>
@@ -142,7 +151,7 @@ if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
 <div class="modal fade" id="modalNuevoUsuario" tabindex="-1" role="dialog" aria-labelledby="modalNuevoUsuarioLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form id="nuevoUsuarioForm" action="nuevo_usuario" method="post">
+      <form id="nuevoUsuarioForm" action="nuevo_usuario.php" method="post">
         <div class="modal-header">
           <h5 class="modal-title" id="modalNuevoUsuarioLabel">Crear Nuevo Usuario</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
@@ -193,6 +202,15 @@ if (Tiene_permiso($permisos_user, 'ver-usuarios')) {
 <script src="../../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
 <script src="../../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
 <script src="../../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+
+<!-- Dependencias para export (JSZip / pdfmake / botones html5/print/colVis) -->
+<script src="../../plugins/jszip/jszip.min.js"></script>
+<script src="../../plugins/pdfmake/pdfmake.min.js"></script>
+<script src="../../plugins/pdfmake/vfs_fonts.js"></script>
+<script src="../../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+<script src="../../plugins/datatables-buttons/js/buttons.print.min.js"></script>
+<script src="../../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+
 <!-- AdminLTE App -->
 <script src="../../dist/js/adminlte.min.js"></script>
 
