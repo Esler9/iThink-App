@@ -1,39 +1,53 @@
 <?php
-// Mostrar errores temporalmente para depuración (Quitar en producción)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/php-error.log');
 
 session_start();
-$User = $_SESSION["username"];
-$cod_user = $_SESSION['cod_user'];
 
-include('../Setting.php');
+// Definir rutas globales (filesystem y URL base)
+define('APP_ROOT', realpath(__DIR__ . '/..')); // carpeta "home"
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 ? 'https://' : 'http://';
+$documentRoot = realpath($_SERVER['DOCUMENT_ROOT']);
+$basePath = str_replace('\\', '/', str_replace($documentRoot, '', APP_ROOT));
+$basePath = rtrim($basePath, '/');
+define('APP_URL', $protocol . $_SERVER['HTTP_HOST'] . $basePath);
 
-if ($mantenimiento == true) {
-  header('location:../mantenimiento.php');
+// Variables de sesión
+$User = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
+$cod_user = isset($_SESSION['cod_user']) ? $_SESSION['cod_user'] : null;
+
+// Includes usando rutas absolutas
+include_once(APP_ROOT . '/Setting.php');
+include_once(APP_ROOT . '/conexion.php');
+include_once(APP_ROOT . '/vistas/logica/ac_permiso.php');
+
+// Mantenimiento (ruta URL global)
+if (isset($mantenimiento) && $mantenimiento == true) {
+  header('Location: ' . APP_URL . '/mantenimiento.php');
   exit;
 }
 
+// Validar sesión (ruta URL global -- ajustar si login está en otra ubicación)
 if (!isset($User)) {
-  header('location:login.php');
+  header('Location: ' . APP_URL . '/login.php');
   exit();
 }
 
-include("../conexion.php");
-include("logica/ac_permiso.php");
-
 // Obtención de tiendas a las que tiene acceso el usuario
-$sql = "SELECT cod_tienda FROM `asignacion_tienda` where cod_user = $cod_user";
-$consulta = mysqli_query($conn, $sql);
-while ($fila = mysqli_fetch_array($consulta)) {
-  $marcas[] = $fila['cod_tienda'];
+$marcas = array();
+if (!empty($cod_user)) {
+  $sql = "SELECT cod_tienda FROM `asignacion_tienda` WHERE cod_user = " . intval($cod_user);
+  $consulta = mysqli_query($conn, $sql);
+  if ($consulta) {
+    while ($fila = mysqli_fetch_array($consulta)) {
+      $marcas[] = $fila['cod_tienda'];
+    }
+  }
 }
 if (!empty($marcas)) {
   $tiendas = implode(', ', $marcas);
   $_SESSION['tiendas'] = $tiendas;
+} else {
+  // Asegurar que la sesión tiene la clave aunque esté vacía
+  $_SESSION['tiendas'] = isset($_SESSION['tiendas']) ? $_SESSION['tiendas'] : '';
 }
 $tiendas = $_SESSION['tiendas'];
 ?>
