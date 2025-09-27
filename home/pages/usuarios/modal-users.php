@@ -1,8 +1,4 @@
-<?php
-// modal-users.php - modales para ver, editar y eliminar usuario
-// Este archivo debe incluirse desde listado_users.php: include("modal-users.php");
-include("../../../conexion.php");
-?>
+
 <!-- Ver Usuario -->
 <div class="modal fade" id="viewUserModal" tabindex="-1" role="dialog" aria-labelledby="viewUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
