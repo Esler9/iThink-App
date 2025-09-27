@@ -153,9 +153,37 @@ while ($u = mysqli_fetch_assoc($res_users)) {
         <td><?php echo htmlspecialchars($tienda_nombre); ?></td>
         <td><span class="badge badge-<?php echo $state_badge; ?>"><?php echo htmlspecialchars($state_label); ?></span></td>
         <td class="table-actions">
-          <a href="ver_usuario.php?codigo=<?php echo urlencode($codigo); ?>" class="btn btn-sm btn-info" title="Ver"><i class="fas fa-eye"></i></a>
-          <a href="editar_usuario.php?codigo=<?php echo urlencode($codigo); ?>" class="btn btn-sm btn-warning" title="Editar" <?php if(!Tiene_permiso($permisos_user,'editar-usuarios')) echo 'disabled'; ?>><i class="fas fa-edit"></i></a>
-          <a href="eliminar_usuario.php?codigo=<?php echo urlencode($codigo); ?>" class="btn btn-sm btn-danger" title="Eliminar" onclick="return confirm('¿Eliminar usuario <?php echo addslashes($user); ?>?')" <?php if(!Tiene_permiso($permisos_user,'eliminar-usuarios')) echo 'disabled'; ?>><i class="fas fa-trash"></i></a>
+          <button
+            class="btn btn-sm btn-info btn-view"
+            data-codigo="<?php echo htmlspecialchars($codigo);?>"
+            data-user="<?php echo htmlspecialchars($user);?>"
+            data-cod-empleado="<?php echo htmlspecialchars($cod_empleado);?>"
+            data-email="<?php echo htmlspecialchars($email);?>"
+            data-email-active="<?php echo (int)$email_active;?>"
+            data-id-group="<?php echo htmlspecialchars($id_group);?>"
+            data-grupo="<?php echo htmlspecialchars($group_name);?>"
+            data-cod-tienda="<?php echo htmlspecialchars($cod_tienda);?>"
+            data-tienda="<?php echo htmlspecialchars($tienda_nombre);?>"
+            data-state="<?php echo htmlspecialchars($state);?>"
+            title="Ver"><i class="fas fa-eye"></i></button>
+
+          <button
+            class="btn btn-sm btn-warning btn-edit"
+            data-codigo="<?php echo htmlspecialchars($codigo);?>"
+            data-user="<?php echo htmlspecialchars($user);?>"
+            data-cod-empleado="<?php echo htmlspecialchars($cod_empleado);?>"
+            data-email="<?php echo htmlspecialchars($email);?>"
+            data-email-active="<?php echo (int)$email_active;?>"
+            data-id-group="<?php echo htmlspecialchars($id_group);?>"
+            data-cod-tienda="<?php echo htmlspecialchars($cod_tienda);?>"
+            data-state="<?php echo htmlspecialchars($state);?>"
+            title="Editar" <?php if(!Tiene_permiso($permisos_user,'editar-usuarios')) echo 'disabled'; ?>><i class="fas fa-edit"></i></button>
+
+          <button
+            class="btn btn-sm btn-danger btn-delete"
+            data-codigo="<?php echo htmlspecialchars($codigo);?>"
+            data-user="<?php echo htmlspecialchars($user);?>"
+            title="Eliminar" <?php if(!Tiene_permiso($permisos_user,'eliminar-usuarios')) echo 'disabled'; ?>><i class="fas fa-trash"></i></button>
         </td>
       </tr>
 <?php } // end while ?>
