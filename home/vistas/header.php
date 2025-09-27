@@ -1,4 +1,11 @@
 <?php
+// Mostrar errores temporalmente para depuración (Quitar en producción)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/php-error.log');
+
 session_start();
 $User = $_SESSION["username"];
 $cod_user = $_SESSION['cod_user'];
