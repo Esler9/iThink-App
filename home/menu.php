@@ -386,44 +386,6 @@
                     </li>
                     <?php } ?>
 
-                    <?php if(Tiene_permiso($permisos_user, 'crear-usuario') || Tiene_permiso($permisos_user, 'editar-usuario') || Tiene_permiso($permisos_user, 'eliminar-usuario')) { ?>
-                    <!-- Usuarios Avanzados -->
-                    <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-user"></i>
-                            <p>
-                                Usuarios
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <?php if(Tiene_permiso($permisos_user, 'crear-usuario')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/usuarios/crear.php" class="nav-link">
-                                    <i class="fas fa-user-plus nav-icon"></i>
-                                    <p>Crear Usuario</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'editar-usuario')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/usuarios/editar.php" class="nav-link">
-                                    <i class="fas fa-edit nav-icon"></i>
-                                    <p>Editar Usuario</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'eliminar-usuario')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/usuarios/eliminar.php" class="nav-link">
-                                    <i class="fas fa-trash nav-icon"></i>
-                                    <p>Eliminar Usuario</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                        </ul>
-                    </li>
-                    <?php } ?>
 
                     <?php if(Tiene_permiso($permisos_user, 'crear-venta') || Tiene_permiso($permisos_user, 'editar-venta') || Tiene_permiso($permisos_user, 'eliminar-venta')) { ?>
                     <!-- Ventas -->
