@@ -368,7 +368,7 @@
                         <ul class="nav nav-treeview">
                             <?php if(Tiene_permiso($permisos_user, 'ver-usuarios')) { ?>
                             <li class="nav-item">
-                                <a href="/home/pages/usuarios/index.php" class="nav-link">
+                                <a href="/home/pages/usuarios/listado_users.php" class="nav-link">
                                     <i class="fas fa-list nav-icon"></i>
                                     <p>Listado de Usuarios</p>
                                 </a>
