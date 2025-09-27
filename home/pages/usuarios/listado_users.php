@@ -135,7 +135,14 @@ while ($u = mysqli_fetch_assoc($res_users)) {
     case '3': $group_badge = 'info'; break;
     default: $group_badge = 'secondary';
   }
-  $email_badge = (int)$email_active === 1 ? '<span class="badge badge-success">Verificado</span>' : '<span class="badge badge-secondary">No</span>';
+  $email_checked = ((int)$email_active === 1) ? 'checked' : '';
+  $email_switch = '
+    <div class="custom-control custom-switch">
+      <input type="checkbox" class="custom-control-input toggle-email" id="toggle-'.htmlspecialchars($codigo).'" data-codigo="'.htmlspecialchars($codigo).'" '. $email_checked .'>
+      <label class="custom-control-label" for="toggle-'.htmlspecialchars($codigo).'"></label>
+    </div>
+  ';
+
   $state_lower = strtolower((string)$state);
   if (in_array($state_lower, ['1','activo','true','yes','on'])) { $state_label = 'Activo'; $state_badge = 'success'; }
   elseif (in_array($state_lower, ['0','inactivo','false','no','off'])) { $state_label = 'Inactivo'; $state_badge = 'dark'; }
@@ -148,7 +155,7 @@ while ($u = mysqli_fetch_assoc($res_users)) {
         <td><?php echo htmlspecialchars($user); ?></td>
         <td><?php echo htmlspecialchars($cod_empleado); ?></td>
         <td><?php echo htmlspecialchars($email); ?></td>
-        <td><?php echo $email_badge; ?></td>
+        <td><?php echo $email_switch; ?></td>
         <td><span class="badge badge-<?php echo $group_badge; ?> badge-group"><?php echo htmlspecialchars($group_name); ?></span></td>
         <td><?php echo htmlspecialchars($tienda_nombre); ?></td>
         <td><span class="badge badge-<?php echo $state_badge; ?>"><?php echo htmlspecialchars($state_label); ?></span></td>
@@ -244,16 +251,43 @@ while ($u = mysqli_fetch_assoc($res_users)) {
 <!-- AdminLTE App -->
 <script src="../../dist/js/adminlte.min.js"></script>
 
+<!-- incluir modales justo antes de los scripts -->
+<?php include("modal-users.php"); ?>
+
+<!-- JS para manejar toggle email_active -->
 <script>
-  $(function () {
-    $("#example1").DataTable({
-      responsive: true,
-      lengthChange: true,
-      pageLength: 25,
-      autoWidth: false,
-      buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
-      language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" }
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+  $(document).on('change', '.toggle-email', function(){
+    var $cb = $(this);
+    var codigo = $cb.data('codigo');
+    var val = $cb.is(':checked') ? 1 : 0;
+    // Desactivar temporalmente checkbox hasta respuesta
+    $cb.prop('disabled', true);
+    $.post('toggle_email_active.php', { Codigo: codigo, email_active: val }, function(resp){
+      try {
+        var j = typeof resp === "object" ? resp : JSON.parse(resp);
+        if (j.success) {
+          // opcional: mostrar toast o alerta breve
+          // usando AdminLTE Toasts si está disponible:
+          if (typeof $(document).Toasts === 'function') {
+            $(document).Toasts('create', { class: 'bg-success', title: 'Email', body: j.message });
+          } else {
+            alert(j.message);
+          }
+        } else {
+          alert('Error: ' + j.message);
+          // revertir estado
+          $cb.prop('checked', !val);
+        }
+      } catch(e) {
+        alert('Respuesta inesperada del servidor.');
+        $cb.prop('checked', !val);
+      }
+      $cb.prop('disabled', false);
+    }).fail(function(){
+      alert('Error de conexión. Intente de nuevo.');
+      $cb.prop('checked', !val);
+      $cb.prop('disabled', false);
+    });
   });
 </script>
 </body>

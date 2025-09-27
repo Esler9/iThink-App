@@ -55,10 +55,12 @@ include("../../../conexion.php");
           </div>
           <div class="form-group">
             <label for="e_email_active">Email verificado</label>
-            <select class="form-control" id="e_email_active" name="email_active">
-              <option value="0">No</option>
-              <option value="1">Si</option>
-            </select>
+            <!-- hidden para asegurar envío cuando está desmarcado -->
+            <input type="hidden" name="email_active" value="0">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="e_email_active" name="email_active" value="1">
+              <label class="custom-control-label" for="e_email_active">Enviar correos / Verificado</label>
+            </div>
           </div>
           <div class="form-group">
             <label for="e_id_group">Grupo</label>
@@ -160,7 +162,12 @@ include("../../../conexion.php");
     $('#e_user').val(data.user);
     $('#e_cod_empleado').val(data.codEmpleado || '');
     $('#e_email').val(data.email || '');
-    $('#e_email_active').val(data.emailActive);
+    // checkbox: comprobar si viene 1
+    if (parseInt(data.emailActive) === 1) {
+      $('#e_email_active').prop('checked', true);
+    } else {
+      $('#e_email_active').prop('checked', false);
+    }
     $('#e_id_group').val(data.idGroup);
     $('#e_cod_tienda').val(data.codTienda);
     $('#e_state').val(data.state);
