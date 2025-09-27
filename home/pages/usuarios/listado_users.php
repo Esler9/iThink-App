@@ -8,7 +8,21 @@ if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
 }
 
 include("../../../conexion.php");
-include("../../logica/ac_permiso.php"); ?>
+include("../../logica/ac_permiso.php"); 
+
+// Validar permiso
+if (Tiene_permiso($permisos_user,'ver-usuarios')) {
+   
+} else {
+  echo "<script>
+        alert('No tienes acceso a esta página.');
+        window.location.href = '/home/dashboard.php'; // Redirigir a la página deseada
+        </script>";
+  exit();
+}
+
+
+?>
 
 <php lang="en">
 <head>
