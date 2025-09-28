@@ -121,7 +121,23 @@ if (!$res_users) {
               <td><?php echo $codigo; ?></td>
               <td><?php echo $user; ?></td>
               <td><?php echo $cod_empleado; ?></td>
-              <td><?php echo $email; ?></td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="mr-2" style="min-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                    <?php echo $email ?: '-'; ?>
+                  </div>
+                  <div>
+                    <div class="custom-control custom-switch">
+                      <input type="checkbox"
+                             class="custom-control-input email-toggle"
+                             id="emailSwitch<?php echo $codigo;?>"
+                             data-codigo="<?php echo $codigo;?>"
+                             <?php echo ($email_active ? 'checked' : ''); ?>>
+                      <label class="custom-control-label" for="emailSwitch<?php echo $codigo;?>" title="Activar/desactivar envíos de email"></label>
+                    </div>
+                  </div>
+                </div>
+              </td>
               <td><?php echo $grupo_nombre; ?></td>
               <td><?php echo $tienda_nombre; ?></td>
               <td><?php echo $state; ?></td>
