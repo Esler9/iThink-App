@@ -35,7 +35,7 @@ switch ($accion) {
         // Creación de usuario
         // Campos esperados en el form: c_user, c_password, c_cod_empleado, c_email, c_id_group, c_cod_tienda, c_state, c_email_active
         if (empty($_POST['c_user']) || empty($_POST['c_password'])) {
-            header("location:../../pages/usuarios/crear.php?alert=DataMissing");
+            header("location:../../pages/usuarios/listado_users.php?alert=DataMissing");
             exit();
         }
 
