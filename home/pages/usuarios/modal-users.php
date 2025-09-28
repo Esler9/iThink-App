@@ -1,5 +1,13 @@
 <script>
-// Cargar opciones de tiendas y grupos al abrir los modales de Crear/Editar
+$(document).ready(function() {
+// Cargar opciones de t$('#editUserModal').on('show.bs.modal', function(){
+  $('#e_cod_tienda').html('<option value="">Cargando...</option>');
+  $('#e_id_group').html('<option value="">Cargando...</option>');
+  cargarSelectsUsuarios();
+});
+
+}); // Cierre del document.ready
+</script> y grupos al abrir los modales de Crear/Editar
 function cargarSelectsUsuarios() {
 	console.log('Iniciando carga de selects...');
 	

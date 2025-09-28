@@ -6,6 +6,17 @@ include("../../../conexion.php");
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 $response = [];
 
+// Test directo si no hay action (para debug)
+if (!$action && isset($_GET['test'])) {
+    echo json_encode([
+        'test' => 'OK',
+        'conexion' => mysqli_ping($conn) ? 'OK' : 'FAIL',
+        'post_data' => $_POST,
+        'get_data' => $_GET
+    ]);
+    exit;
+}
+
 if ($action === 'get_tiendas') {
     $sql = "SELECT cod_tienda, nombre FROM tienda ORDER BY nombre ASC";
     $res = mysqli_query($conn, $sql);
