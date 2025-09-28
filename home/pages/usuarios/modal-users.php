@@ -228,46 +228,49 @@ if (isset($conn)) {
       if (btn) btn.disabled = true;
       var url = form.getAttribute('action') || './usuarios_accion.php';
       var fd = new FormData(form);
-      // mostrar data que se va a enviar (seguro en dev)
       console.log('DEBUG: FormData to send for', form.id, Array.from(fd.entries()));
 
       var opts = {
         method: 'POST',
         body: fd,
         credentials: 'same-origin',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json, text/plain, */*'
+        }
       };
 
-      // si existe campo debug activamos modo manual de redirect para detectar 301/302
-      if (form.querySelector('input[name="debug"]')) {
-        opts.redirect = 'manual';
-        console.warn('DEBUG: fetch will use redirect: manual to capture Location header');
-      }
-
+      // no usar redirect: 'manual' — permitir seguir redirecciones
       fetch(url, opts)
       .then(function(r){
-        // registrar estatus y headers
         console.log('Fetch response status:', r.status, 'ok:', r.ok, 'redirected:', r.redirected, 'url:', r.url);
-        // intentar leer Location header si hubo redirect manual
-        try {
-          var loc = r.headers.get('Location');
-          if (loc) console.warn('Fetch Location header:', loc);
-        } catch(e){ console.warn('No access to Location header', e); }
         return r.text().then(function(t){ return { status: r.status, text: t, url: r.url }; });
       })
       .then(function(res){
         console.log('Response body:', res.text);
-        alert('Respuesta servidor (ver consola). Status: '+res.status);
-        try {
-          var j = JSON.parse(res.text);
-          console.log('JSON parsed:', j);
-          if (j.success) location.reload();
-          else if (j.debug_received) {
-            // mostrar detalle útil en alert corto
-            alert('Debug: ' + (j.message || JSON.stringify(j.debug_received)));
+        // si el servidor devolvió HTML (p. ej. página de login) detectarlo
+        var bodyLower = (res.text||'').toLowerCase();
+        if (res.status === 0) {
+          alert('Error de red (status 0). Revisa consola Network.');
+        } else if (res.status >= 300 && res.status < 400) {
+          alert('Redirección detectada. Revisa Network → Location header.');
+        } else if (bodyLower.indexOf('<form') !== -1 && (bodyLower.indexOf('login') !== -1 || bodyLower.indexOf('signin') !== -1)) {
+          alert('Respuesta parece ser la página de login (la sesión pudo expirar). Revisa que estés logueado.');
+          console.warn('Server returned login HTML:', res.url);
+        } else {
+          try {
+            var j = JSON.parse(res.text);
+            console.log('JSON parsed:', j);
+            if (j.success) location.reload();
+            else if (j.debug_received) {
+              alert('Debug servidor: ' + (j.message || JSON.stringify(j.debug_received)));
+            } else {
+              alert('Servidor respondió: ' + (j.message || JSON.stringify(j)));
+            }
+          } catch(err){
+            console.warn('Respuesta no es JSON, contenido:', res.text);
+            alert('Respuesta no es JSON. Ver consola para más detalle.');
           }
-        } catch(err){
-          console.warn('Response no es JSON');
         }
       })
       .catch(function(err){
