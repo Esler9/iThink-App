@@ -17,55 +17,50 @@ function json_resp($data, $code = 200){
   exit;
 }
 
+// --- NUEVA DEPURACIÓN: headers, raw input, superglobals ---
+$HDRS = function_exists('getallheaders') ? getallheaders() : [];
+$RAW_INPUT = @file_get_contents('php://input');
+dbg("REQ HEADERS: ".json_encode($HDRS));
+dbg("RAW INPUT: " . $RAW_INPUT);
+dbg("_GET: ".json_encode($_GET));
+dbg("_POST: ".json_encode($_POST));
+dbg("_REQUEST: ".json_encode($_REQUEST));
+dbg("_COOKIE: ".json_encode($_COOKIE));
+dbg("_SESSION keys: ".json_encode(isset($_SESSION)?array_keys($_SESSION):[]));
+dbg("REMOTE_ADDR: ".($_SERVER['REMOTE_ADDR'] ?? 'unknown')." URI: ".($_SERVER['REQUEST_URI'] ?? ''));
+
+// Guardar estructura para incluirla en JSON cuando debug=1
+$DEBUG_RECEIVED = [
+  'headers' => $HDRS,
+  'raw_input' => $RAW_INPUT,
+  '_GET' => $_GET,
+  '_POST' => $_POST,
+  '_REQUEST' => $_REQUEST,
+  '_COOKIE' => $_COOKIE,
+  'remote_addr' => $_SERVER['REMOTE_ADDR'] ?? null,
+  'request_uri' => $_SERVER['REQUEST_URI'] ?? null
+];
+
+// si no hay conexión DB
 if (!isset($conn) || !$conn) {
   dbg("No DB connection");
-  if (isset($_REQUEST['ajax']) && $_REQUEST['ajax']=='1') json_resp(['error'=>'No DB connection'],500);
+  if (isset($_REQUEST['ajax']) && $_REQUEST['ajax']=='1') {
+    $resp = ['error'=>'No DB connection'];
+    if (isset($_REQUEST['debug']) && $_REQUEST['debug']=='1') $resp['debug_received'] = $DEBUG_RECEIVED;
+    json_resp($resp,500);
+  }
   $_SESSION['error_usuario'] = "Error de conexión a BD.";
   header('Location: listado_users.php'); exit;
 }
 
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
-
-dbg("usuarios_accion action={$action} method={$_SERVER['REQUEST_METHOD']} REQUEST=".json_encode($_REQUEST));
-
-// Acciones que siempre devuelven JSON
-if ($action === 'list_groups') {
-  $out = [];
-  $sql = "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo ASC";
-  $res = mysqli_query($conn, $sql);
-  if ($res) {
-    while ($r = mysqli_fetch_assoc($res)) $out[] = $r;
-    json_resp($out);
-  } else json_resp(['error'=>mysqli_error($conn)],500);
-}
-
-if ($action === 'list_tiendas') {
-  $out = [];
-  $sql = "SELECT cod_tienda, nombre FROM tienda ORDER BY nombre ASC";
-  $res = mysqli_query($conn, $sql);
-  if ($res) {
-    while ($r = mysqli_fetch_assoc($res)) $out[] = $r;
-    json_resp($out);
-  } else json_resp(['error'=>mysqli_error($conn)],500);
-}
-
-// obtener usuario (JSON)
-if ($action === 'get_user') {
-  $codigo = isset($_REQUEST['codigo']) ? intval($_REQUEST['codigo']) : 0;
-  if ($codigo <= 0) json_resp(['error'=>'Código inválido'],400);
-  $sql = "SELECT Codigo, `User`, Cod_Empleado, State, cod_tienda, email, email_active, id_group_user FROM `Usuarios` WHERE Codigo = {$codigo} LIMIT 1";
-  $res = mysqli_query($conn, $sql);
-  if ($res) {
-    $row = mysqli_fetch_assoc($res);
-    if ($row) json_resp(['success'=>true,'data'=>$row]);
-    json_resp(['error'=>'Usuario no encontrado'],404);
-  } else json_resp(['error'=>mysqli_error($conn)],500);
-}
-
-// Para create/update/delete soportamos AJAX (ajax=1 → JSON) o flujo clásico (redirect + $_SESSION)
+// --- Modificar finish para adjuntar debug_received cuando corresponde ---
 $is_ajax = (isset($_REQUEST['ajax']) && $_REQUEST['ajax']=='1');
 function finish($data, $redirect=true, $is_ajax=false){
-  if ($is_ajax) return json_resp($data, isset($data['error'])?500:200);
+  global $DEBUG_RECEIVED;
+  if ($is_ajax) {
+    if (isset($_REQUEST['debug']) && $_REQUEST['debug']=='1') $data['debug_received'] = $DEBUG_RECEIVED;
+    return json_resp($data, isset($data['error'])?500:200);
+  }
   if (isset($data['success']) && $data['success']) $_SESSION['ok_usuario'] = $data['message'] ?? 'OK';
   else $_SESSION['error_usuario'] = $data['message'] ?? ($data['error'] ?? 'Error');
   header('Location: listado_users.php');

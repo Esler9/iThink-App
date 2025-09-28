@@ -227,24 +227,47 @@ if (isset($conn)) {
       var btn = form.querySelector('button[type="submit"]');
       if (btn) btn.disabled = true;
       var url = form.getAttribute('action') || './usuarios_accion.php';
-      // enviar con credenciales para mantener la sesión
-      fetch(url, {
+      var fd = new FormData(form);
+      // mostrar data que se va a enviar (seguro en dev)
+      console.log('DEBUG: FormData to send for', form.id, Array.from(fd.entries()));
+
+      var opts = {
         method: 'POST',
-        body: new FormData(form),
+        body: fd,
         credentials: 'same-origin',
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      };
+
+      // si existe campo debug activamos modo manual de redirect para detectar 301/302
+      if (form.querySelector('input[name="debug"]')) {
+        opts.redirect = 'manual';
+        console.warn('DEBUG: fetch will use redirect: manual to capture Location header');
+      }
+
+      fetch(url, opts)
+      .then(function(r){
+        // registrar estatus y headers
+        console.log('Fetch response status:', r.status, 'ok:', r.ok, 'redirected:', r.redirected, 'url:', r.url);
+        // intentar leer Location header si hubo redirect manual
+        try {
+          var loc = r.headers.get('Location');
+          if (loc) console.warn('Fetch Location header:', loc);
+        } catch(e){ console.warn('No access to Location header', e); }
+        return r.text().then(function(t){ return { status: r.status, text: t, url: r.url }; });
       })
-      .then(function(r){ return r.text().then(function(t){ return { status: r.status, text: t }; }); })
       .then(function(res){
-        console.log('Response status:', res.status);
         console.log('Response body:', res.text);
-        alert('Respuesta servidor (ver consola para detalle). Status: '+res.status);
+        alert('Respuesta servidor (ver consola). Status: '+res.status);
         try {
           var j = JSON.parse(res.text);
-          console.log('JSON:', j);
+          console.log('JSON parsed:', j);
           if (j.success) location.reload();
+          else if (j.debug_received) {
+            // mostrar detalle útil en alert corto
+            alert('Debug: ' + (j.message || JSON.stringify(j.debug_received)));
+          }
         } catch(err){
-          console.warn('No JSON en respuesta');
+          console.warn('Response no es JSON');
         }
       })
       .catch(function(err){
