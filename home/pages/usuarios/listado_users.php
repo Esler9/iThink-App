@@ -226,22 +226,50 @@ if (!$res_users) {
 <script src="../../dist/js/adminlte.min.js"></script>
 
 <?php
-// Obtener listas en arrays simples (seguro)
-$grupos = [];
-$tiendas = [];
-if (isset($conn) && $conn && @mysqli_ping($conn)) {
-    $q = mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
-    if ($q) { while ($r = mysqli_fetch_assoc($q)) $grupos[] = $r; }
-    $q2 = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
-    if ($q2) { while ($r = mysqli_fetch_assoc($q2)) $tiendas[] = $r; }
-}
+// Temporal: mostrar errores PHP para debug (quítalo cuando arregles)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// incluir modales (modal-users.php leerá $grupos y $tiendas)
-$modalFile = __DIR__ . '/modal-users.php';
-if (file_exists($modalFile) && is_readable($modalFile)) {
-    include $modalFile;
+// MARCADOR 1: después de includes y permisos
+echo "<!-- MARKER 1: after includes and permission check -->\n";
+?>
+
+<?php
+// Después de ejecutar la consulta de usuarios (justo después de $res_users = mysqli_query(...); )
+if (isset($res_users)) {
+    if ($res_users === false) {
+        echo "<!-- MARKER 2: res_users === FALSE -> mysqli_error: " . htmlspecialchars(mysqli_error($conn)) . " -->\n";
+    } else {
+        $countUsers = mysqli_num_rows($res_users);
+        echo "<!-- MARKER 2: res_users OK, rows: " . intval($countUsers) . " -->\n";
+    }
 } else {
-    echo "<!-- modal-users.php no encontrado: {$modalFile} -->";
+    echo "<!-- MARKER 2: res_users not set -->\n";
+}
+?>
+
+<?php
+// Antes de incluir modal-users.php
+$modalFile = __DIR__ . '/modal-users.php';
+echo "<!-- MARKER 3: modalFile path: {$modalFile} exists? " . (file_exists($modalFile) ? 'YES' : 'NO') . " readable? " . (is_readable($modalFile) ? 'YES' : 'NO') . " -->\n";
+
+if (file_exists($modalFile) && is_readable($modalFile)) {
+    // capturar salida del include para detectar errores fatales/parse
+    ob_start();
+    try {
+        include $modalFile;
+        $modalHtml = ob_get_clean();
+        // MARCADOR 4: incluir contenido (primera 200 chars para no inyectar todo)
+        echo "<!-- MARKER 4: modal-users.php included, output-len: " . strlen($modalHtml) . " -->\n";
+        echo substr($modalHtml, 0, 200); // opcional: muestra inicio del HTML incluido
+        echo "\n<!-- MARKER 4-END -->\n";
+    } catch (Throwable $e) {
+        ob_end_clean();
+        echo "<!-- MARKER 4: include threw exception: " . htmlspecialchars($e->getMessage()) . " -->\n";
+    }
+} else {
+    echo "<!-- MARKER 3b: modal-users.php missing or not readable -->\n";
 }
 ?>
 
@@ -368,6 +396,13 @@ btn.onclick = function(){
   } catch(e) { console.error(e); }
 };
 document.body.appendChild(btn);
+</script>
+
+<!-- justo antes de cerrar </body> añade logs JS -->
+<script>
+  console.log('MARKER JS 1: DOM ready, jQuery:', (window.jQuery && jQuery.fn && jQuery.fn.jquery) || 'NO_JQUERY');
+  console.log('MARKER JS 2: modal plugin:', (window.jQuery && $.fn && $.fn.modal) ? 'OK' : 'NO_MODAL_PLUGIN');
+  console.log('MARKER JS 3: #createUserModal present:', !!document.getElementById('createUserModal'));
 </script>
 </body>
 </html>
