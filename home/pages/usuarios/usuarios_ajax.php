@@ -2,12 +2,6 @@
 session_start();
 include_once "../../../conexion.php";
 
-// Elimina o comenta la validación CSRF:
-// if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
-//   echo json_encode(['ok'=>false, 'msg'=>'CSRF inválido.']);
-//   exit;
-// }
-
 $action = $_POST['form_action'] ?? '';
 $response = ['ok'=>false, 'msg'=>'Acción no válida.'];
 
@@ -86,3 +80,19 @@ if ($action === 'delete_user') {
 echo json_encode($response);
 exit;
 ?>
+<form id="formCreateUser" method="post">
+  <input type="hidden" name="form_action" value="create_user">
+  <input type="text" name="User" required>
+  <input type="password" name="Password" required>
+  <button type="submit">Crear</button>
+</form>
+<script>
+$('#formCreateUser').on('submit', function(e){
+  e.preventDefault();
+  $.post('usuarios_ajax.php', $(this).serialize(), function(resp){
+    var r = typeof resp === 'string' ? JSON.parse(resp) : resp;
+    alert(r.msg);
+    if (r.ok) location.reload();
+  });
+});
+</script>

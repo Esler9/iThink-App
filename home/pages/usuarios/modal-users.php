@@ -234,82 +234,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
 <!-- ======================= Crear Usuario ======================= -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <form id="formCreateUser" method="post" action="">
-      <div class="modal-content">
-        <div class="modal-header bg-success">
-          <h5 class="modal-title" id="createUserLabel">Crear Usuario</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"><span aria-hidden="true">&times;</span></button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" name="form_action" value="create_user">
-          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($CSRF); ?>">
+    <!-- Ejemplo de modal para crear usuario -->
+<form id="formCreateUser" method="post">
+  <input type="hidden" name="form_action" value="create_user">
+  <input type="text" name="User" required>
+  <input type="password" name="Password" required>
+  <button type="submit">Crear</button>
+</form>
 
-          <div class="form-group">
-            <label for="c_user">User</label>
-            <input type="text" class="form-control" id="c_user" name="User" required>
-          </div>
-          <div class="form-group">
-            <label for="c_cod_empleado">Cod Empleado</label>
-            <input type="text" class="form-control" id="c_cod_empleado" name="Cod_Empleado">
-          </div>
-          <div class="form-group">
-            <label for="c_email">Email</label>
-            <input type="email" class="form-control" id="c_email" name="email">
-          </div>
-          <div class="form-group">
-            <label for="c_email_active">Email verificado</label>
-            <input type="hidden" name="email_active" value="0">
-            <div class="custom-control custom-switch">
-              <input type="checkbox" class="custom-control-input" id="c_email_active" name="email_active" value="1">
-              <label class="custom-control-label" for="c_email_active">Enviar correos / Verificado</label>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="c_id_group">Grupo</label>
-            <select class="form-control" id="c_id_group" name="id_group_user">
-              <option value="">-- Seleccione --</option>
-              <?php
-              if (isset($conn) && $conn) {
-                $rg = @mysqli_query($conn,"SELECT codigo,nombre_grupo FROM grupo_user ORDER BY codigo");
-                if($rg){ while($gr = @mysqli_fetch_assoc($rg)){
-                  echo '<option value="'.htmlspecialchars($gr['codigo']).'">'.htmlspecialchars($gr['nombre_grupo']).'</option>';
-                }}
-              }
-              ?>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="c_cod_tienda">Tienda</label>
-            <select class="form-control" id="c_cod_tienda" name="cod_tienda">
-              <option value="">-- Seleccione --</option>
-              <?php
-              if (isset($conn) && $conn) {
-                $rt = @mysqli_query($conn,"SELECT cod_tienda,nombre FROM tienda ORDER BY nombre");
-                if($rt){ while($t = @mysqli_fetch_assoc($rt)){
-                  echo '<option value="'.htmlspecialchars($t['cod_tienda']).'">'.htmlspecialchars($t['nombre']).'</option>';
-                }}
-              }
-              ?>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="c_state">Estado</label>
-            <select class="form-control" id="c_state" name="State">
-              <option value="1">Activo</option>
-              <option value="0">Inactivo</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="c_password">Contraseña</label>
-            <input type="password" class="form-control" id="c_password" name="Password" required>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Crear</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-        </div>
-      </div>
-    </form>
+<script>
+$('#formCreateUser').on('submit', function(e){
+  e.preventDefault();
+  $.post('usuarios_ajax.php', $(this).serialize(), function(resp){
+    var r = typeof resp === 'string' ? JSON.parse(resp) : resp;
+    alert(r.msg);
+    if (r.ok) location.reload();
+  });
+});
+</script>
   </div>
 </div>
 
