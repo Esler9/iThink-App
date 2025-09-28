@@ -220,17 +220,46 @@ if (isset($conn)) {
 </div>
 
 <script>
-document.querySelectorAll('#formCreateUser,#formEditUser,#formDeleteUser').forEach(function(f){
-  f.addEventListener('submit', function(e){
-    try {
-      var params = new URLSearchParams(new FormData(f));
-      console.log('Enviando formulario', f.id, params.toString());
-      // alerta temporal para confirmar qué se envía
-      alert('Enviando ' + f.id + '\\n' + params.toString());
-    } catch(err){
-      console.log('Form logging error', err);
-    }
-    // no prevenimos envío
-  });
-});
+(function(){
+  function submitAjax(form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var btn = form.querySelector('button[type="submit"]');
+      if (btn) btn.disabled = true;
+      var url = form.getAttribute('action') || './usuarios_accion.php';
+      // enviar con credenciales para mantener la sesión
+      fetch(url, {
+        method: 'POST',
+        body: new FormData(form),
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(function(r){ return r.text().then(function(t){ return { status: r.status, text: t }; }); })
+      .then(function(res){
+        console.log('Response status:', res.status);
+        console.log('Response body:', res.text);
+        alert('Respuesta servidor (ver consola para detalle). Status: '+res.status);
+        try {
+          var j = JSON.parse(res.text);
+          console.log('JSON:', j);
+          if (j.success) location.reload();
+        } catch(err){
+          console.warn('No JSON en respuesta');
+        }
+      })
+      .catch(function(err){
+        console.error('Fetch error', err);
+        alert('Error en fetch: '+err);
+      })
+      .finally(function(){ if (btn) btn.disabled = false; });
+    });
+  }
+
+  var f = document.getElementById('formCreateUser');
+  if (f) submitAjax(f);
+  var fe = document.getElementById('formEditUser');
+  if (fe) submitAjax(fe);
+  var fd = document.getElementById('formDeleteUser');
+  if (fd) submitAjax(fd);
+})();
 </script>
