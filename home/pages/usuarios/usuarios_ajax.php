@@ -19,11 +19,10 @@ switch ($action) {
   case 'create_user':
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
       $_SESSION['error_usuario'] = "Método inválido.";
-      header('Location: listado_users.php');
-      exit;
+      header('Location: listado_users.php'); exit;
     }
 
-    // Tomar y escapar valores (estilo accion.php)
+    // Escapar valores (estilo accion.php)
     $user = isset($_POST['user']) ? mysqli_real_escape_string($conn, trim($_POST['user'])) : '';
     $cod_empleado = isset($_POST['cod_empleado']) ? mysqli_real_escape_string($conn, trim($_POST['cod_empleado'])) : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
@@ -33,59 +32,41 @@ switch ($action) {
     $email_active = isset($_POST['email_active']) ? 1 : 0;
     $id_group = isset($_POST['id_group']) ? intval($_POST['id_group']) : 0;
 
-    // Validaciones
     if ($user === '' || $password === '' || $id_group <= 0 || $cod_tienda <= 0 || $email === '') {
       $_SESSION['error_usuario'] = "Faltan campos requeridos.";
-      header('Location: listado_users.php');
-      exit;
+      header('Location: listado_users.php'); exit;
     }
 
-    // Verificar usuario único
+    // Verificar unicidad y existencia (puede comentar para debug)
     $q = "SELECT 1 FROM `Usuarios` WHERE `User` = '{$user}' LIMIT 1";
     $r = mysqli_query($conn, $q);
     if ($r === false) {
-      $_SESSION['error_usuario'] = "Error DB: " . mysqli_error($conn);
-      header('Location: listado_users.php');
-      exit;
+      $err = "DB error (check user): " . mysqli_error($conn) . " SQL: {$q}";
+      file_put_contents('/tmp/usuarios_error.log', date('c') . " " . $err . PHP_EOL, FILE_APPEND);
+      $_SESSION['error_usuario'] = $err;
+      header('Location: listado_users.php'); exit;
     }
     if (mysqli_num_rows($r) > 0) {
       $_SESSION['error_usuario'] = "El usuario ya existe.";
-      header('Location: listado_users.php');
-      exit;
+      header('Location: listado_users.php'); exit;
     }
 
-    // Verificar grupo y tienda existen
-    $q = "SELECT 1 FROM `grupo_user` WHERE codigo = {$id_group} LIMIT 1";
-    $r = mysqli_query($conn, $q);
-    if ($r === false || mysqli_num_rows($r) === 0) {
-      $_SESSION['error_usuario'] = "Grupo inválido.";
-      header('Location: listado_users.php');
-      exit;
-    }
-    $q = "SELECT 1 FROM `tienda` WHERE cod_tienda = {$cod_tienda} LIMIT 1";
-    $r = mysqli_query($conn, $q);
-    if ($r === false || mysqli_num_rows($r) === 0) {
-      $_SESSION['error_usuario'] = "Tienda inválida.";
-      header('Location: listado_users.php');
-      exit;
-    }
-
-    // Hash y escape
+    // Hash y preparar INSERT
     $hash = password_hash($password, PASSWORD_DEFAULT);
     $hash_q = mysqli_real_escape_string($conn, $hash);
 
-    // Insert (estilo accion.php)
     $sql = "INSERT INTO `Usuarios` (`User`, `Cod_Empleado`, `Password`, `State`, `cod_tienda`, `email`, `email_active`, `id_group_user`)
             VALUES ('{$user}', '{$cod_empleado}', '{$hash_q}', '{$state}', {$cod_tienda}, '{$email}', {$email_active}, {$id_group})";
 
     if (mysqli_query($conn, $sql)) {
       $_SESSION['ok_usuario'] = "Usuario creado correctamente.";
-      header('Location: listado_users.php');
-      exit;
+      header('Location: listado_users.php'); exit;
     } else {
-      $_SESSION['error_usuario'] = "Error al crear usuario: " . mysqli_error($conn);
-      header('Location: listado_users.php');
-      exit;
+      // Registro detallado para depuración
+      $err = "Error al crear usuario: " . mysqli_error($conn) . " | SQL: " . $sql;
+      file_put_contents('/tmp/usuarios_error.log', date('c') . " " . $err . PHP_EOL, FILE_APPEND);
+      $_SESSION['error_usuario'] = $err;
+      header('Location: listado_users.php'); exit;
     }
     break;
 
