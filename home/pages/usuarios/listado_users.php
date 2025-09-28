@@ -246,6 +246,7 @@ if (!empty($conn)) {
     echo "<!-- DEBUG_MODAL: include 2 -->\n";
     // Tiendas
     $res = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
+    echo "<!-- DEBUG_MODAL: include 3 -->\n";
     if ($res) {
         while ($r = mysqli_fetch_assoc($res)) {
             $tiendas[] = $r;
@@ -262,7 +263,7 @@ if (!empty($conn)) {
         mysqli_free_result($res);
     }
 }
-echo "<!-- DEBUG_MODAL: include 3 -->\n";
+
 include("modal-users.php");
 ?>
 
