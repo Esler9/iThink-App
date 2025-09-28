@@ -22,6 +22,17 @@ function reenviarCorreo($listaCorreos, $identificador, $body) {
 // DEBUG TEMPORAL: log request
 file_put_contents('/tmp/accion_post_debug.log', date('c')." METHOD=".$_SERVER['REQUEST_METHOD']." URI=".$_SERVER['REQUEST_URI']."\nSESSION_USERNAME=". (isset($_SESSION['username'])?$_SESSION['username']:'(none)')."\nPOST=".print_r($_POST,true)."\nGET=".print_r($_GET,true)."\n\n", FILE_APPEND);
 
+// helper debug: alert + redirect (muestra si llegó POST)
+function alert_and_redirect_with_post_check($url) {
+    $has = !empty($_POST);
+    $msg = $has ? 'POST recibido: ' . implode(', ', array_keys($_POST)) : 'No llega info POST';
+    // salida mínima HTML + JS (alert y redirección)
+    echo "<!doctype html><html><head><meta charset='utf-8'></head><body>";
+    echo "<script>alert(" . json_encode($msg) . "); window.location = " . json_encode($url) . ";</script>";
+    echo "</body></html>";
+    exit();
+}
+
 // Solo aceptar POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -60,8 +71,7 @@ switch ($accion) {
         // Creación de usuario
         // Campos esperados en el form: c_user, c_password, c_cod_empleado, c_email, c_id_group, c_cod_tienda, c_state, c_email_active
         if (empty($_POST['c_user']) || empty($_POST['c_password'])) {
-            header("location:../../pages/usuarios/listado_users.php?alert=DataMissing");
-            exit();
+            alert_and_redirect_with_post_check("../../pages/usuarios/listado_users.php?alert=DataMissing");
         }
 
         $user        = mysqli_real_escape_string($conn, $_POST['c_user']);
@@ -97,8 +107,7 @@ switch ($accion) {
         // Edición de usuario
         // Campos esperados: user, password (opcional), cod_empleado, email, id_group, cod_tienda, state, email_active
         if (empty($codigo)) {
-            header("location:../../pages/usuarios/listado_users.php?alert=DataMissing");
-            exit();
+            alert_and_redirect_with_post_check("../../pages/usuarios/listado_users.php?alert=DataMissing");
         }
 
         $user        = mysqli_real_escape_string($conn, $_POST['user'] ?? "");
@@ -141,8 +150,7 @@ switch ($accion) {
         // Se acepta codigo por GET o POST (paralelo a accion.php)
         $codigo_del = isset($_POST['codigo']) ? $_POST['codigo'] : (isset($_GET['codigo']) ? $_GET['codigo'] : "");
         if (empty($codigo_del)) {
-            header("location:../../pages/usuarios/listado_users.php?alert=DataMissing");
-            exit();
+            alert_and_redirect_with_post_check("../../pages/usuarios/listado_users.php?alert=DataMissing");
         }
         $sql = "DELETE FROM Usuarios WHERE Codigo = '$codigo_del'";
         mysqli_query($conn, $sql);
@@ -153,8 +161,7 @@ switch ($accion) {
         // Toggle email_active (similar a otros casos: usa checkbox)
         $codigo_toggle = isset($_POST['codigo']) ? $_POST['codigo'] : (isset($_GET['codigo']) ? $_GET['codigo'] : "");
         if (empty($codigo_toggle)) {
-            header("location:../../pages/usuarios/listado_users.php?alert=DataMissing");
-            exit();
+            alert_and_redirect_with_post_check("../../pages/usuarios/listado_users.php?alert=DataMissing");
         }
         // checkbox enviado => activar, sino desactivar
         $email_active = isset($_POST['email_active']) ? 1 : 0;
