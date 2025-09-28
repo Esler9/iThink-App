@@ -5,7 +5,24 @@ if (!isset($_SESSION["username"])) {
     exit();
 }
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+// Mostrar errores de mysqli como excepciones (útil para debug temporal)
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 include("../../../conexion.php");
+
+// pequeña función helper para depuración segura
+function debug_and_exit($msg, $data = []) {
+    // registrar en el log de errores
+    error_log("accion_usuarios.php DEBUG: " . $msg . " | " . print_r($data, true));
+    // mostrar en pantalla para depuración rápida (quitar en producción)
+    echo "<pre>";
+    echo htmlspecialchars($msg) . "\n\n";
+    echo htmlspecialchars(print_r($data, true));
+    echo "</pre>";
+    exit();
+}
 
 $accion = isset($_GET['accion']) ? $_GET['accion'] : '';
 $date = date('Y-m-d H:i:s');
@@ -112,7 +129,16 @@ switch ($accion) {
         break;
 
     default:
-        echo "Acción no reconocida.";
+        // Mensaje de depuración breve y registro para investigar 500/acción desconocida
+        $debugData = [
+            'accion' => $accion,
+            'GET' => $_GET,
+            'POST_keys' => array_keys($_POST),
+            'SESSION_keys' => array_keys($_SESSION),
+            'conn_present' => isset($conn) ? true : false,
+            'mysqli_error' => isset($conn) ? mysqli_error($conn) : 'no $conn'
+        ];
+        debug_and_exit("Acción no reconocida o falta parámetro 'accion'. Datos de depuración:", $debugData);
         break;
 }
 ?>
