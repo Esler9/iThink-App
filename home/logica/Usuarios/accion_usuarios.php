@@ -4,6 +4,31 @@ session_start();
 // activar debug añadiendo ?debug_post=1 al action del form
 $debug = isset($_GET['debug_post']) && $_GET['debug_post'] === '1';
 
+// helper: safe redirect — en modo debug muestra alert con POST y enlace para continuar
+function safe_redirect($url, $exit = true) {
+    global $debug;
+    if (!$debug) {
+        header("Location: $url");
+        if ($exit) exit();
+        return;
+    }
+    // preparar resumen POST (truncado)
+    $pairs = [];
+    foreach ($_POST as $k => $v) {
+        $val = is_array($v) ? json_encode($v) : (string)$v;
+        if (strlen($val) > 200) $val = substr($val,0,200) . '...';
+        $pairs[] = $k . ': ' . $val;
+    }
+    $postText = !empty($pairs) ? implode("\\n", $pairs) : "(vacío)";
+    $msg = "DEBUG: Se mostrarán datos antes de redirigir.\\n\\nDestino: $url\\n\\nPOST:\\n" . $postText . "\\n\\nGET:\\n" . json_encode($_GET);
+    echo "<!doctype html><html><head><meta charset='utf-8'></head><body>";
+    echo "<script>alert(" . json_encode($msg) . ");</script>";
+    echo "<p>DEBUG: No se hizo redirect automático. <a href=\"" . htmlspecialchars($url) . "\">Continuar</a></p>";
+    echo "<pre style='white-space:pre-wrap;max-height:60vh;overflow:auto;border:1px solid #ccc;padding:8px;'>" . htmlspecialchars($postText) . "</pre>";
+    echo "</body></html>";
+    if ($exit) exit();
+}
+
 // Si no hay sesión y estamos en modo debug -> mostrar alert con POST/GET y no redirigir
 if (!isset($_SESSION["username"])) {
     if ($debug) {
