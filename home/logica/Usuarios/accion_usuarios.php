@@ -7,17 +7,11 @@ if (!isset($_SESSION["username"])) {
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 include("../../../conexion.php");
 
-// pequeña función helper para depuración segura
-function debug_and_exit($msg, $data = []) {
-    error_log("accion_usuarios.php DEBUG: " . $msg . " | " . print_r($data, true));
-    echo "<pre>";
-    echo htmlspecialchars($msg) . "\n\n";
-    echo htmlspecialchars(print_r($data, true));
-    echo "</pre>";
+if (!isset($conn) || !$conn) {
+    header("Location:../pages/usuarios/index.php?alert=DBConn");
     exit();
 }
 
@@ -37,42 +31,44 @@ switch ($accion) {
         $email_active = isset($_POST['c_email_active']) ? 1 : 0;
 
         if ($user === '' || $password === '') {
-            debug_and_exit("Validation error: DataMissing", ['POST' => $_POST]);
+            header("Location:../pages/usuarios/index.php?alert=DataMissing");
+            exit();
         }
 
-        // verificar usuario único (tabla y columna exactas según tu esquema)
         $stmt = $conn->prepare("SELECT COUNT(*) FROM `Usuarios` WHERE `User` = ?");
-        if (!$stmt) debug_and_exit("Prepare failed (select count)", ['error' => $conn->error]);
+        if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
         $stmt->bind_param("s", $user);
         $stmt->execute();
         $stmt->bind_result($cnt);
         $stmt->fetch();
         $stmt->close();
+
         if ($cnt > 0) {
-            debug_and_exit("UserExists", ['user' => $user]);
+            header("Location:../pages/usuarios/index.php?alert=UserExists");
+            exit();
         }
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        // Inserción sin columnas de fecha (según tu esquema)
         $stmt = $conn->prepare("INSERT INTO `Usuarios` (`User`, `Password`, `Cod_Empleado`, `email`, `id_group_user`, `cod_tienda`, `State`, `email_active`) VALUES (?,?,?,?,?,?,?,?)");
-        if (!$stmt) debug_and_exit("Prepare failed (insert)", ['error' => $conn->error]);
-        // tipos: 6 strings (user,hash,cod_empleado,email,id_group_user,cod_tienda), 2 ints (state,email_active)
+        if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
         $stmt->bind_param("ssssssii", $user, $hash, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active);
         $ok = $stmt->execute();
-        $last_id = $conn->insert_id;
         $stmt->close();
 
         if ($ok) {
-            debug_and_exit("Insert successful", ['Codigo_insertado' => $last_id]);
+            header("Location:../pages/usuarios/index.php?alert=0");
+            exit();
         } else {
-            debug_and_exit("Insert failed", ['error' => $conn->error]);
+            header("Location:../pages/usuarios/index.php?alert=InsertError");
+            exit();
         }
         break;
 
     case "1": // Editar usuario
         $codigo = isset($_POST['codigo']) ? (int)$_POST['codigo'] : 0;
         if ($codigo === 0) {
-            debug_and_exit("NoId for update", ['POST' => $_POST]);
+            header("Location:../pages/usuarios/index.php?alert=NoId");
+            exit();
         }
         $user = trim($_POST['user'] ?? '');
         $password = $_POST['password'] ?? '';
@@ -84,74 +80,70 @@ switch ($accion) {
         $email_active = isset($_POST['email_active']) ? 1 : 0;
 
         if ($user === '') {
-            debug_and_exit("Validation error: DataMissing on update", ['POST' => $_POST]);
+            header("Location:../pages/usuarios/index.php?alert=DataMissing");
+            exit();
         }
 
-        // verificar usuario único (excepto el propio)
         $stmt = $conn->prepare("SELECT COUNT(*) FROM `Usuarios` WHERE `User` = ? AND `Codigo` <> ?");
-        if (!$stmt) debug_and_exit("Prepare failed (select count update)", ['error' => $conn->error]);
+        if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
         $stmt->bind_param("si", $user, $codigo);
         $stmt->execute();
         $stmt->bind_result($cnt);
         $stmt->fetch();
         $stmt->close();
+
         if ($cnt > 0) {
-            debug_and_exit("UserExists (update)", ['user' => $user, 'Codigo' => $codigo]);
+            header("Location:../pages/usuarios/index.php?alert=UserExists");
+            exit();
         }
 
         if (!empty($password)) {
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            // UPDATE sin date_update
             $stmt = $conn->prepare("UPDATE `Usuarios` SET `User`=?, `Password`=?, `Cod_Empleado`=?, `email`=?, `id_group_user`=?, `cod_tienda`=?, `State`=?, `email_active`=? WHERE `Codigo`=?");
-            if (!$stmt) debug_and_exit("Prepare failed (update pw)", ['error' => $conn->error]);
-            // tipos: 6 strings, 3 ints (state,email_active,codigo)
+            if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
             $stmt->bind_param("ssssssiii", $user, $hash, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active, $codigo);
         } else {
             $stmt = $conn->prepare("UPDATE `Usuarios` SET `User`=?, `Cod_Empleado`=?, `email`=?, `id_group_user`=?, `cod_tienda`=?, `State`=?, `email_active`=? WHERE `Codigo`=?");
-            if (!$stmt) debug_and_exit("Prepare failed (update no pw)", ['error' => $conn->error]);
-            // tipos: 5 strings, 3 ints (state,email_active,codigo)
+            if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
             $stmt->bind_param("sssssiii", $user, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active, $codigo);
         }
+
         $ok = $stmt->execute();
-        $affected = $stmt->affected_rows;
         $stmt->close();
 
         if ($ok) {
-            debug_and_exit("Update successful", ['Codigo' => $codigo, 'affected_rows' => $affected]);
+            header("Location:../pages/usuarios/index.php?alert=1");
+            exit();
         } else {
-            debug_and_exit("Update failed", ['error' => $conn->error]);
+            header("Location:../pages/usuarios/index.php?alert=UpdateError");
+            exit();
         }
         break;
 
     case "2": // Eliminar usuario
         $codigo = isset($_POST['codigo']) ? (int)$_POST['codigo'] : 0;
         if ($codigo === 0) {
-            debug_and_exit("NoId for delete", ['POST' => $_POST]);
+            header("Location:../pages/usuarios/index.php?alert=NoId");
+            exit();
         }
         $stmt = $conn->prepare("DELETE FROM `Usuarios` WHERE `Codigo` = ?");
-        if (!$stmt) debug_and_exit("Prepare failed (delete)", ['error' => $conn->error]);
+        if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
         $stmt->bind_param("i", $codigo);
         $ok = $stmt->execute();
-        $affected = $stmt->affected_rows;
         $stmt->close();
 
         if ($ok) {
-            debug_and_exit("Delete successful", ['Codigo' => $codigo, 'affected_rows' => $affected]);
+            header("Location:../pages/usuarios/index.php?alert=2");
+            exit();
         } else {
-            debug_and_exit("Delete failed", ['error' => $conn->error]);
+            header("Location:../pages/usuarios/index.php?alert=DeleteError");
+            exit();
         }
         break;
 
     default:
-        $debugData = [
-            'accion' => $accion,
-            'GET' => $_GET,
-            'POST_keys' => array_keys($_POST),
-            'SESSION_keys' => array_keys($_SESSION),
-            'conn_present' => isset($conn) ? true : false,
-            'mysqli_error' => isset($conn) ? mysqli_error($conn) : 'no $conn'
-        ];
-        debug_and_exit("Acción no reconocida o falta parámetro 'accion'. Datos de depuración:", $debugData);
+        header("Location:../pages/usuarios/index.php?alert=NoAction");
+        exit();
         break;
 }
 ?>
