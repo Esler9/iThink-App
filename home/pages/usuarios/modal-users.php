@@ -1,12 +1,8 @@
 <?php
-// modal-users.php — versión con marcadores de depuración
+// modal-users.php — versión limpia sin comentarios de depuración
 if (!isset($grupos) || !is_array($grupos)) $grupos = [];
 if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
 if (!isset($states) || !is_array($states)) $states = [];
-
-// PHP / HTML markers
-echo "<!-- DEBUG_MODAL: include start -->\n";
-echo "<!-- DEBUG_MODAL: grupos_count=" . count($grupos) . " tiendas_count=" . count($tiendas) . " states_count=" . count($states) . " -->\n";
 ?>
 <!-- Crear Usuario -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -43,9 +39,7 @@ echo "<!-- DEBUG_MODAL: grupos_count=" . count($grupos) . " tiendas_count=" . co
               <option value="">-</option>
               <?php if (!empty($grupos)): foreach ($grupos as $g): ?>
                 <option value="<?php echo htmlspecialchars($g['codigo'] ?? ''); ?>"><?php echo htmlspecialchars($g['nombre_grupo'] ?? ''); ?></option>
-              <?php endforeach; else: ?>
-                <!-- DEBUG_MODAL: no grupos available -->
-              <?php endif; ?>
+              <?php endforeach; endif; ?>
             </select>
           </div>
         </div>
@@ -57,9 +51,7 @@ echo "<!-- DEBUG_MODAL: grupos_count=" . count($grupos) . " tiendas_count=" . co
               <option value="">-</option>
               <?php if (!empty($tiendas)): foreach ($tiendas as $t): ?>
                 <option value="<?php echo htmlspecialchars($t['cod_tienda'] ?? ''); ?>"><?php echo htmlspecialchars($t['tienda_nombre'] ?? ''); ?></option>
-              <?php endforeach; else: ?>
-                <!-- DEBUG_MODAL: no tiendas available -->
-              <?php endif; ?>
+              <?php endforeach; endif; ?>
             </select>
           </div>
 
@@ -90,7 +82,7 @@ echo "<!-- DEBUG_MODAL: grupos_count=" . count($grupos) . " tiendas_count=" . co
   </div>
 </div>
 
-<!-- Editar / Ver / Eliminar (sin cambios funcionales, con logs JS abajo) -->
+<!-- Editar Usuario -->
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <form id="formEditUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=1" class="modal-content">
@@ -206,22 +198,15 @@ echo "<!-- DEBUG_MODAL: grupos_count=" . count($grupos) . " tiendas_count=" . co
 
 <script>
 jQuery(function($){
-  // debug: indicar que el script de modales se cargó y contar arrays
-  console.log('DEBUG_MODAL: handlers attached', {grupos_count: <?php echo count($grupos); ?>, tiendas_count: <?php echo count($tiendas); ?>, states_count: <?php echo count($states); ?>});
-
-  // Crear: reset y defaults (con logs)
   $('#createUserModal').on('show.bs.modal', function (e) {
-    console.log('DEBUG_MODAL: show createUserModal, trigger=', e && e.relatedTarget);
     var f = $('#formCreateUser')[0];
     if (f) f.reset();
     $('#c_id_group,#c_cod_tienda,#c_state').val('');
     $('#c_email_active').prop('checked', false);
   });
 
-  // Edit: rellenar (state -> select, email_active -> switch)
   $('#editUserModal').on('show.bs.modal', function (e) {
     var b = $(e.relatedTarget);
-    console.log('DEBUG_MODAL: show editUserModal, data=', b.data());
     $('#e_codigo').val(b.data('codigo') || '');
     $('#e_user').val(b.data('user') || '');
     $('#e_cod_empleado').val(b.data('cod_empleado') || '');
@@ -233,10 +218,8 @@ jQuery(function($){
     $('#e_password').val('');
   });
 
-  // View modal
   $('#viewUserModal').on('show.bs.modal', function (e) {
     var b = $(e.relatedTarget);
-    console.log('DEBUG_MODAL: show viewUserModal, data=', b.data());
     $('#v_codigo').text(b.data('codigo') || '-');
     $('#v_user').text(b.data('user') || '-');
     $('#v_email').text(b.data('email') || '-');
@@ -247,10 +230,8 @@ jQuery(function($){
     $('#v_state').text(stLabel);
   });
 
-  // Delete modal
   $('#deleteUserModal').on('show.bs.modal', function (e) {
     var b = $(e.relatedTarget);
-    console.log('DEBUG_MODAL: show deleteUserModal, data=', b.data());
     $('#d_codigo').val(b.data('codigo') || '');
     $('#d_user').text(b.data('user') || '-');
   });
@@ -259,5 +240,4 @@ jQuery(function($){
 
 <?php
 // fin del include
-echo "<!-- DEBUG_MODAL: include end -->\n";
 ?>

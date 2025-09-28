@@ -227,7 +227,6 @@ if (!$res_users) {
 
 <?php
 
-echo "<!-- DEBUG_MODAL: include start -->\n";
 $grupos = [];
 $tiendas = [];
 $states = [];
@@ -243,10 +242,10 @@ if (!empty($conn)) {
         }
         mysqli_free_result($res);
     }
-    echo "<!-- DEBUG_MODAL: include 2 -->\n";
+ 
     // Tiendas
     $res = mysqli_query($conn, "SELECT cod_tienda, nombre FROM tienda ORDER BY nombre");
-    echo "<!-- DEBUG_MODAL: include 3 -->\n";
+
     if ($res) {
         while ($r = mysqli_fetch_assoc($res)) {
             $tiendas[] = $r;
