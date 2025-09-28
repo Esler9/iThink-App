@@ -1,9 +1,5 @@
-<?php
-// Este archivo se incluye desde listado_users.php (por eso $conn existe)
-// Cargar opciones para selects
-$grupos_q = mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
-$tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
-?>
+
+
 <!-- Crear Usuario -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
