@@ -378,6 +378,29 @@ $(function () {
 </script>
 
 <script>
+jQuery(function($){
+  console.log('DEBUG handler: hooking create button -> force modal show');
+
+  // Logueo rápido para depurar clicks en el botón Crear
+  $(document).on('click', 'button[data-toggle="modal"][data-target="#createUserModal"]', function(e){
+    console.log('DEBUG: create button clicked, event target:', this);
+    // prevenir comportamiento por defecto y forzar apertura
+    e.preventDefault();
+    if ($('#createUserModal').length) {
+      $('#createUserModal').modal('show');
+      console.log('DEBUG: Forced show #createUserModal');
+    } else {
+      console.error('DEBUG: #createUserModal no está en el DOM');
+    }
+  });
+
+  // También exponer comando para abrir manualmente desde consola
+  window.__openCreateUser = function(){ $('#createUserModal').modal('show'); };
+
+});
+</script>
+
+<script>
 console.log('DEBUG jQuery version:', (window.jQuery && jQuery.fn && jQuery.fn.jquery) || 'NO_JQUERY');
 console.log('DEBUG modal plugin:', (window.jQuery && $.fn && $.fn.modal) ? 'OK' : 'NO_MODAL_PLUGIN');
 console.log('DEBUG #createUserModal found:', !!document.getElementById('createUserModal'));
