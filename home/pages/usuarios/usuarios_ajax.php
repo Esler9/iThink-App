@@ -8,9 +8,33 @@ $response = [];
 
 // Test directo si no hay action (para debug)
 if (!$action && isset($_GET['test'])) {
+    // Test tiendas
+    $sql_tiendas = "SELECT cod_tienda, nombre FROM tienda ORDER BY nombre ASC";
+    $res_tiendas = mysqli_query($conn, $sql_tiendas);
+    $tiendas_test = [];
+    if ($res_tiendas) {
+        while ($row = mysqli_fetch_assoc($res_tiendas)) {
+            $tiendas_test[] = $row;
+        }
+    }
+    
+    // Test grupos
+    $sql_grupos = "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo ASC";
+    $res_grupos = mysqli_query($conn, $sql_grupos);
+    $grupos_test = [];
+    if ($res_grupos) {
+        while ($row = mysqli_fetch_assoc($res_grupos)) {
+            $grupos_test[] = $row;
+        }
+    }
+    
     echo json_encode([
         'test' => 'OK',
         'conexion' => mysqli_ping($conn) ? 'OK' : 'FAIL',
+        'tiendas_count' => count($tiendas_test),
+        'tiendas' => $tiendas_test,
+        'grupos_count' => count($grupos_test),
+        'grupos' => $grupos_test,
         'post_data' => $_POST,
         'get_data' => $_GET
     ]);
