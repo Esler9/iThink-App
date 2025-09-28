@@ -1,200 +1,226 @@
 <?php
 session_start();
 
-if (!isset($_SESSION["username"])) {
-    header('HTTP/1.1 401 Unauthorized');
-    echo 'No autorizado';
+// Conexión y permisos (ajusta rutas si es necesario)
+include_once __DIR__ . '/../../../conexion.php';        // conexion.php en raíz del proyecto
+include_once __DIR__ . '/../ac_permiso.php';            // ac_permiso.php en /home/logica/
+
+// Comprobar sesión básica
+if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
+    header('Location: /home/login.php');
     exit();
 }
 
-include("../../../conexion.php");
+$User = $_SESSION["username"];
+$cod_user = $_SESSION['cod_user'];
 
-
-// Fecha para campos date/date_update
-$date = date('Y-m-d H:i:s');
-
-// Función auxiliar simple para mostrar resultado en HTML (evita redirecciones automáticas)
-function respond($title, $message = '', $data = []) {
-    header('Content-Type: text/html; charset=utf-8');
-    $data_pretty = $data ? json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : '';
-    echo '<!doctype html><html><head><meta charset="utf-8"><title>' . htmlspecialchars($title) . '</title></head><body>';
-    echo '<h1>' . htmlspecialchars($title) . '</h1>';
-    if ($message !== '') echo '<p>' . nl2br(htmlspecialchars($message)) . '</p>';
-    if ($data_pretty !== '') {
-        echo '<h2>Datos</h2><pre>' . htmlspecialchars($data_pretty, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</pre>';
+// Helper para redirigir con mensaje en sesión
+function redirect_back($msg_key = null, $msg = null, $ok = true) {
+    if ($msg_key !== null) {
+        $_SESSION[$msg_key] = $msg;
+        $_SESSION[$msg_key . '_ok'] = $ok ? 1 : 0;
     }
-    echo '<p><button onclick="history.back()">Volver</button></p>';
-    echo '</body></html>';
-    exit;
+    header('Location: /home/pages/usuarios/listado_users.php');
+    exit();
 }
 
-// Solo aceptar POST para operaciones CRUD
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    respond('Método no permitido', 'Este endpoint acepta únicamente peticiones POST.');
+// Sólo usuarios con permiso de gestión pueden ejecutar acciones mutantes
+$action = isset($_REQUEST['action']) ? trim($_REQUEST['action']) : '';
+
+if ($action === '') {
+    // Si no hay acción, volver al listado
+    redirect_back();
 }
 
-// Acción (viene por GET ?accion=N)
-$accion = isset($_GET['accion']) ? (int)$_GET['accion'] : 0;
-
-// Código (puede venir por POST o GET)
-$codigo = isset($_POST['codigo']) ? trim($_POST['codigo']) : (isset($_GET['codigo']) ? trim($_GET['codigo']) : '');
-
-// Recolectar y normalizar campos comunes (usar nombre según el formulario)
-$c_user = isset($_POST['c_user']) ? trim($_POST['c_user']) : (isset($_POST['user']) ? trim($_POST['user']) : '');
-$c_password = isset($_POST['c_password']) ? trim($_POST['c_password']) : (isset($_POST['password']) ? trim($_POST['password']) : '');
-$c_cod_empleado = isset($_POST['c_cod_empleado']) ? trim($_POST['c_cod_empleado']) : (isset($_POST['cod_empleado']) ? trim($_POST['cod_empleado']) : '');
-$c_email = isset($_POST['c_email']) ? trim($_POST['c_email']) : (isset($_POST['email']) ? trim($_POST['email']) : '');
-$c_id_group = isset($_POST['c_id_group']) ? trim($_POST['c_id_group']) : (isset($_POST['id_group']) ? trim($_POST['id_group']) : '');
-$c_cod_tienda = isset($_POST['c_cod_tienda']) ? trim($_POST['c_cod_tienda']) : (isset($_POST['cod_tienda']) ? trim($_POST['cod_tienda']) : '');
-$c_state = isset($_POST['c_state']) ? trim($_POST['c_state']) : (isset($_POST['state']) ? trim($_POST['state']) : '');
-$c_email_active = isset($_POST['c_email_active']) || isset($_POST['email_active']) ? 1 : 0;
-
-$errors = [];
-
-// Validaciones básicas según acción
-if ($accion === 0) { // crear
-    if ($c_user === '') $errors[] = 'Usuario requerido';
-    if ($c_password === '') $errors[] = 'Contraseña requerida';
-}
-if ($c_email !== '' && !filter_var($c_email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Email inválido';
-
-if (!empty($errors)) {
-    respond('Errores de validación', implode("\n", $errors), $_POST);
+// Validar conexión
+if (empty($conn) || mysqli_connect_errno()) {
+    error_log("accion_usuarios: conexión inválida");
+    redirect_back('error_usuario', 'Problema de conexión con la base de datos', false);
 }
 
-// Conexión: $conn (incluida desde conexion.php). Usamos escapes simples para claridad.
-switch ($accion) {
-    case 0: // Crear usuario
-        $user = mysqli_real_escape_string($conn, $c_user);
-        $password = $c_password;
-        $cod_empleado = mysqli_real_escape_string($conn, $c_cod_empleado);
-        $email = mysqli_real_escape_string($conn, $c_email);
-        $id_group = mysqli_real_escape_string($conn, $c_id_group);
-        $cod_tienda = mysqli_real_escape_string($conn, $c_cod_tienda);
-        $state = ($c_state !== '') ? 1 : 0;
-        $email_active = $c_email_active ? 1 : 0;
-
-        // Verificar existencia
-        $sql_chk = "SELECT COUNT(*) AS contar FROM Usuarios WHERE `User` = '$user'";
-        $res = mysqli_query($conn, $sql_chk);
-        $row = $res ? mysqli_fetch_assoc($res) : null;
-        if ($row && (int)$row['contar'] > 0) {
-            respond('Usuario duplicado', "El usuario '$user' ya existe.", $_POST);
-        }
-
-        // Insertar
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
-        $password_hash_esc = mysqli_real_escape_string($conn, $password_hash);
-        $sql = "INSERT INTO Usuarios (`User`,`Cod_Empleado`,`email`,`email_active`,`State`,`cod_tienda`,`id_group_user`,`Password`,`date_update`,`date`)
-                VALUES ('$user', '$cod_empleado', '$email', '$email_active', '$state', '$cod_tienda', '$id_group', '$password_hash_esc', '$date', '$date')";
-        $ok = mysqli_query($conn, $sql);
-        if ($ok) {
-            respond('Usuario creado', "Usuario '$user' creado correctamente.", ['user' => $user]);
-        } else {
-            respond('Error BD', mysqli_error($conn), $_POST);
-        }
-        break;
-
-    case 1: // Editar usuario
-        if ($codigo === '') {
-            respond('Código faltante', 'No se recibió el código del usuario.', $_POST);
-        }
-
-        $user = mysqli_real_escape_string($conn, $c_user);
-        $password = $c_password;
-        $cod_empleado = mysqli_real_escape_string($conn, $c_cod_empleado);
-        $email = mysqli_real_escape_string($conn, $c_email);
-        $id_group = mysqli_real_escape_string($conn, $c_id_group);
-        $cod_tienda = mysqli_real_escape_string($conn, $c_cod_tienda);
-        $state = ($c_state !== '') ? 1 : 0;
-        $email_active = $c_email_active ? 1 : 0;
-        $codigo_esc = mysqli_real_escape_string($conn, $codigo);
-
-        // Comprobar usuario duplicado (si cambia el nombre)
-        if ($user !== '') {
-            $sql_chk = "SELECT Codigo FROM Usuarios WHERE `User` = '$user' AND Codigo <> '$codigo_esc' LIMIT 1";
-            $res = mysqli_query($conn, $sql_chk);
-            if ($res && mysqli_num_rows($res) > 0) {
-                respond('Usuario duplicado', "El usuario '$user' ya está en uso por otro registro.", $_POST);
-            }
-        }
-
-        // Preparar UPDATE
-        if ($password !== '') {
-            $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $password_hash_esc = mysqli_real_escape_string($conn, $password_hash);
-            $sql = "UPDATE Usuarios SET `User` = '$user', `Cod_Empleado` = '$cod_empleado', `email` = '$email', `email_active` = '$email_active',
-                    `State` = '$state', `cod_tienda` = '$cod_tienda', `id_group_user` = '$id_group', `Password` = '$password_hash_esc', date_update = '$date'
-                    WHERE Codigo = '$codigo_esc'";
-        } else {
-            $sql = "UPDATE Usuarios SET `User` = '$user', `Cod_Empleado` = '$cod_empleado', `email` = '$email', `email_active` = '$email_active',
-                    `State` = '$state', `cod_tienda` = '$cod_tienda', `id_group_user` = '$id_group', date_update = '$date'
-                    WHERE Codigo = '$codigo_esc'";
-        }
-
-        $ok = mysqli_query($conn, $sql);
-        if ($ok) {
-            respond('Usuario actualizado', "El usuario con código $codigo ha sido actualizado.", ['codigo' => $codigo]);
-        } else {
-            respond('Error BD', mysqli_error($conn), $_POST);
-        }
-        break;
-
-    case 2: // Eliminar usuario
-        $codigo_del = isset($_POST['codigo']) ? trim($_POST['codigo']) : '';
-        if ($codigo_del === '') {
-            respond('Código faltante', 'No se recibió el código para eliminar.', $_POST);
-        }
-        $codigo_del_esc = mysqli_real_escape_string($conn, $codigo_del);
-        $sql = "DELETE FROM Usuarios WHERE Codigo = '$codigo_del_esc'";
-        $ok = mysqli_query($conn, $sql);
-        if ($ok) {
-            respond('Usuario eliminado', "Usuario con código $codigo_del eliminado.", ['codigo' => $codigo_del]);
-        } else {
-            respond('Error BD', mysqli_error($conn), $_POST);
-        }
-        break;
-
-    case 3: // Toggle email_active (u otra acción)
-        $codigo_toggle = isset($_POST['codigo']) ? trim($_POST['codigo']) : '';
-        if ($codigo_toggle === '') {
-            respond('Código faltante', 'No se recibió el código para la acción.', $_POST);
-        }
-        $email_active = isset($_POST['email_active']) ? 1 : 0;
-        $codigo_toggle_esc = mysqli_real_escape_string($conn, $codigo_toggle);
-        $sql = "UPDATE Usuarios SET email_active = '$email_active', date_update = '$date' WHERE Codigo = '$codigo_toggle_esc'";
-        $ok = mysqli_query($conn, $sql);
-        if ($ok) {
-            respond('Estado actualizado', "email_active = $email_active para código $codigo_toggle.", ['codigo' => $codigo_toggle]);
-        } else {
-            respond('Error BD', mysqli_error($conn), $_POST);
-        }
-        break;
-
-    default:
-        respond('Acción desconocida', "Acción '$accion' no reconocida.", $_POST);
-        break;
+// Función de limpieza básica
+function clean($v) {
+    return trim($v);
 }
 
-// ---------- PARCHE TEMPORAL PARA DEPURAR 500 ----------
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
+// CREATE
+if ($action === 'create') {
+    if (!Tiene_permiso($permisos_user, 'crear-usuarios')) {
+        redirect_back(null, null, false);
+    }
 
-// Comprueba que el archivo de conexión existe y que $conn quedó definido
-$expected = __DIR__ . '/../../../conexion.php';
-if (!file_exists($expected)) {
-    header('Content-Type: text/plain; charset=utf-8', true, 500);
-    echo "Error: fichero de conexión no encontrado en: $expected\n";
-    exit;
+    $user = isset($_POST['c_user']) ? clean($_POST['c_user']) : '';
+    $cod_empleado = isset($_POST['c_cod_empleado']) ? clean($_POST['c_cod_empleado']) : '';
+    $email = isset($_POST['c_email']) ? filter_var($_POST['c_email'], FILTER_SANITIZE_EMAIL) : '';
+    $email_active = isset($_POST['c_email_active']) ? 1 : 0;
+    $id_group = isset($_POST['c_id_group']) && $_POST['c_id_group'] !== '' ? intval($_POST['c_id_group']) : null;
+    $cod_tienda = isset($_POST['c_cod_tienda']) && $_POST['c_cod_tienda'] !== '' ? intval($_POST['c_cod_tienda']) : null;
+    $state = isset($_POST['c_state']) ? (intval($_POST['c_state']) ? 1 : 0) : 1;
+    $password = isset($_POST['c_password']) ? $_POST['c_password'] : '';
+
+    if ($user === '' || $password === '') {
+        redirect_back('error_usuario', 'Usuario y contraseña son obligatorios', false);
+    }
+
+    $pass_hash = password_hash($password, PASSWORD_DEFAULT);
+
+    $sql = "INSERT INTO `Usuarios` (`User`, `Cod_Empleado`, `email`, `email_active`, `id_group_user`, `cod_tienda`, `State`, `Password`)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $sql);
+    if (!$stmt) {
+        error_log('accion_usuarios create prepare: ' . mysqli_error($conn));
+        redirect_back('error_usuario', 'Error al crear usuario', false);
+    }
+    mysqli_stmt_bind_param($stmt, 'sssiisss',
+        $user,
+        $cod_empleado,
+        $email,
+        $email_active,
+        $id_group,
+        $cod_tienda,
+        $state,
+        $pass_hash
+    );
+    $ok = mysqli_stmt_execute($stmt);
+    if (!$ok) {
+        error_log('accion_usuarios create exec: ' . mysqli_stmt_error($stmt));
+        mysqli_stmt_close($stmt);
+        redirect_back('error_usuario', 'No fue posible crear el usuario', false);
+    }
+    mysqli_stmt_close($stmt);
+    redirect_back('ok_usuario', 'Usuario creado correctamente', true);
+    // END CREATE
 }
 
-// después del include(...) ya debería existir $conn
-if (!isset($conn) || !($conn instanceof mysqli)) {
-    header('Content-Type: text/plain; charset=utf-8', true, 500);
-    echo "Error: la variable \$conn no está definida o no es una instancia de mysqli.\n";
-    echo "Revisa /Volumes/Archivos/Proyectos_esler/iThink-App/conexion.php para asegurar que crea \$conn.\n";
-    exit;
+// UPDATE
+if ($action === 'update') {
+    if (!Tiene_permiso($permisos_user, 'editar-usuarios')) {
+        redirect_back(null, null, false);
+    }
+
+    $codigo = isset($_POST['e_codigo']) ? intval($_POST['e_codigo']) : 0;
+    if ($codigo <= 0) {
+        redirect_back('error_usuario', 'Código de usuario inválido', false);
+    }
+
+    $user = isset($_POST['e_user']) ? clean($_POST['e_user']) : '';
+    $cod_empleado = isset($_POST['e_cod_empleado']) ? clean($_POST['e_cod_empleado']) : '';
+    $email = isset($_POST['e_email']) ? filter_var($_POST['e_email'], FILTER_SANITIZE_EMAIL) : '';
+    $email_active = isset($_POST['e_email_active']) ? 1 : 0;
+    $id_group = isset($_POST['e_id_group']) && $_POST['e_id_group'] !== '' ? intval($_POST['e_id_group']) : null;
+    $cod_tienda = isset($_POST['e_cod_tienda']) && $_POST['e_cod_tienda'] !== '' ? intval($_POST['e_cod_tienda']) : null;
+    $state = isset($_POST['e_state']) ? (intval($_POST['e_state']) ? 1 : 0) : 0;
+    $password = isset($_POST['e_password']) ? $_POST['e_password'] : '';
+
+    // Construir SQL dinámico si no se cambia la contraseña
+    if ($password !== '') {
+        $pass_hash = password_hash($password, PASSWORD_DEFAULT);
+        $sql = "UPDATE `Usuarios` SET `User` = ?, `Cod_Empleado` = ?, `email` = ?, `email_active` = ?, `id_group_user` = ?, `cod_tienda` = ?, `State` = ?, `Password` = ? WHERE `Codigo` = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        if (!$stmt) {
+            error_log('accion_usuarios update prepare: ' . mysqli_error($conn));
+            redirect_back('error_usuario', 'Error al actualizar usuario', false);
+        }
+        mysqli_stmt_bind_param($stmt, 'sssiisssi',
+            $user,
+            $cod_empleado,
+            $email,
+            $email_active,
+            $id_group,
+            $cod_tienda,
+            $state,
+            $pass_hash,
+            $codigo
+        );
+    } else {
+        $sql = "UPDATE `Usuarios` SET `User` = ?, `Cod_Empleado` = ?, `email` = ?, `email_active` = ?, `id_group_user` = ?, `cod_tienda` = ?, `State` = ? WHERE `Codigo` = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        if (!$stmt) {
+            error_log('accion_usuarios update prepare: ' . mysqli_error($conn));
+            redirect_back('error_usuario', 'Error al actualizar usuario', false);
+        }
+        mysqli_stmt_bind_param($stmt, 'sssiissi',
+            $user,
+            $cod_empleado,
+            $email,
+            $email_active,
+            $id_group,
+            $cod_tienda,
+            $state,
+            $codigo
+        );
+    }
+
+    $ok = mysqli_stmt_execute($stmt);
+    if (!$ok) {
+        error_log('accion_usuarios update exec: ' . mysqli_stmt_error($stmt));
+        mysqli_stmt_close($stmt);
+        redirect_back('error_usuario', 'No fue posible actualizar el usuario', false);
+    }
+    mysqli_stmt_close($stmt);
+    redirect_back('ok_usuario', 'Usuario actualizado correctamente', true);
+    // END UPDATE
 }
-// ---------- FIN PARCHE TEMPORAL ----------
+
+// DELETE
+if ($action === 'delete') {
+    if (!Tiene_permiso($permisos_user, 'eliminar-usuarios')) {
+        redirect_back(null, null, false);
+    }
+
+    $codigo = isset($_POST['d_codigo']) ? intval($_POST['d_codigo']) : 0;
+    if ($codigo <= 0) {
+        redirect_back('error_usuario', 'Código de usuario inválido', false);
+    }
+
+    $sql = "DELETE FROM `Usuarios` WHERE `Codigo` = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    if (!$stmt) {
+        error_log('accion_usuarios delete prepare: ' . mysqli_error($conn));
+        redirect_back('error_usuario', 'Error al eliminar usuario', false);
+    }
+    mysqli_stmt_bind_param($stmt, 'i', $codigo);
+    $ok = mysqli_stmt_execute($stmt);
+    if (!$ok) {
+        error_log('accion_usuarios delete exec: ' . mysqli_stmt_error($stmt));
+        mysqli_stmt_close($stmt);
+        redirect_back('error_usuario', 'No fue posible eliminar el usuario', false);
+    }
+    mysqli_stmt_close($stmt);
+    redirect_back('ok_usuario', 'Usuario eliminado correctamente', true);
+    // END DELETE
+}
+
+// TOGGLE EMAIL (ejemplo para checkbox)
+if ($action === 'toggle_email') {
+    if (!Tiene_permiso($permisos_user, 'editar-usuarios')) {
+        redirect_back(null, null, false);
+    }
+    $codigo = isset($_POST['codigo']) ? intval($_POST['codigo']) : 0;
+    $value = isset($_POST['value']) ? (intval($_POST['value']) ? 1 : 0) : 0;
+    if ($codigo <= 0) {
+        redirect_back('error_usuario', 'Código inválido', false);
+    }
+    $sql = "UPDATE `Usuarios` SET `email_active` = ? WHERE `Codigo` = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    if (!$stmt) {
+        error_log('accion_usuarios toggle prepare: ' . mysqli_error($conn));
+        redirect_back('error_usuario', 'Error al cambiar configuración', false);
+    }
+    mysqli_stmt_bind_param($stmt, 'ii', $value, $codigo);
+    $ok = mysqli_stmt_execute($stmt);
+    if (!$ok) {
+        error_log('accion_usuarios toggle exec: ' . mysqli_stmt_error($stmt));
+        mysqli_stmt_close($stmt);
+        redirect_back('error_usuario', 'No fue posible actualizar', false);
+    }
+    mysqli_stmt_close($stmt);
+    // Responder para peticiones AJAX: devolver JSON mínimo
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['ok' => true]);
+    exit();
+}
+
+// Si la acción no coincide, redirigir
+redirect_back();
 ?>

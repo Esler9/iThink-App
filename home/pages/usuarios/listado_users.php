@@ -15,10 +15,8 @@ include("../../logica/ac_permiso.php");
 
 // Validar permiso
 if (!Tiene_permiso($permisos_user,'ver-usuarios')) {
-  echo "<script>
-        alert('No tienes acceso a esta página.');
-        window.location.href = '/home/dashboard.php';
-        </script>";
+  // Redirigir sin mostrar alertas
+  header('Location: /home/dashboard.php');
   exit();
 }
 ?>
@@ -66,7 +64,9 @@ $sql_users = "
 $res_users = mysqli_query($conn, $sql_users);
 
 if (!$res_users) {
-  echo '<div class="alert alert-danger">Error al consultar usuarios: '.htmlspecialchars(mysqli_error($conn)).'</div>';
+  // Registrar el error en el log del servidor y mostrar mensaje discreto (sin clases "alert")
+  error_log('Error al consultar usuarios: '.mysqli_error($conn));
+  echo '<div class="text-muted small">No fue posible cargar el listado de usuarios.</div>';
 } else {
 ?>
 
@@ -81,13 +81,11 @@ if (!$res_users) {
       </div>
       <div class="card-body">
         <?php
-        // justo antes de renderizar la tabla
+        // Mensajes de sesión ya no se muestran como alertas; sólo se limpian.
         if (isset($_SESSION['ok_usuario'])) {
-          echo '<div class="alert alert-success">'.htmlspecialchars($_SESSION['ok_usuario']).'</div>';
           unset($_SESSION['ok_usuario']);
         }
         if (isset($_SESSION['error_usuario'])) {
-          echo '<div class="alert alert-danger">'.htmlspecialchars($_SESSION['error_usuario']).'</div>';
           unset($_SESSION['error_usuario']);
         }
         ?>
