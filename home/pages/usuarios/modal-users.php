@@ -133,8 +133,12 @@ if (!isset($states) || !is_array($states)) $states = [];
             <label>Tienda</label>
             <select name="cod_tienda" id="e_cod_tienda" class="form-control" style="color:#212529">
               <option value="">-</option>
-              <?php if (!empty($tiendas)): foreach ($tiendas as $t): ?>
-                <option value="<?php echo htmlspecialchars($t['cod_tienda'] ?? ''); ?>"><?php echo htmlspecialchars($t['tienda_nombre'] ?? ''); ?></option>
+              <?php if (!empty($tiendas)): foreach ($tiendas as $t):
+                $display = trim((string)($t['tienda_nombre'] ?? $t['nombre_tienda'] ?? $t['nombre'] ?? $t['tienda'] ?? $t['tiendaName'] ?? $t['nombreTienda'] ?? $t['cod_tienda'] ?? ''));
+                if ($display === '') $display = (string)($t['cod_tienda'] ?? '');
+                $value = (string)($t['cod_tienda'] ?? $display);
+              ?>
+                <option value="<?php echo htmlspecialchars($value); ?>"><?php echo htmlspecialchars($display); ?></option>
               <?php endforeach; endif; ?>
             </select>
           </div>
