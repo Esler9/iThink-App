@@ -2,7 +2,7 @@
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form id="formCreateUser" method="post" action="./usuarios_ajax.php?action=create_user">
+      <form id="formCreateUser" method="get" action="./usuarios_Accion.php?action=create_user">
         <!-- input hidden para debug temporal (opcional) -->
         <input type="hidden" name="debug" value="1">
         <div class="modal-header bg-success text-white">
@@ -109,7 +109,7 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <!-- Edit form -->
-      <form id="formEditUser" method="post" action="./usuarios_ajax.php?action=update_user">
+      <form id="formEditUser" method="get" action="./usuarios_Accion.php?action=update_user">
         <input type="hidden" name="debug" value="1">
         <input type="hidden" id="e_codigo" name="codigo">
         <div class="modal-header bg-warning">
@@ -177,7 +177,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <!-- Delete form -->
-      <form id="formDeleteUser" method="post" action="./usuarios_ajax.php?action=delete_user">
+      <form id="formDeleteUser" method="get" action="./usuarios_Accion.php?action=delete_user">
         <input type="hidden" name="debug" value="1">
         <input type="hidden" id="d_codigo" name="codigo">
         <div class="modal-header bg-danger text-white">
