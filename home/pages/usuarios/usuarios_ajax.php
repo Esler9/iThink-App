@@ -19,6 +19,7 @@ switch ($action) {
   case 'create_user':
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
       $_SESSION['error_usuario'] = "Método inválido.";
+      dbg("create_user: método inválido: ".$_SERVER['REQUEST_METHOD']);
       header('Location: listado_users.php'); exit;
     }
 
@@ -32,22 +33,29 @@ switch ($action) {
     $email_active = isset($_POST['email_active']) ? 1 : 0;
     $id_group = isset($_POST['id_group']) ? intval($_POST['id_group']) : 0;
 
+    dbg("create_user: datos recibidos user={$user} cod_empleado={$cod_empleado} cod_tienda={$cod_tienda} id_group={$id_group} email_active={$email_active}");
+
     if ($user === '' || $password === '' || $id_group <= 0 || $cod_tienda <= 0 || $email === '') {
       $_SESSION['error_usuario'] = "Faltan campos requeridos.";
+      dbg("create_user: faltan campos");
       header('Location: listado_users.php'); exit;
     }
 
     // Verificar unicidad y existencia (puede comentar para debug)
     $q = "SELECT 1 FROM `Usuarios` WHERE `User` = '{$user}' LIMIT 1";
+    dbg("create_user: query check user: ".$q);
     $r = mysqli_query($conn, $q);
     if ($r === false) {
       $err = "DB error (check user): " . mysqli_error($conn) . " SQL: {$q}";
-      file_put_contents('/tmp/usuarios_error.log', date('c') . " " . $err . PHP_EOL, FILE_APPEND);
-      $_SESSION['error_usuario'] = $err;
+      dbg($err);
+      file_put_contents('/tmp/usuarios_debug.log', date('c')." ".$err.PHP_EOL, FILE_APPEND);
+      $_SESSION['error_usuario'] = "Error DB al verificar usuario.";
+      if ($show_debug) $_SESSION['error_usuario'] .= " Detalle: ".mysqli_error($conn);
       header('Location: listado_users.php'); exit;
     }
     if (mysqli_num_rows($r) > 0) {
       $_SESSION['error_usuario'] = "El usuario ya existe.";
+      dbg("create_user: usuario ya existe");
       header('Location: listado_users.php'); exit;
     }
 
@@ -57,15 +65,18 @@ switch ($action) {
 
     $sql = "INSERT INTO `Usuarios` (`User`, `Cod_Empleado`, `Password`, `State`, `cod_tienda`, `email`, `email_active`, `id_group_user`)
             VALUES ('{$user}', '{$cod_empleado}', '{$hash_q}', '{$state}', {$cod_tienda}, '{$email}', {$email_active}, {$id_group})";
+    dbg("create_user: SQL insert: ".$sql);
 
     if (mysqli_query($conn, $sql)) {
       $_SESSION['ok_usuario'] = "Usuario creado correctamente.";
+      dbg("create_user: insert OK id=".mysqli_insert_id($conn));
       header('Location: listado_users.php'); exit;
     } else {
-      // Registro detallado para depuración
       $err = "Error al crear usuario: " . mysqli_error($conn) . " | SQL: " . $sql;
-      file_put_contents('/tmp/usuarios_error.log', date('c') . " " . $err . PHP_EOL, FILE_APPEND);
-      $_SESSION['error_usuario'] = $err;
+      dbg($err);
+      file_put_contents('/tmp/usuarios_debug.log', date('c')." ".$err.PHP_EOL, FILE_APPEND);
+      $_SESSION['error_usuario'] = "Error al crear usuario.";
+      if ($show_debug) $_SESSION['error_usuario'] .= " Detalle: ".mysqli_error($conn);
       header('Location: listado_users.php'); exit;
     }
     break;
@@ -190,4 +201,23 @@ switch ($action) {
     header('Location: listado_users.php');
     exit;
 }
-?>
+
+// === DEPURACIÓN (añadir al inicio del archivo, tras include_once("../../../conexion.php");) ===
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+$DEBUG_LOG = '/tmp/usuarios_debug.log';
+function dbg($msg) {
+  global $DEBUG_LOG;
+  // evita escribir si el log no es escribible
+  @file_put_contents($DEBUG_LOG, date('c').' '.$msg.PHP_EOL, FILE_APPEND);
+}
+
+$show_debug = (isset($_REQUEST['debug']) && $_REQUEST['debug'] == '1');
+
+dbg("=== usuarios_ajax.php iniciando ===");
+dbg("Action: ".(isset($_REQUEST['action'])?$_REQUEST['action']:'(none)')." Method: ".$_SERVER['REQUEST_METHOD']);
+dbg("GET: ".json_encode($_GET));
+dbg("POST: ".json_encode($_POST));
+dbg("SESSION: ".json_encode(array_diff_key($_SESSION, array_flip(['__ci_last_regenerate']))));
