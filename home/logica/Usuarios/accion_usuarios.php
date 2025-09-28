@@ -175,4 +175,26 @@ switch ($accion) {
         respond('Acción desconocida', "Acción '$accion' no reconocida.", $_POST);
         break;
 }
+
+// ---------- PARCHE TEMPORAL PARA DEPURAR 500 ----------
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
+// Comprueba que el archivo de conexión existe y que $conn quedó definido
+$expected = __DIR__ . '/../../../conexion.php';
+if (!file_exists($expected)) {
+    header('Content-Type: text/plain; charset=utf-8', true, 500);
+    echo "Error: fichero de conexión no encontrado en: $expected\n";
+    exit;
+}
+
+// después del include(...) ya debería existir $conn
+if (!isset($conn) || !($conn instanceof mysqli)) {
+    header('Content-Type: text/plain; charset=utf-8', true, 500);
+    echo "Error: la variable \$conn no está definida o no es una instancia de mysqli.\n";
+    echo "Revisa /Volumes/Archivos/Proyectos_esler/iThink-App/conexion.php para asegurar que crea \$conn.\n";
+    exit;
+}
+// ---------- FIN PARCHE TEMPORAL ----------
 ?>
