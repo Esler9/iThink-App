@@ -67,6 +67,35 @@ function reenviarCorreo($listaCorreos, $identificador, $body) {
 // DEBUG TEMPORAL: log request
 file_put_contents('/tmp/accion_post_debug.log', date('c')." METHOD=".$_SERVER['REQUEST_METHOD']." URI=".$_SERVER['REQUEST_URI']."\nSESSION_USERNAME=". (isset($_SESSION['username'])?$_SESSION['username']:'(none)')."\nPOST=".print_r($_POST,true)."\nGET=".print_r($_GET,true)."\n\n", FILE_APPEND);
 
+// DEBUG adicional: si estamos en modo debug y llegó POST vacío, mostrar alert con info útil
+if ($debug && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST)) {
+    $raw = file_get_contents('php://input');
+    $headers = function_exists('getallheaders') ? getallheaders() : [];
+    $info = [
+        'method'      => $_SERVER['REQUEST_METHOD'] ?? '',
+        'uri'         => $_SERVER['REQUEST_URI'] ?? '',
+        'action_get'  => $_GET['accion'] ?? null,
+        'post_count'  => count($_POST),
+        'post_keys'   => array_values(array_keys($_POST)),
+        'raw_input'   => (strlen($raw) > 1000) ? substr($raw,0,1000) . '...' : $raw,
+        'headers'     => $headers,
+        'cookies'     => $_COOKIE,
+        'session_name'=> session_name(),
+        'session_id'  => session_id(),
+    ];
+    echo "<!doctype html><html><head><meta charset='utf-8'><title>DEBUG POST vacío</title></head><body>";
+    echo "<script>";
+    echo "var __dbg = " . json_encode($info, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) . ";";
+    echo "alert('DEBUG: POST vacío. Revisa consola y contenido mostrado.');";
+    echo "console.log('DEBUG_POST_EMPTY info:', __dbg);";
+    echo "</script>";
+    echo "<h2>DEBUG: POST vacío</h2>";
+    echo "<pre style='white-space:pre-wrap;max-height:60vh;overflow:auto;border:1px solid #ccc;padding:8px;'>" . htmlspecialchars(print_r($info, true)) . "</pre>";
+    echo "<p><a href='javascript:history.back()'>Volver</a> — <a href='" . htmlspecialchars($_SERVER['REQUEST_URI']) . "'>Reintentar</a></p>";
+    echo "</body></html>";
+    exit();
+}
+
 // helper debug: alert + redirect (muestra si llegó POST) — ahora incluye valores
 function alert_and_redirect_with_post_check($url) {
     $has = !empty($_POST);
