@@ -14,6 +14,9 @@ if ($action === 'get_tiendas') {
         while ($row = mysqli_fetch_assoc($res)) {
             $tiendas[] = $row;
         }
+    } else {
+        // Error en la consulta
+        $tiendas = ['error' => mysqli_error($conn), 'sql' => $sql];
     }
     echo json_encode($tiendas);
     exit;
@@ -27,6 +30,9 @@ if ($action === 'get_grupos') {
         while ($row = mysqli_fetch_assoc($res)) {
             $grupos[] = $row;
         }
+    } else {
+        // Error en la consulta
+        $grupos = ['error' => mysqli_error($conn), 'sql' => $sql];
     }
     echo json_encode($grupos);
     exit;
