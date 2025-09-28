@@ -28,6 +28,7 @@ if (isset($conn)) {
     <div class="modal-content">
       <form id="formCreateUser" method="post" action="./usuarios_accion.php?action=create_user">
         <input type="hidden" name="action" value="create_user">
+        <input type="hidden" name="debug" value="1"> <!-- temporal -->
         <div class="modal-header">
           <h5 class="modal-title">Crear usuario</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
@@ -130,6 +131,7 @@ if (isset($conn)) {
       <form id="formEditUser" method="post" action="./usuarios_accion.php?action=update_user">
         <input type="hidden" name="action" value="update_user">
         <input type="hidden" id="e_codigo" name="codigo">
+        <input type="hidden" name="debug" value="1"> <!-- temporal -->
         <div class="modal-header">
           <h5 class="modal-title">Editar usuario</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">

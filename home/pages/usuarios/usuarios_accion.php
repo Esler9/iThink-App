@@ -90,8 +90,19 @@ switch ($action) {
 
     dbg("create_user payload user={$user} cod_tienda={$cod_tienda} id_group={$id_group}");
 
-    if ($user === '' || $password === '' || $id_group <= 0 || $cod_tienda <= 0 || $email === '') {
-      finish(['error'=>true,'message'=>'Faltan campos requeridos'], true, $is_ajax);
+    // validación detallada (muestra campos faltantes si debug=1)
+    $missing = [];
+    if ($user === '') $missing[] = 'user';
+    if ($password === '') $missing[] = 'password';
+    if ($id_group <= 0) $missing[] = 'id_group';
+    if ($cod_tienda <= 0) $missing[] = 'cod_tienda';
+    if ($email === '') $missing[] = 'email';
+
+    if (!empty($missing)) {
+      $detail = 'Faltan campos requeridos: ' . implode(', ', $missing);
+      // si no pediste debug, usar mensaje genérico
+      $msg = (isset($_REQUEST['debug']) && $_REQUEST['debug']=='1') ? $detail : 'Faltan campos requeridos.';
+      finish(['error'=>true,'message'=>$msg], true, $is_ajax);
     }
 
     // comprobar usuario único
@@ -131,8 +142,17 @@ switch ($action) {
     $email_active = isset($_REQUEST['email_active']) ? 1 : 0;
     $id_group = isset($_REQUEST['id_group']) ? intval($_REQUEST['id_group']) : 0;
 
-    if ($user === '' || $id_group <= 0 || $cod_tienda <= 0 || $email === '') {
-      finish(['error'=>true,'message'=>'Faltan campos requeridos'], true, $is_ajax);
+    // validación detallada para update
+    $missing = [];
+    if ($user === '') $missing[] = 'user';
+    if ($id_group <= 0) $missing[] = 'id_group';
+    if ($cod_tienda <= 0) $missing[] = 'cod_tienda';
+    if ($email === '') $missing[] = 'email';
+
+    if (!empty($missing)) {
+      $detail = 'Faltan campos requeridos: ' . implode(', ', $missing);
+      $msg = (isset($_REQUEST['debug']) && $_REQUEST['debug']=='1') ? $detail : 'Faltan campos requeridos.';
+      finish(['error'=>true,'message'=>$msg], true, $is_ajax);
     }
 
     // validar grupo/tienda
