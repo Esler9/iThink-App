@@ -283,7 +283,7 @@ while ($u = mysqli_fetch_assoc($res_users)) {
       var codigo = $cb.data('codigo') || $cb.attr('data-codigo');
       var val = $cb.is(':checked') ? 1 : 0;
       $cb.prop('disabled', true);
-      $.post('toggle_email_active.php', { Codigo: codigo, email_active: val })
+      $.post('usuarios_ajax.php', { action: 'toggle_email', Codigo: codigo, email_active: val })
         .done(function(resp){
           var j;
           try { j = (typeof resp === 'object') ? resp : JSON.parse(resp); }
@@ -436,6 +436,60 @@ while ($u = mysqli_fetch_assoc($res_users)) {
       $('#e_cod_tienda').html('<option value="">Cargando...</option>');
       $('#e_id_group').html('<option value="">Cargando...</option>');
       cargarSelectsUsuarios();
+    });
+
+    // Envío formulario crear usuario
+    $('#formCreateUser').on('submit', function(e){
+      e.preventDefault();
+      var formData = $(this).serialize() + '&action=create_user';
+      $.post('usuarios_ajax.php', formData)
+        .done(function(resp){
+          var j = (typeof resp === 'object') ? resp : JSON.parse(resp);
+          if (j.success) {
+            alert('Usuario creado correctamente');
+            $('#createUserModal').modal('hide');
+            location.reload();
+          } else {
+            alert('Error: ' + j.message);
+          }
+        })
+        .fail(function(){ alert('Error de conexión'); });
+    });
+
+    // Envío formulario editar usuario
+    $('#formEditUser').on('submit', function(e){
+      e.preventDefault();
+      var formData = $(this).serialize() + '&action=edit_user';
+      $.post('usuarios_ajax.php', formData)
+        .done(function(resp){
+          var j = (typeof resp === 'object') ? resp : JSON.parse(resp);
+          if (j.success) {
+            alert('Usuario actualizado correctamente');
+            $('#editUserModal').modal('hide');
+            location.reload();
+          } else {
+            alert('Error: ' + j.message);
+          }
+        })
+        .fail(function(){ alert('Error de conexión'); });
+    });
+
+    // Envío formulario eliminar usuario
+    $('#formDeleteUser').on('submit', function(e){
+      e.preventDefault();
+      var formData = $(this).serialize() + '&action=delete_user';
+      $.post('usuarios_ajax.php', formData)
+        .done(function(resp){
+          var j = (typeof resp === 'object') ? resp : JSON.parse(resp);
+          if (j.success) {
+            alert('Usuario eliminado correctamente');
+            $('#deleteUserModal').modal('hide');
+            location.reload();
+          } else {
+            alert('Error: ' + j.message);
+          }
+        })
+        .fail(function(){ alert('Error de conexión'); });
     });
 
     // Reportar errores JS en consola (no suprimir)
