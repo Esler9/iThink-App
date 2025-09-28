@@ -1,5 +1,6 @@
 <?php
 // Este archivo se incluye desde listado_users.php (por eso $conn existe)
+// Cargar opciones para selects
 $grupos_q = mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
 $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
 ?>
@@ -36,9 +37,7 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
             <label>Grupo</label>
             <select name="c_id_group" id="c_id_group" class="form-control">
               <option value="">-</option>
-              <?php
-              mysqli_data_seek($grupos_q, 0);
-              while($g = mysqli_fetch_assoc($grupos_q)): ?>
+              <?php mysqli_data_seek($grupos_q,0); while($g = mysqli_fetch_assoc($grupos_q)): ?>
                 <option value="<?php echo htmlspecialchars($g['codigo']); ?>"><?php echo htmlspecialchars($g['nombre_grupo']); ?></option>
               <?php endwhile; ?>
             </select>
@@ -50,9 +49,7 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
             <label>Tienda</label>
             <select name="c_cod_tienda" id="c_cod_tienda" class="form-control">
               <option value="">-</option>
-              <?php
-              mysqli_data_seek($tiendas_q, 0);
-              while($t = mysqli_fetch_assoc($tiendas_q)): ?>
+              <?php mysqli_data_seek($tiendas_q,0); while($t = mysqli_fetch_assoc($tiendas_q)): ?>
                 <option value="<?php echo htmlspecialchars($t['cod_tienda']); ?>"><?php echo htmlspecialchars($t['tienda_nombre']); ?></option>
               <?php endwhile; ?>
             </select>
@@ -114,9 +111,7 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
             <label>Grupo</label>
             <select name="id_group" id="e_id_group" class="form-control">
               <option value="">-</option>
-              <?php
-              mysqli_data_seek($grupos_q, 0);
-              while($g = mysqli_fetch_assoc($grupos_q)): ?>
+              <?php mysqli_data_seek($grupos_q,0); while($g = mysqli_fetch_assoc($grupos_q)): ?>
                 <option value="<?php echo htmlspecialchars($g['codigo']); ?>"><?php echo htmlspecialchars($g['nombre_grupo']); ?></option>
               <?php endwhile; ?>
             </select>
@@ -128,9 +123,7 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
             <label>Tienda</label>
             <select name="cod_tienda" id="e_cod_tienda" class="form-control">
               <option value="">-</option>
-              <?php
-              mysqli_data_seek($tiendas_q, 0);
-              while($t = mysqli_fetch_assoc($tiendas_q)): ?>
+              <?php mysqli_data_seek($tiendas_q,0); while($t = mysqli_fetch_assoc($tiendas_q)): ?>
                 <option value="<?php echo htmlspecialchars($t['cod_tienda']); ?>"><?php echo htmlspecialchars($t['tienda_nombre']); ?></option>
               <?php endwhile; ?>
             </select>
