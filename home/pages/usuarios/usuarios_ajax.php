@@ -175,6 +175,35 @@ switch ($action) {
     }
     break;
 
+  // Manejo inmediato de listados (debe devolver JSON sin redirigir)
+  case 'list_groups':
+    header('Content-Type: application/json; charset=utf-8');
+    $out = [];
+    $sql = "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo ASC";
+    if ($res = mysqli_query($conn, $sql)) {
+      while ($r = mysqli_fetch_assoc($res)) $out[] = ['codigo' => $r['codigo'], 'nombre' => $r['nombre_grupo']];
+      echo json_encode($out);
+      exit;
+    } else {
+      echo json_encode(['error' => mysqli_error($conn)]);
+      exit;
+    }
+    break;
+
+  case 'list_tiendas':
+    header('Content-Type: application/json; charset=utf-8');
+    $out = [];
+    $sql = "SELECT cod_tienda, nombre FROM tienda ORDER BY nombre ASC";
+    if ($res = mysqli_query($conn, $sql)) {
+      while ($r = mysqli_fetch_assoc($res)) $out[] = ['cod_tienda' => $r['cod_tienda'], 'nombre' => $r['nombre']];
+      echo json_encode($out);
+      exit;
+    } else {
+      echo json_encode(['error' => mysqli_error($conn)]);
+      exit;
+    }
+    break;
+
   default:
     $_SESSION['error_usuario'] = "Acción no válida.";
     header('Location: listado_users.php');

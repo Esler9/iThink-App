@@ -237,9 +237,10 @@ $(function () {
     var selG = (typeof opts.selectedGroup !== 'undefined') ? String(opts.selectedGroup) : '';
     var selT = (typeof opts.selectedTienda !== 'undefined') ? String(opts.selectedTienda) : '';
 
-    var url = 'usuarios_ajax.php';
-    var gReq = $.getJSON(url, { action: 'list_groups' });
-    var tReq = $.getJSON(url, { action: 'list_tiendas' });
+    var url = './usuarios_ajax.php';
+    console.log('Cargando grupos/tiendas desde', url);
+    var gReq = $.getJSON(url, { action: 'list_groups' }).done(function(data){ console.log('groups:', data); });
+    var tReq = $.getJSON(url, { action: 'list_tiendas' }).done(function(data){ console.log('tiendas:', data); });
 
     $.when(gReq, tReq).done(function(gRes, tRes){
       var groups = gRes[0];
