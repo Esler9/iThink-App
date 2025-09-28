@@ -39,6 +39,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit('Método no permitido');
 }
 
+// DEBUG: mostrar alerta con contenido POST si se pasa debug_post=1 en la URL
+if (isset($_GET['debug_post']) && $_GET['debug_post'] == '1') {
+    // preparar mensaje resumido (truncar valores largos)
+    $pairs = [];
+    foreach ($_POST as $k => $v) {
+        $val = is_array($v) ? json_encode($v) : (string)$v;
+        if (strlen($val) > 200) $val = substr($val,0,200) . '...';
+        $pairs[] = $k . ': ' . $val;
+    }
+    $msg = !empty($pairs) ? "POST recibido:\\n" . implode("\\n", $pairs) : "No llega info POST";
+    // también añadir info de destino (accion)
+    $msg = $msg . "\\n\\nAcción (GET accion): " . (isset($_GET['accion']) ? $_GET['accion'] : '(no)') . "\\nUsuario sesión: " . (isset($_SESSION['username'])?$_SESSION['username']:'(none)');
+    echo "<!doctype html><html><head><meta charset='utf-8'></head><body>";
+    echo "<script>";
+    echo "alert(" . json_encode($msg) . ");";
+    echo "</script>";
+    echo "</body></html>";
+    exit();
+}
+
 // Recuperar y sanitizar
 $accion = isset($_GET['accion']) ? (int)$_GET['accion'] : 0;
 $c_user = isset($_POST['c_user']) ? trim($_POST['c_user']) : '';
