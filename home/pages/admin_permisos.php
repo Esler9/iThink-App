@@ -2,6 +2,14 @@
 session_start();
 include '../../conexion.php';
 
+// Asegurar que las funciones/variables de permisos estén disponibles antes de renderizar el sidebar
+// Ajusta la ruta según tu estructura si es necesario
+if (file_exists(__DIR__ . '/../logica/ac_permiso.php')) {
+    include_once __DIR__ . '/../logica/ac_permiso.php';
+}
+// Si ac_permiso no inicializa $permisos_user, dejarlo como array vacío para evitar warnings en menu.php
+if (!isset($permisos_user)) $permisos_user = [];
+
 // Obtener grupos de permisos
 $grupos = $conn->query("SELECT * FROM grupo_permiso");
 $color_msj = 0;
@@ -25,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $slug_query->close();
 
     if ($slug_count > 0) {
-        header("Location: admin_permisos.php?msg='El Slug : $slug ya Existe'");
+        header("Location: admin_permisos.php?msg=" . urlencode("El Slug : $slug ya Existe"));
         exit();
     }
 
@@ -42,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if ($stmt->execute()) {
-        header("Location: admin_permisos.php?msg='Permiso guardado exitosamente'");
+        header("Location: admin_permisos.php?msg=" . urlencode("Permiso guardado exitosamente"));
         exit();
     } else {
         echo "Error: " . $stmt->error;
