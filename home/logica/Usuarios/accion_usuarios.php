@@ -11,7 +11,7 @@ error_reporting(E_ALL);
 include("../../../conexion.php");
 
 if (!isset($conn) || !$conn) {
-    header("Location:../pages/usuarios/index.php?alert=DBConn");
+    header("Location:../pages/usuarios/listado_users.php?alert=DBConn");
     exit();
 }
 
@@ -31,12 +31,12 @@ switch ($accion) {
         $email_active = isset($_POST['c_email_active']) ? 1 : 0;
 
         if ($user === '' || $password === '') {
-            header("Location:../pages/usuarios/index.php?alert=DataMissing");
+            header("Location:../pages/usuarios/listado_users.php?alert=DataMissing");
             exit();
         }
 
         $stmt = $conn->prepare("SELECT COUNT(*) FROM `Usuarios` WHERE `User` = ?");
-        if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
+        if (!$stmt) { header("Location:../pages/usuarios/listado_users.php?alert=DBErr"); exit(); }
         $stmt->bind_param("s", $user);
         $stmt->execute();
         $stmt->bind_result($cnt);
@@ -44,22 +44,22 @@ switch ($accion) {
         $stmt->close();
 
         if ($cnt > 0) {
-            header("Location:../pages/usuarios/index.php?alert=UserExists");
+            header("Location:../pages/usuarios/listado_users.php?alert=UserExists");
             exit();
         }
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $conn->prepare("INSERT INTO `Usuarios` (`User`, `Password`, `Cod_Empleado`, `email`, `id_group_user`, `cod_tienda`, `State`, `email_active`) VALUES (?,?,?,?,?,?,?,?)");
-        if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
+        if (!$stmt) { header("Location:../pages/usuarios/listado_users.php?alert=DBErr"); exit(); }
         $stmt->bind_param("ssssssii", $user, $hash, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active);
         $ok = $stmt->execute();
         $stmt->close();
 
         if ($ok) {
-            header("Location:../pages/usuarios/index.php?alert=0");
+            header("Location:../pages/usuarios/listado_users.php?alert=0");
             exit();
         } else {
-            header("Location:../pages/usuarios/index.php?alert=InsertError");
+            header("Location:../pages/usuarios/listado_users.php?alert=InsertError");
             exit();
         }
         break;
@@ -67,7 +67,7 @@ switch ($accion) {
     case "1": // Editar usuario
         $codigo = isset($_POST['codigo']) ? (int)$_POST['codigo'] : 0;
         if ($codigo === 0) {
-            header("Location:../pages/usuarios/index.php?alert=NoId");
+            header("Location:../pages/usuarios/listado_users.php?alert=NoId");
             exit();
         }
         $user = trim($_POST['user'] ?? '');
@@ -80,12 +80,12 @@ switch ($accion) {
         $email_active = isset($_POST['email_active']) ? 1 : 0;
 
         if ($user === '') {
-            header("Location:../pages/usuarios/index.php?alert=DataMissing");
+            header("Location:../pages/usuarios/listado_users.php?alert=DataMissing");
             exit();
         }
 
         $stmt = $conn->prepare("SELECT COUNT(*) FROM `Usuarios` WHERE `User` = ? AND `Codigo` <> ?");
-        if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
+        if (!$stmt) { header("Location:../pages/usuarios/listado_users.php?alert=DBErr"); exit(); }
         $stmt->bind_param("si", $user, $codigo);
         $stmt->execute();
         $stmt->bind_result($cnt);
@@ -93,18 +93,18 @@ switch ($accion) {
         $stmt->close();
 
         if ($cnt > 0) {
-            header("Location:../pages/usuarios/index.php?alert=UserExists");
+            header("Location:../pages/usuarios/listado_users.php?alert=UserExists");
             exit();
         }
 
         if (!empty($password)) {
             $hash = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $conn->prepare("UPDATE `Usuarios` SET `User`=?, `Password`=?, `Cod_Empleado`=?, `email`=?, `id_group_user`=?, `cod_tienda`=?, `State`=?, `email_active`=? WHERE `Codigo`=?");
-            if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
+            if (!$stmt) { header("Location:../pages/usuarios/listado_users.php?alert=DBErr"); exit(); }
             $stmt->bind_param("ssssssiii", $user, $hash, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active, $codigo);
         } else {
             $stmt = $conn->prepare("UPDATE `Usuarios` SET `User`=?, `Cod_Empleado`=?, `email`=?, `id_group_user`=?, `cod_tienda`=?, `State`=?, `email_active`=? WHERE `Codigo`=?");
-            if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
+            if (!$stmt) { header("Location:../pages/usuarios/listado_users.php?alert=DBErr"); exit(); }
             $stmt->bind_param("sssssiii", $user, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active, $codigo);
         }
 
@@ -112,10 +112,10 @@ switch ($accion) {
         $stmt->close();
 
         if ($ok) {
-            header("Location:../pages/usuarios/index.php?alert=1");
+            header("Location:../pages/usuarios/listado_users.php?alert=1");
             exit();
         } else {
-            header("Location:../pages/usuarios/index.php?alert=UpdateError");
+            header("Location:../pages/usuarios/listado_users.php?alert=UpdateError");
             exit();
         }
         break;
@@ -123,26 +123,26 @@ switch ($accion) {
     case "2": // Eliminar usuario
         $codigo = isset($_POST['codigo']) ? (int)$_POST['codigo'] : 0;
         if ($codigo === 0) {
-            header("Location:../pages/usuarios/index.php?alert=NoId");
+            header("Location:../pages/usuarios/listado_users.php?alert=NoId");
             exit();
         }
         $stmt = $conn->prepare("DELETE FROM `Usuarios` WHERE `Codigo` = ?");
-        if (!$stmt) { header("Location:../pages/usuarios/index.php?alert=DBErr"); exit(); }
+        if (!$stmt) { header("Location:../pages/usuarios/listado_users.php?alert=DBErr"); exit(); }
         $stmt->bind_param("i", $codigo);
         $ok = $stmt->execute();
         $stmt->close();
 
         if ($ok) {
-            header("Location:../pages/usuarios/index.php?alert=2");
+            header("Location:../pages/usuarios/listado_users.php?alert=2");
             exit();
         } else {
-            header("Location:../pages/usuarios/index.php?alert=DeleteError");
+            header("Location:../pages/usuarios/listado_users.php?alert=DeleteError");
             exit();
         }
         break;
 
     default:
-        header("Location:../pages/usuarios/index.php?alert=NoAction");
+        header("Location:../pages/usuarios/listado_users.php?alert=NoAction");
         exit();
         break;
 }

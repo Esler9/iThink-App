@@ -81,13 +81,35 @@ if (!$res_users) {
       </div>
       <div class="card-body">
         <?php
-        // Mensajes de sesión ya no se muestran como alertas; sólo se limpian.
-        if (isset($_SESSION['ok_usuario'])) {
-          unset($_SESSION['ok_usuario']);
+        // Mostrar alertas de acción (vienen por ?alert=...)
+        $alert = $_GET['alert'] ?? '';
+        if ($alert) {
+            $alerts = [
+                '0' => ['type'=>'success','icon'=>'check-circle','text'=>'Usuario creado correctamente.'],
+                '1' => ['type'=>'success','icon'=>'edit','text'=>'Usuario actualizado correctamente.'],
+                '2' => ['type'=>'success','icon'=>'trash','text'=>'Usuario eliminado correctamente.'],
+                'DataMissing' => ['type'=>'warning','icon'=>'exclamation-triangle','text'=>'Faltan datos obligatorios.'],
+                'UserExists' => ['type'=>'warning','icon'=>'user','text'=>'El nombre de usuario ya existe.'],
+                'DBErr' => ['type'=>'danger','icon'=>'database','text'=>'Error de base de datos.'],
+                'InsertError' => ['type'=>'danger','icon'=>'times-circle','text'=>'No se pudo crear el usuario.'],
+                'UpdateError' => ['type'=>'danger','icon'=>'times-circle','text'=>'No se pudo actualizar el usuario.'],
+                'DeleteError' => ['type'=>'danger','icon'=>'times-circle','text'=>'No se pudo eliminar el usuario.'],
+                'NoAction' => ['type'=>'info','icon'=>'info-circle','text'=>'Acción no especificada.'],
+                'DBConn' => ['type'=>'danger','icon'=>'plug','text'=>'Error de conexión a la base de datos.'],
+                'NoId' => ['type'=>'warning','icon'=>'id-badge','text'=>'Falta identificador del usuario.'],
+            ];
+            if (isset($alerts[$alert])) {
+                $a = $alerts[$alert];
+                echo '<div class="alert alert-' . $a['type'] . ' alert-dismissible fade show action-alert" role="alert">';
+                echo '<i class="fas fa-' . $a['icon'] . ' mr-2"></i><strong>' . htmlspecialchars($a['text']) . '</strong>';
+                echo '<button type="button" class="close" data-dismiss="alert" aria-label="Cerrar"><span aria-hidden="true">&times;</span></button>';
+                echo '</div>';
+            }
         }
-        if (isset($_SESSION['error_usuario'])) {
-          unset($_SESSION['error_usuario']);
-        }
+
+        // Mantener limpieza previa de variables de sesión si las hubiera
+        if (isset($_SESSION['ok_usuario'])) { unset($_SESSION['ok_usuario']); }
+        if (isset($_SESSION['error_usuario'])) { unset($_SESSION['error_usuario']); }
         ?>
         <table id="usersTable" class="table table-bordered table-striped">
           <thead>
@@ -325,6 +347,11 @@ jQuery(function ($) {
   $('#formCreateUser, #formEditUser, #formDeleteUser').on('submit', function () {
     $(this).find('button[type="submit"]').attr('disabled', true);
   });
+
+  // autocerrar alertas de acción después de 5s
+  setTimeout(function () {
+    $('.action-alert').alert('close');
+  }, 5000);
 });
 </script>
 
