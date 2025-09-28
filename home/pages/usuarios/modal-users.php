@@ -8,6 +8,7 @@ if (!isset($states) || !is_array($states)) $states = [];
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <form id="formCreateUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=0" class="modal-content">
+      <input type="hidden" name="__debug_post_check" value="1" />
       <div class="modal-header">
         <h5 class="modal-title">Crear usuario</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">&times;</button>
@@ -91,6 +92,7 @@ if (!isset($states) || !is_array($states)) $states = [];
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <form id="formEditUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=1" class="modal-content">
+      <input type="hidden" name="__debug_post_check" value="1" />
       <input type="hidden" name="codigo" id="e_codigo" value="" />
       <div class="modal-header">
         <h5 class="modal-title">Editar usuario</h5>
@@ -193,6 +195,7 @@ if (!isset($states) || !is_array($states)) $states = [];
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <form id="formDeleteUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=2" class="modal-content">
+      <input type="hidden" name="__debug_post_check" value="1" />
       <input type="hidden" name="codigo" id="d_codigo" value="" />
       <div class="modal-header"><h5 class="modal-title">Eliminar usuario</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">&times;</button></div>
