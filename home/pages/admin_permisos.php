@@ -1,241 +1,230 @@
 <?php
 session_start();
-include '../../conexion.php';
 
-// Asegurar funciones de permisos
-if (file_exists(__DIR__ . '/../logica/ac_permiso.php')) {
-    include_once __DIR__ . '/../logica/ac_permiso.php';
+// Config / mantenimiento
+include_once __DIR__ . '/../../Setting.php';
+
+// Si hay mantenimiento detener
+if (isset($mantenimiento) && $mantenimiento === true) {
+    echo "<h3>Sitio en mantenimiento</h3>";
+    exit();
 }
-if (!isset($permisos_user)) $permisos_user = [];
 
-// Obtener grupos de permisos
-$grupos = $conn->query("SELECT * FROM grupo_permiso");
-$color_msj = 0;
+// Verificar sesión
+if (!isset($_SESSION["username"]) || !isset($_SESSION['cod_user'])) {
+    header('Location: ../login.php');
+    exit();
+}
 
-// Manejo de formulario (sin cambios)
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+$User = htmlspecialchars($_SESSION["username"]);
+$cod_user = htmlspecialchars($_SESSION['cod_user']);
+$page = 2;
+
+include_once __DIR__ . '/../../conexion.php';
+include_once __DIR__ . '/../logica/ac_permiso.php';
+include_once __DIR__ . '/../datos/dt_permisos.php';
+
+// Traer grupos y permisos (función Traer_grupo_usuario asumida en dt_permisos.php)
+$grupos = Traer_grupo_usuario($conn);
+
+// Construir arreglo de permisos por grupo (si dt_permisos provee permisos)
+$groupPermissionsArray = [];
+if (function_exists('Traer_permisos_por_grupo')) {
+    foreach ($grupos as $g) {
+        $groupPermissionsArray[$g['codigo']] = Traer_permisos_por_grupo($conn, $g['codigo']);
+    }
+}
+
+// Manejo de formulario (crear/editar permiso) - similar a la versión previa pero compatible con la estructura de permisos_view
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $codigo = $_POST['codigo'] ?? null;
-    $nombre_permiso = $_POST['nombre_permiso'] ?? '';
-    $des_permiso = $_POST['des_permiso'] ?? '';
-    $group_permiso = $_POST['group_permiso'] ?? 0;
+    $nombre_permiso = trim($_POST['nombre_permiso'] ?? '');
+    $des_permiso = trim($_POST['des_permiso'] ?? '');
+    $group_permiso = (int)($_POST['group_permiso'] ?? 0);
 
-    $slug = strtolower(trim(preg_replace('/\s+/', '-', $nombre_permiso)));
+    if ($nombre_permiso === '') {
+        header("Location: admin_permisos.php?msg=" . urlencode("El nombre del permiso es requerido"));
+        exit();
+    }
 
-    $slug_query = $conn->prepare("SELECT COUNT(*) FROM Permiso WHERE slug = ? AND (codigo != ? OR ? IS NULL)");
-    $slug_query->bind_param("ssi", $slug, $codigo, $codigo);
-    $slug_query->execute();
-    $slug_query->bind_result($slug_count);
-    $slug_query->fetch();
-    $slug_query->close();
+    $slug = strtolower(preg_replace('/\s+/', '-', $nombre_permiso));
+
+    // Verificar unicidad del slug
+    $q = $conn->prepare("SELECT COUNT(*) FROM Permiso WHERE slug = ? " . ($codigo ? "AND codigo <> ?" : ""));
+    if ($codigo) {
+        $q->bind_param("si", $slug, $codigo);
+    } else {
+        $q->bind_param("s", $slug);
+    }
+    $q->execute();
+    $q->bind_result($slug_count);
+    $q->fetch();
+    $q->close();
 
     if ($slug_count > 0) {
-        header("Location: admin_permisos.php?msg=" . urlencode("El Slug : $slug ya Existe"));
+        header("Location: admin_permisos.php?msg=" . urlencode("El slug ya existe"));
         exit();
     }
 
     if ($codigo) {
-        $sql = "UPDATE Permiso SET nombre_permiso=?, des_permiso=?, group_permiso=?, slug=? WHERE codigo=?";
-        $stmt = $conn->prepare($sql);
+        $stmt = $conn->prepare("UPDATE Permiso SET nombre_permiso = ?, des_permiso = ?, group_permiso = ?, slug = ? WHERE codigo = ?");
         $stmt->bind_param("ssisi", $nombre_permiso, $des_permiso, $group_permiso, $slug, $codigo);
     } else {
-        $sql = "INSERT INTO Permiso (nombre_permiso, des_permiso, group_permiso, slug) VALUES (?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
+        $stmt = $conn->prepare("INSERT INTO Permiso (nombre_permiso, des_permiso, group_permiso, slug) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssis", $nombre_permiso, $des_permiso, $group_permiso, $slug);
     }
 
     if ($stmt->execute()) {
-        header("Location: admin_permisos.php?msg=" . urlencode("Permiso guardado exitosamente"));
+        header("Location: admin_permisos.php?msg=" . urlencode("Permiso guardado correctamente"));
         exit();
     } else {
-        echo "Error: " . $stmt->error;
+        header("Location: admin_permisos.php?msg=" . urlencode("Error al guardar permiso"));
+        exit();
     }
-
-    $stmt->close();
 }
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Administrador de Permisos</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Permisos</title>
 
-    <!-- CSS externos -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- estilos (puedes cambiar por AdminLTE si lo usas) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Estilos mínimos para layout sidebar + contenido (evita overflow) -->
-    <style>
-      :root { --sidebar-width: 260px; }
-      html,body { height:100%; margin:0; }
-      .wrapper { display:flex; min-height:100vh; }
-      .main-sidebar {
-        width: var(--sidebar-width);
-        flex: 0 0 var(--sidebar-width);
-        background:#343a40;
-        color:#fff;
-        padding-top:1rem;
-        overflow:auto;
-      }
-      .main-sidebar a { color: #cfd8dc; text-decoration:none; display:block; padding:.5rem 1rem; }
-      .main-sidebar a:hover { background:rgba(255,255,255,0.03); color:#fff; }
-      .content-area { flex:1; padding:1.25rem; background:#f4f6f9; min-width:0; } /* min-width:0 evita overflow en flex */
-      .content-inner { max-width:1200px; margin:0 auto; }
-      .table-responsive { overflow:auto; }
-      @media (max-width: 768px) {
-        .wrapper { flex-direction:column; }
-        .main-sidebar { width:100%; flex:0 0 auto; position:relative; }
-        .content-area { margin-top:0; }
-      }
-    </style>
+  <style>
+    :root{--sidebar-width:260px}
+    html,body{height:100%;margin:0}
+    .wrapper{display:flex;min-height:100vh}
+    .main-sidebar{width:var(--sidebar-width);flex:0 0 var(--sidebar-width);background:#343a40;color:#fff;padding:1rem;overflow:auto}
+    .main-sidebar a{color:#cfd8dc;display:block;padding:.5rem 1rem;text-decoration:none}
+    .main-sidebar a:hover{background:rgba(255,255,255,.03);color:#fff}
+    .content-area{flex:1;padding:1.25rem;background:#f4f6f9;min-width:0}
+    .content-inner{max-width:1200px;margin:0 auto}
+    .table-responsive{overflow:auto}
+    @media (max-width:768px){.wrapper{flex-direction:column}.main-sidebar{width:100%}}
+  </style>
 </head>
 <body>
-
 <div class="wrapper">
-    <!-- Sidebar (archivo existente) -->
-    <?php include_once __DIR__ . '/sidebar.php'; ?>
+  <!-- Sidebar -->
+  <?php include_once __DIR__ . '/sidebar.php'; ?>
 
-    <!-- Contenido principal -->
-    <main class="content-area">
-      <div class="content-inner">
+  <!-- Contenido -->
+  <main class="content-area">
+    <div class="content-inner">
 
-        <!-- Mensajes -->
-        <?php if (isset($_GET['msg'])): ?>
-          <div class="alert <?php echo $color_msj == 1 ? 'alert-success' : 'alert-info'; ?> alert-dismissible fade show" role="alert">
-            <?php echo htmlspecialchars($_GET['msg']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-          </div>
-        <?php endif; ?>
-
-        <!-- Botón y formulario -->
-        <div class="mb-3 d-flex justify-content-between align-items-center">
-          <h3 class="m-0">Permisos</h3>
-          <button id="crearPermisoBtn" class="btn btn-primary">Crear Permiso</button>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="m-0">Administrar Permisos</h3>
+        <div>
+          <button id="nuevoPermisoBtn" class="btn btn-primary">Nuevo Permiso</button>
         </div>
+      </div>
 
-        <div id="formularioPermiso" class="card mb-4" style="display:none;">
-          <div class="card-body">
-            <form method="POST" id="permisoForm">
-              <div class="mb-3">
-                <label class="form-label">Nombre del Permiso</label>
-                <input type="text" name="nombre_permiso" class="form-control" required>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Descripción</label>
-                <textarea name="des_permiso" class="form-control"></textarea>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Grupo de Permiso</label>
-                <select name="group_permiso" class="form-select" required>
-                  <?php while ($grupo = $grupos->fetch_assoc()): ?>
-                    <option value="<?php echo $grupo['codigo']; ?>"><?php echo $grupo['nombre_grupo_p']; ?></option>
-                  <?php endwhile; ?>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-success">Crear</button>
-            </form>
-          </div>
+      <!-- Mensaje -->
+      <?php if (!empty($_GET['msg'])): ?>
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          <?php echo htmlspecialchars($_GET['msg']); ?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
+      <?php endif; ?>
 
-        <!-- Tabla -->
-        <div class="card">
-          <div class="card-body table-responsive">
-            <table id="permisoTable" class="table table-striped table-hover">
-              <thead>
-                <tr>
-                  <th>Código</th><th>Nombre</th><th>Descripción</th><th>Grupo</th><th>Slug</th><th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
+      <!-- Formulario creación -->
+      <div id="formCrear" class="card mb-4" style="display:none;">
+        <div class="card-body">
+          <form method="post" id="formPermiso">
+            <input type="hidden" name="codigo" id="codigoPermiso" value="">
+            <div class="mb-3">
+              <label class="form-label">Nombre permiso</label>
+              <input class="form-control" name="nombre_permiso" id="nombrePermiso" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Descripción</label>
+              <textarea class="form-control" name="des_permiso" id="desPermiso"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Grupo</label>
+              <select class="form-select" name="group_permiso" id="groupPermiso" required>
                 <?php
-                $result = $conn->query("SELECT p.codigo, p.nombre_permiso, p.des_permiso, g.nombre_grupo_p, p.slug FROM Permiso p JOIN grupo_permiso g ON p.group_permiso = g.codigo");
-                while ($permiso_existente = $result->fetch_assoc()):
+                // $grupos puede ser array o mysqli_result dependiendo de Traer_grupo_usuario
+                if (is_array($grupos)) {
+                    foreach ($grupos as $g) {
+                        echo '<option value="'.htmlspecialchars($g['codigo']).'">'.htmlspecialchars($g['nombre_grupo_p'] ?? $g['nombre']).'</option>';
+                    }
+                } else {
+                    while ($g = $grupos->fetch_assoc()) {
+                        echo '<option value="'.htmlspecialchars($g['codigo']).'">'.htmlspecialchars($g['nombre_grupo_p'] ?? $g['nombre']).'</option>';
+                    }
+                }
                 ?>
-                  <tr>
-                    <td><?php echo $permiso_existente['codigo']; ?></td>
-                    <td><?php echo $permiso_existente['nombre_permiso']; ?></td>
-                    <td><?php echo $permiso_existente['des_permiso']; ?></td>
-                    <td><?php echo $permiso_existente['nombre_grupo_p']; ?></td>
-                    <td><?php echo $permiso_existente['slug']; ?></td>
-                    <td>
-                      <button class="btn btn-warning btn-sm editPermisoBtn"
-                              data-codigo="<?php echo $permiso_existente['codigo']; ?>"
-                              data-nombre="<?php echo htmlspecialchars($permiso_existente['nombre_permiso'], ENT_QUOTES); ?>"
-                              data-descripcion="<?php echo htmlspecialchars($permiso_existente['des_permiso'], ENT_QUOTES); ?>"
-                              data-grupo="<?php echo $permiso_existente['nombre_grupo_p']; ?>">
-                        <i class="fa fa-edit"></i> Editar
-                      </button>
-                    </td>
-                  </tr>
-                <?php endwhile; ?>
-              </tbody>
-            </table>
-          </div>
+              </select>
+            </div>
+            <button class="btn btn-success" type="submit">Guardar</button>
+            <button type="button" id="cancelCrear" class="btn btn-secondary">Cancelar</button>
+          </form>
         </div>
+      </div>
 
-      </div><!-- .content-inner -->
-    </main>
-</div><!-- .wrapper -->
-
-<!-- Modales (igual que antes) -->
-<div class="modal fade" id="editPermisoModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form method="POST" id="editPermisoForm">
-        <div class="modal-header">
-          <h5 class="modal-title">Editar Permiso</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" name="codigo" id="editCodigo">
-          <div class="mb-3">
-            <label class="form-label">Nombre</label>
-            <input type="text" name="nombre_permiso" id="editNombrePermiso" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Descripción</label>
-            <textarea name="des_permiso" id="editDesPermiso" class="form-control"></textarea>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Grupo</label>
-            <select name="group_permiso" id="editGroupPermiso" class="form-select" required>
+      <!-- Tabla de permisos -->
+      <div class="card">
+        <div class="card-body table-responsive">
+          <table class="table table-striped" id="tablaPermisos">
+            <thead>
+              <tr><th>Código</th><th>Nombre</th><th>Descripción</th><th>Grupo</th><th>Slug</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
               <?php
-              $grupos = $conn->query("SELECT * FROM grupo_permiso");
-              while ($grupo = $grupos->fetch_assoc()):
+              $q = $conn->query("SELECT p.codigo, p.nombre_permiso, p.des_permiso, g.nombre_grupo_p, p.slug FROM Permiso p LEFT JOIN grupo_permiso g ON p.group_permiso = g.codigo ORDER BY p.codigo DESC");
+              while ($row = $q->fetch_assoc()):
               ?>
-                <option value="<?php echo $grupo['codigo']; ?>"><?php echo $grupo['nombre_grupo_p']; ?></option>
+                <tr>
+                  <td><?php echo $row['codigo']; ?></td>
+                  <td><?php echo htmlspecialchars($row['nombre_permiso']); ?></td>
+                  <td><?php echo htmlspecialchars($row['des_permiso']); ?></td>
+                  <td><?php echo htmlspecialchars($row['nombre_grupo_p']); ?></td>
+                  <td><?php echo htmlspecialchars($row['slug']); ?></td>
+                  <td>
+                    <button class="btn btn-sm btn-warning editarBtn"
+                      data-codigo="<?php echo $row['codigo']; ?>"
+                      data-nombre="<?php echo htmlspecialchars($row['nombre_permiso'], ENT_QUOTES); ?>"
+                      data-des="<?php echo htmlspecialchars($row['des_permiso'], ENT_QUOTES); ?>"
+                      data-grupo="<?php echo htmlspecialchars($row['nombre_grupo_p'], ENT_QUOTES); ?>">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                  </td>
+                </tr>
               <?php endwhile; ?>
-            </select>
-          </div>
+            </tbody>
+          </table>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-        </div>
-      </form>
+      </div>
+
     </div>
-  </div>
+  </main>
 </div>
 
-<!-- JS -->
+<!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
 <script>
-  $(function(){
-    $('#permisoTable').DataTable({ responsive:true });
-    $('#crearPermisoBtn').on('click', function(){ $('#formularioPermiso').toggle(); });
+  (function($){
+    $('#nuevoPermisoBtn').on('click', function(){ $('#formCrear').slideToggle(); });
+    $('#cancelCrear').on('click', function(){ $('#formCrear').slideUp(); $('#formPermiso')[0].reset(); });
 
-    $('#permisoTable').on('click', '.editPermisoBtn', function(){
-      $('#editCodigo').val($(this).data('codigo'));
-      $('#editNombrePermiso').val($(this).data('nombre'));
-      $('#editDesPermiso').val($(this).data('descripcion'));
-      // seleccionar grupo por texto (si coincide) — puedes ajustar para usar value en data-*
-      $('#editGroupPermiso option').filter(function(){ return $(this).text() == $(this).data('grupo'); }).prop('selected', true);
-      $('#editPermisoModal').modal('show');
+    // editar: cargar datos en formulario y mostrar
+    $('.editarBtn').on('click', function(){
+      var btn = $(this);
+      $('#codigoPermiso').val(btn.data('codigo'));
+      $('#nombrePermiso').val(btn.data('nombre'));
+      $('#desPermiso').val(btn.data('des'));
+      // intentar seleccionar grupo por texto (si coincide)
+      $('#groupPermiso option').filter(function(){ return $(this).text() === btn.data('grupo'); }).prop('selected', true);
+      $('#formCrear').slideDown();
+      $('html,body').animate({scrollTop: $('#formCrear').offset().top - 20}, 300);
     });
-  });
+  })(jQuery);
 </script>
 </body>
 </html>
