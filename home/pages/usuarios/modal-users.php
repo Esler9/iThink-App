@@ -2,7 +2,9 @@
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form id="formCreateUser" method="post" action="usuarios_ajax.php?action=create_user">
+      <form id="formCreateUser" method="post" action="./usuarios_ajax.php?action=create_user">
+        <!-- input hidden para debug temporal (opcional) -->
+        <input type="hidden" name="debug" value="1">
         <div class="modal-header bg-success text-white">
           <h5 class="modal-title" id="createUserLabel"><i class="fas fa-user-plus mr-1"></i> Crear usuario</h5>
           <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
@@ -106,7 +108,10 @@
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form id="formEditUser" method="post" action="usuarios_ajax.php?action=update_user">
+      <!-- Edit form -->
+      <form id="formEditUser" method="post" action="./usuarios_ajax.php?action=update_user">
+        <input type="hidden" name="debug" value="1">
+        <input type="hidden" id="e_codigo" name="codigo">
         <div class="modal-header bg-warning">
           <h5 class="modal-title" id="editUserLabel"><i class="fas fa-user-edit mr-1"></i> Editar usuario</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -114,7 +119,6 @@
           </button>
         </div>
         <div class="modal-body">
-          <input type="hidden" id="e_codigo" name="codigo">
           <div class="row">
             <div class="col-md-6 form-group">
               <label for="e_user">Usuario</label>
@@ -172,7 +176,10 @@
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form id="formDeleteUser" method="post" action="usuarios_ajax.php?action=delete_user">
+      <!-- Delete form -->
+      <form id="formDeleteUser" method="post" action="./usuarios_ajax.php?action=delete_user">
+        <input type="hidden" name="debug" value="1">
+        <input type="hidden" id="d_codigo" name="codigo">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title" id="deleteUserLabel"><i class="fas fa-user-times mr-1"></i> Eliminar usuario</h5>
           <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
@@ -180,7 +187,6 @@
           </button>
         </div>
         <div class="modal-body">
-          <input type="hidden" id="d_codigo" name="codigo">
           <p>Confirma eliminar al usuario: <strong id="d_user">-</strong> (Código: <span id="d_codigo_txt">-</span>)</p>
         </div>
         <div class="modal-footer">
