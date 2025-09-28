@@ -1,9 +1,8 @@
-
 <!-- Modal: Crear usuario -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form id="formCreateUser" method="post">
+      <form id="formCreateUser" method="post" action="usuarios_ajax.php?action=create_user">
         <div class="modal-header bg-success text-white">
           <h5 class="modal-title" id="createUserLabel"><i class="fas fa-user-plus mr-1"></i> Crear usuario</h5>
           <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
@@ -107,7 +106,7 @@
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form id="formEditUser" method="post">
+      <form id="formEditUser" method="post" action="usuarios_ajax.php?action=update_user">
         <div class="modal-header bg-warning">
           <h5 class="modal-title" id="editUserLabel"><i class="fas fa-user-edit mr-1"></i> Editar usuario</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -173,7 +172,7 @@
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form id="formDeleteUser" method="post">
+      <form id="formDeleteUser" method="post" action="usuarios_ajax.php?action=delete_user">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title" id="deleteUserLabel"><i class="fas fa-user-times mr-1"></i> Eliminar usuario</h5>
           <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">

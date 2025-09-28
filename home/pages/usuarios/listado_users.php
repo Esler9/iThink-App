@@ -80,6 +80,17 @@ if (!$res_users) {
         </div>
       </div>
       <div class="card-body">
+        <?php
+        // justo antes de renderizar la tabla
+        if (isset($_SESSION['ok_usuario'])) {
+          echo '<div class="alert alert-success">'.htmlspecialchars($_SESSION['ok_usuario']).'</div>';
+          unset($_SESSION['ok_usuario']);
+        }
+        if (isset($_SESSION['error_usuario'])) {
+          echo '<div class="alert alert-danger">'.htmlspecialchars($_SESSION['error_usuario']).'</div>';
+          unset($_SESSION['error_usuario']);
+        }
+        ?>
         <table id="usersTable" class="table table-bordered table-striped">
           <thead>
             <tr>
