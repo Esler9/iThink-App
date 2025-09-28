@@ -238,9 +238,6 @@ if (isset($conn) && $conn && @mysqli_ping($conn)) {
     $q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
     if ($q) { while ($r = mysqli_fetch_assoc($q)) $tiendas[] = $r; }
 
-    // Traer estados distintos para permitir más de dos opciones
-    $q = mysqli_query($conn, "SELECT DISTINCT State FROM `Usuarios` ORDER BY State");
-    if ($q) { while ($r = mysqli_fetch_assoc($q)) $states[] = $r['State']; }
 }
 
 // Incluir modales (modal-users.php leerá $grupos, $tiendas, $states)
