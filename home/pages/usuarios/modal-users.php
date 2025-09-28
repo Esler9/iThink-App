@@ -1,3 +1,49 @@
+<script>
+// Cargar opciones de tiendas y grupos al abrir los modales de Crear/Editar
+function cargarSelectsUsuarios() {
+	// Tiendas
+	$.ajax({
+		url: 'usuarios_ajax.php',
+		type: 'POST',
+		data: { action: 'get_tiendas' },
+		dataType: 'json',
+		success: function(resp) {
+			var opts = '<option value="">Seleccione...</option>';
+			if (resp && Array.isArray(resp)) {
+				resp.forEach(function(t) {
+					opts += '<option value="'+t.cod_tienda+'">'+t.nombre+'</option>';
+				});
+			}
+			$('#c_cod_tienda, #e_cod_tienda').html(opts);
+		}
+	});
+	// Grupos
+	$.ajax({
+		url: 'usuarios_ajax.php',
+		type: 'POST',
+		data: { action: 'get_grupos' },
+		dataType: 'json',
+		success: function(resp) {
+			var opts = '<option value="">Seleccione...</option>';
+			if (resp && Array.isArray(resp)) {
+				resp.forEach(function(g) {
+					opts += '<option value="'+g.codigo+'">'+g.nombre_grupo+'</option>';
+				});
+			}
+			$('#c_id_group, #e_id_group').html(opts);
+		}
+	});
+}
+
+// Abrir modal crear usuario: cargar selects
+$('#createUserModal').on('show.bs.modal', function(){
+	cargarSelectsUsuarios();
+});
+// Abrir modal editar usuario: cargar selects
+$('#editUserModal').on('show.bs.modal', function(){
+	cargarSelectsUsuarios();
+});
+</script>
 <!-- Modal: Crear Usuario -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
