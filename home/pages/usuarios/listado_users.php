@@ -226,35 +226,22 @@ if (!$res_users) {
 <script src="../../dist/js/adminlte.min.js"></script>
 
 <?php
-// <-- añadir esto antes de incluir los modales -->
-$grupos_q = false;
-$tiendas_q = false;
+// Obtener listas en arrays simples (seguro)
+$grupos = [];
+$tiendas = [];
 if (isset($conn) && $conn && @mysqli_ping($conn)) {
-    $grupos_q = @mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
-    $tiendas_q = @mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
+    $q = mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
+    if ($q) { while ($r = mysqli_fetch_assoc($q)) $grupos[] = $r; }
+    $q2 = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
+    if ($q2) { while ($r = mysqli_fetch_assoc($q2)) $tiendas[] = $r; }
 }
-?>
-<!-- incluir modales justo antes de los scripts -->
-<?php
+
+// incluir modales (modal-users.php leerá $grupos y $tiendas)
 $modalFile = __DIR__ . '/modal-users.php';
 if (file_exists($modalFile) && is_readable($modalFile)) {
     include $modalFile;
 } else {
-    // DEBUG: mostrar comentario HTML y modal de fallback mínimo para pruebas
-    echo "<!-- ERROR: modal-users.php no encontrado en: {$modalFile} -->";
-    ?>
-    <!-- Modal fallback mínimo para pruebas -->
-    <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title">Crear usuario (fallback)</h5>
-            <button type="button" class="close" data-dismiss="modal">&times;</button></div>
-          <div class="modal-body">Modal de fallback: modal-users.php faltante o no legible.</div>
-          <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button></div>
-        </div>
-      </div>
-    </div>
-    <?php
+    echo "<!-- modal-users.php no encontrado: {$modalFile} -->";
 }
 ?>
 
