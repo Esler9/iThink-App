@@ -1,13 +1,12 @@
 <?php
-// Este archivo se incluye desde listado_users.php, por lo que $conn ya está disponible
-// Cargar listas para selects
+// Este archivo se incluye desde listado_users.php (por eso $conn existe)
 $grupos_q = mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
 $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
 ?>
 <!-- Crear Usuario -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
-    <form method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=0" class="modal-content">
+    <form id="formCreateUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=0" class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Crear usuario</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"><span aria-hidden="true">&times;</span></button>
@@ -35,9 +34,11 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
           </div>
           <div class="form-group col-md-4">
             <label>Grupo</label>
-            <select name="c_id_group" class="form-control">
+            <select name="c_id_group" id="c_id_group" class="form-control">
               <option value="">-</option>
-              <?php while($g = mysqli_fetch_assoc($grupos_q)): ?>
+              <?php
+              mysqli_data_seek($grupos_q, 0);
+              while($g = mysqli_fetch_assoc($grupos_q)): ?>
                 <option value="<?php echo htmlspecialchars($g['codigo']); ?>"><?php echo htmlspecialchars($g['nombre_grupo']); ?></option>
               <?php endwhile; ?>
             </select>
@@ -47,24 +48,23 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
         <div class="form-row">
           <div class="form-group col-md-6">
             <label>Tienda</label>
-            <select name="c_cod_tienda" class="form-control">
+            <select name="c_cod_tienda" id="c_cod_tienda" class="form-control">
               <option value="">-</option>
               <?php
-              // reset pointer en caso de inclusión múltiple
               mysqli_data_seek($tiendas_q, 0);
               while($t = mysqli_fetch_assoc($tiendas_q)): ?>
                 <option value="<?php echo htmlspecialchars($t['cod_tienda']); ?>"><?php echo htmlspecialchars($t['tienda_nombre']); ?></option>
               <?php endwhile; ?>
             </select>
           </div>
-          <div class="form-group col-md-3">
-            <div class="form-check mt-4">
+          <div class="form-group col-md-3 d-flex align-items-center">
+            <div class="form-check">
               <input class="form-check-input" type="checkbox" id="c_state" name="c_state">
               <label class="form-check-label" for="c_state">Activo</label>
             </div>
           </div>
-          <div class="form-group col-md-3">
-            <div class="form-check mt-4">
+          <div class="form-group col-md-3 d-flex align-items-center">
+            <div class="form-check">
               <input class="form-check-input" type="checkbox" id="c_email_active" name="c_email_active">
               <label class="form-check-label" for="c_email_active">Emails activos</label>
             </div>
@@ -83,7 +83,7 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
 <!-- Editar Usuario -->
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
-    <form method="post" id="editUserForm" action="../../logica/Usuarios/accion_usuarios.php?accion=1" class="modal-content">
+    <form id="formEditUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=1" class="modal-content">
       <input type="hidden" name="codigo" id="e_codigo" value="" />
       <div class="modal-header">
         <h5 class="modal-title">Editar usuario</h5>
@@ -135,14 +135,14 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
               <?php endwhile; ?>
             </select>
           </div>
-          <div class="form-group col-md-3">
-            <div class="form-check mt-4">
+          <div class="form-group col-md-3 d-flex align-items-center">
+            <div class="form-check">
               <input class="form-check-input" type="checkbox" id="e_state" name="state">
               <label class="form-check-label" for="e_state">Activo</label>
             </div>
           </div>
-          <div class="form-group col-md-3">
-            <div class="form-check mt-4">
+          <div class="form-group col-md-3 d-flex align-items-center">
+            <div class="form-check">
               <input class="form-check-input" type="checkbox" id="e_email_active" name="email_active">
               <label class="form-check-label" for="e_email_active">Emails activos</label>
             </div>
@@ -188,14 +188,14 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
 <!-- Eliminar Usuario -->
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <form method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=2" class="modal-content">
+    <form id="formDeleteUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=2" class="modal-content">
       <input type="hidden" name="codigo" id="d_codigo" value="" />
       <div class="modal-header">
         <h5 class="modal-title">Eliminar usuario</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
-        <p>¿Confirma eliminar el usuario <strong id="d_user">-</strong> (esta acción no se puede deshacer)?</p>
+        <p>¿Confirma eliminar el usuario <strong id="d_user">-</strong>?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -206,20 +206,34 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
 </div>
 
 <script>
-  // Rellenar modales desde los botones con data-*
-  $('#editUserModal').on('show.bs.modal', function (e) {
-    var btn = $(e.relatedTarget);
-    $('#e_codigo').val(btn.data('codigo') || '');
-    $('#e_user').val(btn.data('user') || '');
-    $('#e_password').val(''); // no mostrar contraseña
-    $('#e_cod_empleado').val(btn.data('cod_empleado') || '');
-    $('#e_email').val(btn.data('email') || '');
-    $('#e_id_group').val(btn.data('id_group') || '');
-    $('#e_cod_tienda').val(btn.data('cod_tienda') || '');
-    $('#e_state').prop('checked', btn.data('state') == 'Activo' || btn.data('state') == 1 || btn.data('state') === true);
-    $('#e_email_active').prop('checked', btn.data('email_active') == 1 || btn.data('email_active') === true);
+jQuery(function($){
+
+  // Crear: resetear form al abrir modal
+  $('#createUserModal').on('show.bs.modal', function () {
+    $('#formCreateUser')[0].reset();
+    $('#c_id_group, #c_cod_tienda').val('');
+    $('#c_email_active, #c_state').prop('checked', false);
   });
 
+  // Editar: rellenar campos desde data-* del botón
+  $('#editUserModal').on('show.bs.modal', function (e) {
+    var btn = $(e.relatedTarget);
+    var data = btn.data() || {};
+
+    $('#e_codigo').val(data.codigo || '');
+    $('#e_user').val(data.user || '');
+    $('#e_cod_empleado').val(data.cod_empleado || '');
+    $('#e_email').val(data.email || '');
+    $('#e_id_group').val(data.id_group || '');
+    $('#e_cod_tienda').val(data.cod_tienda || '');
+    $('#e_password').val('');
+    // state puede venir como '1'/'0' o 'Activo'/'Inactivo'
+    var stateChecked = (data.state === 1 || data.state === '1' || data.state === 'Activo' || data.state === true);
+    $('#e_state').prop('checked', !!stateChecked);
+    $('#e_email_active').prop('checked', !!(data.email_active == 1 || data.email_active === true));
+  });
+
+  // Ver: mostrar datos en texto
   $('#viewUserModal').on('show.bs.modal', function (e) {
     var btn = $(e.relatedTarget);
     $('#v_codigo').text(btn.data('codigo') || '-');
@@ -232,10 +246,17 @@ $tiendas_q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda O
     $('#v_state').text(btn.data('state') || '-');
   });
 
+  // Eliminar: setear codigo y usuario
   $('#deleteUserModal').on('show.bs.modal', function (e) {
     var btn = $(e.relatedTarget);
     $('#d_codigo').val(btn.data('codigo') || '');
     $('#d_user').text(btn.data('user') || '-');
   });
+
+  // Evitar doble submit (para envíos normales)
+  $('#formCreateUser, #formEditUser, #formDeleteUser').on('submit', function(){
+    $(this).find('button[type="submit"]').attr('disabled', true);
+  });
+
+});
 </script>
-?>
