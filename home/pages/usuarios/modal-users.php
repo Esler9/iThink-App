@@ -1,63 +1,81 @@
+<?php
+
+// obtener grupos
+$options_groups = '<option value="">--Seleccione grupo--</option>';
+if (isset($conn)) {
+  $res = mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo ASC");
+  if ($res) {
+    while ($g = mysqli_fetch_assoc($res)) {
+      $options_groups .= '<option value="'.htmlspecialchars($g['codigo']).'">'.htmlspecialchars($g['nombre_grupo']).'</option>';
+    }
+  }
+}
+
+// obtener tiendas
+$options_tiendas = '<option value="">--Seleccione tienda--</option>';
+if (isset($conn)) {
+  $res = mysqli_query($conn, "SELECT cod_tienda, nombre FROM tienda ORDER BY nombre ASC");
+  if ($res) {
+    while ($t = mysqli_fetch_assoc($res)) {
+      $options_tiendas .= '<option value="'.htmlspecialchars($t['cod_tienda']).'">'.htmlspecialchars($t['nombre']).'</option>';
+    }
+  }
+}
+?>
 <!-- Modal: Crear usuario -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <form id="formCreateUser" method="get" action="./usuarios_Accion.php?action=create_user">
-        <!-- input hidden para debug temporal (opcional) -->
-        <input type="hidden" name="debug" value="1">
-        <div class="modal-header bg-success text-white">
-          <h5 class="modal-title" id="createUserLabel"><i class="fas fa-user-plus mr-1"></i> Crear usuario</h5>
-          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+        <div class="modal-header">
+          <h5 class="modal-title">Crear usuario</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-
         <div class="modal-body">
-          <div class="row">
-            <div class="col-md-6 form-group">
-              <label for="c_user">Usuario</label>
-              <input type="text" id="c_user" name="user" class="form-control" required>
+          <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" name="user" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Código empleado</label>
+            <input type="text" name="cod_empleado" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" name="password" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Grupo</label>
+            <select name="id_group" id="c_id_group" class="form-control" required>
+              <?php echo $options_groups; ?>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tienda</label>
+            <select name="cod_tienda" id="c_cod_tienda" class="form-control" required>
+              <?php echo $options_tiendas; ?>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label>Email</label>
+              <input type="email" name="email" class="form-control" required>
             </div>
-            <div class="col-md-6 form-group">
-              <label for="c_cod_empleado">Cód. Empleado</label>
-              <input type="text" id="c_cod_empleado" name="cod_empleado" class="form-control">
-            </div>
-            <div class="col-md-6 form-group">
-              <label for="c_password">Contraseña</label>
-              <input type="password" id="c_password" name="password" class="form-control" required>
-            </div>
-            <div class="col-md-6 form-group">
-              <label for="c_email">Email</label>
-              <input type="email" id="c_email" name="email" class="form-control" required>
-            </div>
-            <div class="col-md-6 form-group">
-              <label for="c_id_group">Grupo</label>
-              <select id="c_id_group" name="id_group" class="form-control" required>
-                <option value="">Cargando...</option>
-              </select>
-            </div>
-            <div class="col-md-6 form-group">
-              <label for="c_cod_tienda">Tienda</label>
-              <select id="c_cod_tienda" name="cod_tienda" class="form-control" required>
-                <option value="">Cargando...</option>
-              </select>
-            </div>
-            <div class="col-md-6 form-group">
-              <label for="c_state">Estado</label>
-              <select id="c_state" name="state" class="form-control">
+            <div class="form-group col-md-3">
+              <label>Estado</label>
+              <select name="state" class="form-control">
                 <option value="1">Activo</option>
                 <option value="0">Inactivo</option>
               </select>
             </div>
-            <div class="col-md-6 form-group d-flex align-items-center">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="c_email_active" name="email_active" value="1">
-                <label class="form-check-label" for="c_email_active">Email activo</label>
-              </div>
+            <div class="form-group col-md-3">
+              <label>Email activo</label><br>
+              <input type="checkbox" name="email_active" value="1">
             </div>
           </div>
         </div>
-
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
           <button type="submit" class="btn btn-success">Guardar</button>
@@ -108,58 +126,55 @@
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <!-- Edit form -->
       <form id="formEditUser" method="get" action="./usuarios_Accion.php?action=update_user">
-        <input type="hidden" name="debug" value="1">
         <input type="hidden" id="e_codigo" name="codigo">
-        <div class="modal-header bg-warning">
-          <h5 class="modal-title" id="editUserLabel"><i class="fas fa-user-edit mr-1"></i> Editar usuario</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar usuario</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <div class="row">
-            <div class="col-md-6 form-group">
-              <label for="e_user">Usuario</label>
-              <input type="text" id="e_user" name="user" class="form-control" required>
+          <!-- mismos inputs que crear; values se llenan con JS cuando se abre el modal -->
+          <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" name="user" id="e_user" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Código empleado</label>
+            <input type="text" name="cod_empleado" id="e_cod_empleado" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Nueva contraseña (dejar vacío para no cambiar)</label>
+            <input type="password" name="password" id="e_password" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Grupo</label>
+            <select name="id_group" id="e_id_group" class="form-control" required>
+              <?php echo $options_groups; ?>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tienda</label>
+            <select name="cod_tienda" id="e_cod_tienda" class="form-control" required>
+              <?php echo $options_tiendas; ?>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label>Email</label>
+              <input type="email" name="email" id="e_email" class="form-control" required>
             </div>
-            <div class="col-md-6 form-group">
-              <label for="e_cod_empleado">Cód. Empleado</label>
-              <input type="text" id="e_cod_empleado" name="cod_empleado" class="form-control">
-            </div>
-            <div class="col-md-6 form-group">
-              <label for="e_password">Contraseña (dejar vacío para no cambiar)</label>
-              <input type="password" id="e_password" name="password" class="form-control">
-            </div>
-            <div class="col-md-6 form-group">
-              <label for="e_email">Email</label>
-              <input type="email" id="e_email" name="email" class="form-control" required>
-            </div>
-            <div class="col-md-6 form-group">
-              <label for="e_id_group">Grupo</label>
-              <select id="e_id_group" name="id_group" class="form-control" required>
-                <option value="">Cargando...</option>
-              </select>
-            </div>
-            <div class="col-md-6 form-group">
-              <label for="e_cod_tienda">Tienda</label>
-              <select id="e_cod_tienda" name="cod_tienda" class="form-control" required>
-                <option value="">Cargando...</option>
-              </select>
-            </div>
-            <div class="col-md-6 form-group">
-              <label for="e_state">Estado</label>
-              <select id="e_state" name="state" class="form-control">
+            <div class="form-group col-md-3">
+              <label>Estado</label>
+              <select name="state" id="e_state" class="form-control">
                 <option value="1">Activo</option>
                 <option value="0">Inactivo</option>
               </select>
             </div>
-            <div class="col-md-6 form-group d-flex align-items-center">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="e_email_active" name="email_active" value="1">
-                <label class="form-check-label" for="e_email_active">Email activo</label>
-              </div>
+            <div class="form-group col-md-3">
+              <label>Email activo</label><br>
+              <input type="checkbox" name="email_active" id="e_email_active" value="1">
             </div>
           </div>
         </div>
@@ -176,18 +191,16 @@
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <!-- Delete form -->
       <form id="formDeleteUser" method="get" action="./usuarios_Accion.php?action=delete_user">
-        <input type="hidden" name="debug" value="1">
         <input type="hidden" id="d_codigo" name="codigo">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="deleteUserLabel"><i class="fas fa-user-times mr-1"></i> Eliminar usuario</h5>
-          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar usuario</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <p>Confirma eliminar al usuario: <strong id="d_user">-</strong> (Código: <span id="d_codigo_txt">-</span>)</p>
+          ¿Confirma eliminar este usuario?
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
