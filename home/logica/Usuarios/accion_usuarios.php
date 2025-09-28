@@ -19,6 +19,8 @@ function reenviarCorreo($listaCorreos, $identificador, $body) {
 
 // DEBUG TEMPORAL: ver si llegan datos (quitar en producción)
 //file_put_contents('/tmp/post_debug.txt', print_r($_POST, true), FILE_APPEND);
+// DEBUG TEMPORAL: log request
+file_put_contents('/tmp/accion_post_debug.log', date('c')." METHOD=".$_SERVER['REQUEST_METHOD']." URI=".$_SERVER['REQUEST_URI']."\nSESSION_USERNAME=". (isset($_SESSION['username'])?$_SESSION['username']:'(none)')."\nPOST=".print_r($_POST,true)."\nGET=".print_r($_GET,true)."\n\n", FILE_APPEND);
 
 // Solo aceptar POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
