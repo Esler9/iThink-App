@@ -100,9 +100,12 @@ switch ($action) {
 
     if (!empty($missing)) {
       $detail = 'Faltan campos requeridos: ' . implode(', ', $missing);
-      // si no pediste debug, usar mensaje genérico
-      $msg = (isset($_REQUEST['debug']) && $_REQUEST['debug']=='1') ? $detail : 'Faltan campos requeridos.';
-      finish(['error'=>true,'message'=>$msg], true, $is_ajax);
+      // si debug=1 añadimos lo que realmente llegó
+      if (isset($_REQUEST['debug']) && $_REQUEST['debug'] == '1') {
+        $received = print_r($_REQUEST, true);
+        $detail .= "\n\nREQUEST recibida:\n" . $received;
+      }
+      finish(['error'=>true,'message'=>$detail], true, $is_ajax);
     }
 
     // comprobar usuario único

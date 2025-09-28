@@ -215,3 +215,17 @@ if (isset($conn)) {
     </div>
   </div>
 </div>
+
+<script>
+document.querySelectorAll('#formCreateUser,#formEditUser,#formDeleteUser').forEach(function(f){
+  f.addEventListener('submit', function(e){
+    try {
+      var s = new URLSearchParams(new FormData(f)).toString();
+      console.log('Enviando formulario', f.id, s);
+    } catch(err){
+      console.log('Form logging error', err);
+    }
+    // no hacemos preventDefault: el formulario sigue su envío normal
+  });
+});
+</script>
