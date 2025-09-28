@@ -51,183 +51,128 @@ if (!Tiene_permiso($permisos_user,'ver-usuarios')) {
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-  <!-- Content Header (Page header) -->
-  <section class="content-header">
-    <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-6">
-          <h1>Usuarios</h1>
-        </div>
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="../../dashboard.php">Home</a></li>
-            <li class="breadcrumb-item active">Usuarios</li>
-          </ol>
-        </div>
-      </div>
-    </div><!-- /.container-fluid -->
-  </section>
-
-  <!-- Main content: Tabla de usuarios -->
-  <section class="content">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-12">
-          <div class="card card-outline card-primary">
-            <div class="card-header">
-              <h3 class="card-title">Listado de Usuarios</h3>
-              <div class="card-tools">
-                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#createUserModal">
-                  <i class="fas fa-plus"></i> Nuevo
-                </button>
-              </div>
-            </div>
-            <div class="card-body">
 <?php
 // Consulta con JOIN a tienda y grupo_user para mostrar nombres en lugar de sólo códigos
 $sql_users = "
-  SELECT u.Codigo, u.`User`, u.Cod_Empleado, u.Password, u.State, u.cod_tienda, u.email, u.email_active, u.id_group_user,
+  SELECT u.Codigo, u.`User`, u.Cod_Empleado, u.email, u.email_active, u.State,
+         u.cod_tienda, u.id_group_user,
          t.nombre AS tienda_nombre,
          g.nombre_grupo
   FROM `Usuarios` u
-  LEFT JOIN `tienda` t ON u.cod_tienda = t.cod_tienda
-  LEFT JOIN `grupo_user` g ON u.id_group_user = g.codigo
+  LEFT JOIN tienda t ON u.cod_tienda = t.cod_tienda
+  LEFT JOIN grupo_user g ON u.id_group_user = g.codigo
   ORDER BY u.Codigo DESC
 ";
 $res_users = mysqli_query($conn, $sql_users);
 
 if (!$res_users) {
   echo '<div class="alert alert-danger">Error al consultar usuarios: '.htmlspecialchars(mysqli_error($conn)).'</div>';
-} elseif (mysqli_num_rows($res_users) === 0) {
-  echo '<div class="alert alert-info">No se encontraron usuarios.</div>';
 } else {
 ?>
-  <div class="table-responsive">
-    <table id="example1" class="table table-bordered table-striped table-hover">
-      <thead class="thead-dark">
-        <tr>
-          <th>Codigo</th>
-          <th>User</th>
-          <th>Cod_Empleado</th>
-          <th>Email</th>
-          <th>Email Active</th>
-          <th>Grupo</th>
-          <th>Tienda</th>
-          <th>Estado</th>
-          <th style="width:140px">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-<?php
-while ($u = mysqli_fetch_assoc($res_users)) {
-  $codigo = $u['Codigo'];
-  $user = $u['User'];
-  $cod_empleado = $u['Cod_Empleado'];
-  $email = $u['email'];
-  $email_active = $u['email_active'];
-  $id_group = $u['id_group_user'];
-  $cod_tienda = $u['cod_tienda'];
-  $state = $u['State'];
 
-  $group_name = $u['nombre_grupo'] ?? ($id_group ? 'Grupo '.$id_group : 'Sin grupo');
-  // Badges
-  switch ((string)$id_group) {
-    case '1': $group_badge = 'danger'; break;
-    case '2': $group_badge = 'primary'; break;
-    case '3': $group_badge = 'info'; break;
-    default: $group_badge = 'secondary';
-  }
-  $email_checked = ((int)$email_active === 1) ? 'checked' : '';
-  $email_switch = '
-    <div class="custom-control custom-switch">
-      <input type="checkbox" class="custom-control-input toggle-email" id="toggle-'.htmlspecialchars($codigo).'" data-codigo="'.htmlspecialchars($codigo).'" '. $email_checked .'>
-      <label class="custom-control-label" for="toggle-'.htmlspecialchars($codigo).'"></label>
-    </div>
-  ';
-
-  $state_lower = strtolower((string)$state);
-  if (in_array($state_lower, ['1','activo','true','yes','on'])) { $state_label = 'Activo'; $state_badge = 'success'; }
-  elseif (in_array($state_lower, ['0','inactivo','false','no','off'])) { $state_label = 'Inactivo'; $state_badge = 'dark'; }
-  else { $state_label = ucfirst($state_lower); $state_badge = 'info'; }
-
-  $tienda_nombre = $u['tienda_nombre'] ?? $cod_tienda;
-?>
-      <tr>
-        <td><?php echo htmlspecialchars($codigo); ?></td>
-        <td><?php echo htmlspecialchars($user); ?></td>
-        <td><?php echo htmlspecialchars($cod_empleado); ?></td>
-        <td><?php echo htmlspecialchars($email); ?></td>
-        <td><?php echo $email_switch; ?></td>
-        <td><span class="badge badge-<?php echo $group_badge; ?> badge-group"><?php echo htmlspecialchars($group_name); ?></span></td>
-        <td><?php echo htmlspecialchars($tienda_nombre); ?></td>
-        <td><span class="badge badge-<?php echo $state_badge; ?>"><?php echo htmlspecialchars($state_label); ?></span></td>
-        <td class="table-actions">
-          <button
-            class="btn btn-sm btn-info btn-view"
-            data-codigo="<?php echo htmlspecialchars($codigo);?>"
-            data-user="<?php echo htmlspecialchars($user);?>"
-            data-cod-empleado="<?php echo htmlspecialchars($cod_empleado);?>"
-            data-email="<?php echo htmlspecialchars($email);?>"
-            data-email-active="<?php echo (int)$email_active;?>"
-            data-id-group="<?php echo htmlspecialchars($id_group);?>"
-            data-grupo="<?php echo htmlspecialchars($group_name);?>"
-            data-cod-tienda="<?php echo htmlspecialchars($cod_tienda);?>"
-            data-tienda="<?php echo htmlspecialchars($tienda_nombre);?>"
-            data-state="<?php echo htmlspecialchars($state);?>"
-            title="Ver"><i class="fas fa-eye"></i></button>
-
-          <button
-            class="btn btn-sm btn-warning btn-edit"
-            data-codigo="<?php echo htmlspecialchars($codigo);?>"
-            data-user="<?php echo htmlspecialchars($user);?>"
-            data-cod-empleado="<?php echo htmlspecialchars($cod_empleado);?>"
-            data-email="<?php echo htmlspecialchars($email);?>"
-            data-email-active="<?php echo (int)$email_active;?>"
-            data-id-group="<?php echo htmlspecialchars($id_group);?>"
-            data-cod-tienda="<?php echo htmlspecialchars($cod_tienda);?>"
-            data-state="<?php echo htmlspecialchars($state);?>"
-            title="Editar" <?php if(!Tiene_permiso($permisos_user,'editar-usuario')) echo 'disabled'; ?>><i class="fas fa-edit"></i></button>
-
-          <button
-            class="btn btn-sm btn-danger btn-delete"
-            data-codigo="<?php echo htmlspecialchars($codigo);?>"
-            data-user="<?php echo htmlspecialchars($user);?>"
-            title="Eliminar" <?php if(!Tiene_permiso($permisos_user,'eliminar-usuario')) echo 'disabled'; ?>><i class="fas fa-trash"></i></button>
-        </td>
-      </tr>
-<?php } // end while ?>
-      </tbody>
-      <tfoot>
-        <tr>
-          <th>Codigo</th>
-          <th>User</th>
-          <th>Cod_Empleado</th>
-          <th>Email</th>
-          <th>Email Active</th>
-          <th>Grupo</th>
-          <th>Tienda</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-<?php } // end else ?>
-            </div>
-          </div>
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Listado de Usuarios</h3>
+        <div class="card-tools">
+          <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#createUserModal"><i class="fas fa-user-plus"></i> Crear</button>
         </div>
       </div>
+      <div class="card-body">
+        <table id="usersTable" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Usuario</th>
+              <th>Cód. Empleado</th>
+              <th>Email</th>
+              <th>Grupo</th>
+              <th>Tienda</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php while ($u = mysqli_fetch_assoc($res_users)) {
+              $codigo = htmlspecialchars($u['Codigo']);
+              $user = htmlspecialchars($u['User']);
+              $cod_empleado = htmlspecialchars($u['Cod_Empleado']);
+              $email = htmlspecialchars($u['email']);
+              $email_active = intval($u['email_active']);
+              $grupo_id = htmlspecialchars($u['id_group_user']);
+              $grupo_nombre = htmlspecialchars($u['nombre_grupo'] ?: '-');
+              $tienda_id = htmlspecialchars($u['cod_tienda']);
+              $tienda_nombre = htmlspecialchars($u['tienda_nombre'] ?: '-');
+              $state = ($u['State'] == '1') ? 'Activo' : 'Inactivo';
+            ?>
+            <tr>
+              <td><?php echo $codigo; ?></td>
+              <td><?php echo $user; ?></td>
+              <td><?php echo $cod_empleado; ?></td>
+              <td><?php echo $email; ?></td>
+              <td><?php echo $grupo_nombre; ?></td>
+              <td><?php echo $tienda_nombre; ?></td>
+              <td><?php echo $state; ?></td>
+              <td>
+                <button class="btn btn-app bg-info btn-view"
+                        data-toggle="modal" data-target="#viewUserModal"
+                        data-codigo="<?php echo $codigo;?>"
+                        data-user="<?php echo $user;?>"
+                        data-cod_empleado="<?php echo $cod_empleado;?>"
+                        data-email="<?php echo $email;?>"
+                        data-email_active="<?php echo $email_active;?>"
+                        data-id_group="<?php echo $grupo_id;?>"
+                        data-grupo="<?php echo $grupo_nombre;?>"
+                        data-cod_tienda="<?php echo $tienda_id;?>"
+                        data-tienda="<?php echo $tienda_nombre;?>"
+                        data-state="<?php echo $state;?>"
+                        title="Ver"><i class="fas fa-eye"></i></button>
+
+                <button class="btn btn-app bg-warning btn-edit"
+                        data-toggle="modal" data-target="#editUserModal"
+                        data-codigo="<?php echo $codigo;?>"
+                        data-user="<?php echo $user;?>"
+                        data-cod_empleado="<?php echo $cod_empleado;?>"
+                        data-email="<?php echo $email;?>"
+                        data-email_active="<?php echo $email_active;?>"
+                        data-id_group="<?php echo $grupo_id;?>"
+                        data-cod_tienda="<?php echo $tienda_id;?>"
+                        data-state="<?php echo ($u['State']);?>"
+                        title="Editar"><i class="fas fa-edit"></i></button>
+
+                <button class="btn btn-app bg-danger btn-delete"
+                        data-toggle="modal" data-target="#deleteUserModal"
+                        data-codigo="<?php echo $codigo;?>"
+                        data-user="<?php echo $user;?>"
+                        title="Eliminar"><i class="fas fa-user-times"></i></button>
+              </td>
+            </tr>
+            <?php } // end while ?>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th>Código</th>
+              <th>Usuario</th>
+              <th>Cód. Empleado</th>
+              <th>Email</th>
+              <th>Grupo</th>
+              <th>Tienda</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
-  </section>
-  <!-- /.content -->
+  </div>
+</section>
+
+<?php } // end else ?>
 </div>
 <!-- /.content-wrapper -->
 
 <footer class="main-footer">
-  <div class="float-right d-none d-sm-block">
-    <b>Version</b> 1
-  </div>
-  <strong>Copyright &copy; 2023 <a href="https://hexasystems.com">Hexa Systems</a>.</strong> All rights reserved.
 </footer>
 
 <!-- Control Sidebar -->
@@ -256,132 +201,49 @@ while ($u = mysqli_fetch_assoc($res_users)) {
 <!-- incluir modales justo antes de los scripts -->
 <?php include("modal-users.php"); ?>
 
-<!-- JS: inicializar DataTables, toggle y handlers de modales -->
 <script>
-  $(function () {
-    // Utilidades
-    function populateSelect($sel, items, valueKey, textKey, placeholder) {
-      $sel.empty();
-      if (placeholder) $sel.append($('<option>').val('').text(placeholder));
-      if (!Array.isArray(items)) return;
-      items.forEach(function(it){
-        // Evitar option duplicadas
-        if ($sel.find('option[value="' + it[valueKey] + '"]').length === 0) {
-          $sel.append($('<option>').val(it[valueKey]).text(it[textKey]));
-        }
-      });
-    }
+$(function () {
+  $("#usersTable").DataTable({
+    "responsive": true, "lengthChange": false, "autoWidth": false,
+    "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+  }).buttons().container().appendTo('#usersTable_wrapper .col-md-6:eq(0)');
 
-    // Carga combinada de grupos y tiendas; selected opcional
-    function loadGroupsAndTiendas(opts) {
-      var gSel = opts.groupSel;
-      var tSel = opts.tiendaSel;
-      var selG = (typeof opts.selectedGroup !== 'undefined') ? opts.selectedGroup : '';
-      var selT = (typeof opts.selectedTienda !== 'undefined') ? opts.selectedTienda : '';
-
-      var url = 'usuarios_ajax.php';
-
-      var gReq = $.getJSON(url, { action: 'list_groups' });
-      var tReq = $.getJSON(url, { action: 'list_tiendas' });
-
-      $.when(gReq, tReq).done(function(gRes, tRes){
-        // gRes[0] y tRes[0] contienen los arrays de datos
-        var groups = gRes[0];
-        var tiendas = tRes[0];
-
-        populateSelect(gSel, groups, 'codigo', 'nombre', 'Seleccione grupo');
-        populateSelect(tSel, tiendas, 'cod_tienda', 'nombre', 'Seleccione tienda');
-
-        if (selG !== '' && gSel.find('option[value="' + selG + '"]').length) gSel.val(selG);
-        if (selT !== '' && tSel.find('option[value="' + selT + '"]').length) tSel.val(selT);
-      }).fail(function(jq, textStatus, errorThrown){
-        console.error('Error cargando grupos/tiendas:', textStatus, errorThrown);
-        gSel.empty().append($('<option>').val('').text('Error al cargar grupos'));
-        tSel.empty().append($('<option>').val('').text('Error al cargar tiendas'));
-      });
-    }
-
-    // Al abrir Crear: poblar (sin seleccionados) y resetear formulario
-    $('#createUserModal').on('show.bs.modal', function () {
-      loadGroupsAndTiendas({
-        groupSel: $('#c_id_group'),
-        tiendaSel: $('#c_cod_tienda')
-      });
-      $('#formCreateUser')[0].reset();
-      $('#c_email_active').prop('checked', false);
-    });
-
-    // Al abrir Editar: leer data-* del trigger y poblar, seleccionar valores
-    $('#editUserModal').on('show.bs.modal', function (e) {
-      var trigger = $(e.relatedTarget);
-      var codigo = trigger.data('codigo') || '';
-      var user = trigger.data('user') || '';
-      var cod_empleado = trigger.data('cod_empleado') || '';
-      var email = trigger.data('email') || '';
-      var id_group = trigger.data('id_group') || '';
-      var cod_tienda = trigger.data('cod_tienda') || '';
-      var state = (typeof trigger.data('state') !== 'undefined') ? trigger.data('state') : '1';
-      var email_active = trigger.data('email_active') ? true : false;
-
-      $('#e_codigo').val(codigo);
-      $('#e_user').val(user);
-      $('#e_cod_empleado').val(cod_empleado);
-      $('#e_email').val(email);
-      $('#e_password').val('');
-      $('#e_state').val(state);
-      $('#e_email_active').prop('checked', email_active);
-
-      loadGroupsAndTiendas({
-        groupSel: $('#e_id_group'),
-        tiendaSel: $('#e_cod_tienda'),
-        selectedGroup: id_group,
-        selectedTienda: cod_tienda
-      });
-    });
-
-    // Handler básico para Ver (si usas botones con data-*)
-    $(document).on('click', '.btn-view', function(){
-      var $b = $(this);
-      $('#v_codigo').text($b.data('codigo') || '-');
-      $('#v_user').text($b.data('user') || '-');
-      $('#v_cod_empleado').text($b.data('cod_empleado') || '-');
-      $('#v_email').text($b.data('email') || '-');
-      $('#v_email_active').text($b.data('email_active') ? 'Sí' : 'No');
-      $('#v_grupo').text($b.data('grupo') || '-');
-      $('#v_tienda').text($b.data('tienda') || '-');
-      $('#v_state').text($b.data('state') || '-');
-      $('#viewUserModal').modal('show');
-    });
-
-    // Crear usuario: manejar formulario
-    $('#formCreateUser').on('submit', function(e){
-      e.preventDefault();
-      var $f = $(this);
-      var data = $f.serialize();
-      console.log('Enviando create_user payload:', data);
-      $.post('usuarios_ajax.php?action=create_user', data, null, 'json')
-        .done(function(resp){
-          console.log('create_user response:', resp);
-          if (resp.success) {
-            $('#createUserModal').modal('hide');
-            location.reload();
-          } else {
-            alert(resp.error || 'Error creando usuario');
-          }
-        })
-        .fail(function(xhr){
-          console.error('AJAX error:', xhr.responseText);
-          alert('Error de servidor. Revisa la consola o Network.');
-        });
-    });
-
-    // Depuración: informa si no encuentra el endpoint
-    $.ajaxSetup({
-      error: function (jqXHR, textStatus, errorThrown) {
-        // No sobreescribir globales si ya tienes manejo
-      }
-    });
+  // Handlers básicos para botones (llenan modales con data-*)
+  $(document).on('click', '.btn-view', function(){
+    var $b = $(this);
+    $('#v_codigo').text($b.data('codigo') || '-');
+    $('#v_user').text($b.data('user') || '-');
+    $('#v_cod_empleado').text($b.data('cod_empleado') || '-');
+    $('#v_email').text($b.data('email') || '-');
+    $('#v_email_active').text($b.data('email_active') ? 'Sí' : 'No');
+    $('#v_grupo').text($b.data('grupo') || '-');
+    $('#v_tienda').text($b.data('tienda') || '-');
+    $('#v_state').text($b.data('state') || '-');
+    $('#viewUserModal').modal('show');
   });
+
+  $(document).on('click', '.btn-edit', function(){
+    var $b = $(this);
+    // Triggea apertura del modal; el evento show.bs.modal en listado_users.php se encargará de cargar selects
+    $('#e_codigo').val($b.data('codigo') || '');
+    $('#e_user').val($b.data('user') || '');
+    $('#e_cod_empleado').val($b.data('cod_empleado') || '');
+    $('#e_email').val($b.data('email') || '');
+    $('#e_state').val($b.data('state') || '1');
+    $('#e_email_active').prop('checked', $b.data('email_active') ? true : false);
+    // Forzar abrir modal (si no se abre por data-target)
+    $('#editUserModal').modal('show');
+    // Los selects serán poblados en show.bs.modal usando loadGroupsAndTiendas (si existe)
+  });
+
+  $(document).on('click', '.btn-delete', function(){
+    var $b = $(this);
+    $('#d_codigo').val($b.data('codigo') || '');
+    $('#d_user').text($b.data('user') || '-');
+    $('#d_codigo_txt').text($b.data('codigo') || '-');
+    $('#deleteUserModal').modal('show');
+  });
+});
 </script>
 </body>
 </php>
