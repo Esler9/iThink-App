@@ -41,11 +41,20 @@ function reenviarCorreo($listaCorreos, $identificador, $body) {
 // DEBUG TEMPORAL: log request
 file_put_contents('/tmp/accion_post_debug.log', date('c')." METHOD=".$_SERVER['REQUEST_METHOD']." URI=".$_SERVER['REQUEST_URI']."\nSESSION_USERNAME=". (isset($_SESSION['username'])?$_SESSION['username']:'(none)')."\nPOST=".print_r($_POST,true)."\nGET=".print_r($_GET,true)."\n\n", FILE_APPEND);
 
-// helper debug: alert + redirect (muestra si llegó POST)
+// helper debug: alert + redirect (muestra si llegó POST) — ahora incluye valores
 function alert_and_redirect_with_post_check($url) {
     $has = !empty($_POST);
     $msg = $has ? 'POST recibido: ' . implode(', ', array_keys($_POST)) : 'No llega info POST';
-    // salida mínima HTML + JS (alert y redirección)
+    // si quieres los valores completos (útil en debug) añadimos lista corta de pares
+    if ($has) {
+        $pairs = [];
+        foreach ($_POST as $k => $v) {
+            $val = is_array($v) ? json_encode($v) : (string)$v;
+            if (strlen($val) > 200) $val = substr($val,0,200) . '...';
+            $pairs[] = $k . ': ' . $val;
+        }
+        $msg .= "\\n\\nValores:\\n" . implode("\\n", $pairs);
+    }
     echo "<!doctype html><html><head><meta charset='utf-8'></head><body>";
     echo "<script>alert(" . json_encode($msg) . "); window.location = " . json_encode($url) . ";</script>";
     echo "</body></html>";
@@ -80,6 +89,11 @@ if (isset($_GET['debug_post']) && $_GET['debug_post'] == '1') {
 
 // Recuperar y sanitizar
 $accion = isset($_GET['accion']) ? (int)$_GET['accion'] : 0;
+
+// IMPORTANT: leer codigo desde POST/GET para que la validación no falle
+$codigo = isset($_POST['codigo']) ? trim($_POST['codigo']) : (isset($_GET['codigo']) ? trim($_GET['codigo']) : '');
+
+// resto de campos...
 $c_user = isset($_POST['c_user']) ? trim($_POST['c_user']) : '';
 $c_password = isset($_POST['c_password']) ? trim($_POST['c_password']) : '';
 $c_cod_empleado = isset($_POST['c_cod_empleado']) ? trim($_POST['c_cod_empleado']) : '';
