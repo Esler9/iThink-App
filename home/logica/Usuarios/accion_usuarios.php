@@ -17,17 +17,40 @@ function reenviarCorreo($listaCorreos, $identificador, $body) {
     }
 }
 
-$accion = $_GET['accion'];
-// Para usuarios usaremos 'codigo' como identificador (paralelo a 'imei' en accion.php)
-$codigo = isset($_GET['codigo']) ? $_GET['codigo'] : "";
-$desc   = isset($_POST['desc']) ? $_POST['desc'] : "";
-$date   = date('Y-m-d H:i:s');
+// DEBUG TEMPORAL: ver si llegan datos (quitar en producción)
+//file_put_contents('/tmp/post_debug.txt', print_r($_POST, true), FILE_APPEND);
 
-// Datos comunes que podrían ser útiles para notificaciones (estructura similar a accion.php)
-$datosCommon = [
-    'codigo'        => $codigo,
-    'observaciones' => $desc
-];
+// Solo aceptar POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit('Método no permitido');
+}
+
+// Recuperar y sanitizar
+$accion = isset($_GET['accion']) ? (int)$_GET['accion'] : 0;
+$c_user = isset($_POST['c_user']) ? trim($_POST['c_user']) : '';
+$c_password = isset($_POST['c_password']) ? trim($_POST['c_password']) : '';
+$c_cod_empleado = isset($_POST['c_cod_empleado']) ? trim($_POST['c_cod_empleado']) : '';
+$c_email = isset($_POST['c_email']) ? trim($_POST['c_email']) : '';
+$c_id_group = isset($_POST['c_id_group']) ? trim($_POST['c_id_group']) : '';
+$c_cod_tienda = isset($_POST['c_cod_tienda']) ? trim($_POST['c_cod_tienda']) : '';
+$c_state = isset($_POST['c_state']) ? trim($_POST['c_state']) : ''; // puede ser string con varios estados
+$c_email_active = isset($_POST['c_email_active']) ? 1 : 0; // checkbox
+
+$errors = [];
+
+// Validaciones básicas
+if ($c_user === '') $errors[] = 'Usuario requerido';
+if ($accion === 0 && $c_password === '') $errors[] = 'Contraseña requerida';
+if ($c_email !== '' && !filter_var($c_email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Email inválido';
+
+// Si hay errores devolver/mostrar y detener
+if (!empty($errors)) {
+    // ejemplo: redirigir con mensaje o mostrar JSON
+    header('Content-Type: application/json');
+    echo json_encode(['ok' => false, 'errors' => $errors]);
+    exit;
+}
 
 switch ($accion) {
 
