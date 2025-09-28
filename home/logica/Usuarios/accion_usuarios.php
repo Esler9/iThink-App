@@ -5,7 +5,7 @@ if (!isset($_SESSION["username"])) {
     exit();
 }
 
-include("../../conexion.php");
+include("../../../conexion.php");
 
 $accion = isset($_GET['accion']) ? $_GET['accion'] : '';
 $date = date('Y-m-d H:i:s');
