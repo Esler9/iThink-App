@@ -1,4 +1,4 @@
-<!DOCTYPE php>
+<!DOCTYPE html>
 <?php
 session_start();
 // Verificar que las variables de sesión estén configuradas
@@ -22,7 +22,7 @@ if (!Tiene_permiso($permisos_user,'ver-usuarios')) {
   exit();
 }
 ?>
-<php lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -115,37 +115,37 @@ if (!$res_users) {
               <td><?php echo $tienda_nombre; ?></td>
               <td><?php echo $state; ?></td>
               <td>
-                <button class="btn btn-app bg-info btn-view"
-                        data-toggle="modal" data-target="#viewUserModal"
-                        data-codigo="<?php echo $codigo;?>"
-                        data-user="<?php echo $user;?>"
-                        data-cod_empleado="<?php echo $cod_empleado;?>"
-                        data-email="<?php echo $email;?>"
-                        data-email_active="<?php echo $email_active;?>"
-                        data-id_group="<?php echo $grupo_id;?>"
-                        data-grupo="<?php echo $grupo_nombre;?>"
-                        data-cod_tienda="<?php echo $tienda_id;?>"
-                        data-tienda="<?php echo $tienda_nombre;?>"
-                        data-state="<?php echo $state;?>"
-                        title="Ver"><i class="fas fa-eye"></i></button>
+                <button type="button" class="btn btn-app bg-info btn-view"
+                         data-toggle="modal" data-target="#viewUserModal"
+                         data-codigo="<?php echo $codigo;?>"
+                         data-user="<?php echo $user;?>"
+                         data-cod_empleado="<?php echo $cod_empleado;?>"
+                         data-email="<?php echo $email;?>"
+                         data-email_active="<?php echo $email_active;?>"
+                         data-id_group="<?php echo $grupo_id;?>"
+                         data-grupo="<?php echo $grupo_nombre;?>"
+                         data-cod_tienda="<?php echo $tienda_id;?>"
+                         data-tienda="<?php echo $tienda_nombre;?>"
+                         data-state="<?php echo $state;?>"
+                         title="Ver"><i class="fas fa-eye"></i></button>
 
-                <button class="btn btn-app bg-warning btn-edit"
-                        data-toggle="modal" data-target="#editUserModal"
-                        data-codigo="<?php echo $codigo;?>"
-                        data-user="<?php echo $user;?>"
-                        data-cod_empleado="<?php echo $cod_empleado;?>"
-                        data-email="<?php echo $email;?>"
-                        data-email_active="<?php echo $email_active;?>"
-                        data-id_group="<?php echo $grupo_id;?>"
-                        data-cod_tienda="<?php echo $tienda_id;?>"
-                        data-state="<?php echo ($u['State']);?>"
-                        title="Editar"><i class="fas fa-edit"></i></button>
+                <button type="button" class="btn btn-app bg-warning btn-edit"
+                         data-toggle="modal" data-target="#editUserModal"
+                         data-codigo="<?php echo $codigo;?>"
+                         data-user="<?php echo $user;?>"
+                         data-cod_empleado="<?php echo $cod_empleado;?>"
+                         data-email="<?php echo $email;?>"
+                         data-email_active="<?php echo $email_active;?>"
+                         data-id_group="<?php echo $grupo_id;?>"
+                         data-cod_tienda="<?php echo $tienda_id;?>"
+                         data-state="<?php echo ($u['State']);?>"
+                         title="Editar"><i class="fas fa-edit"></i></button>
 
-                <button class="btn btn-app bg-danger btn-delete"
-                        data-toggle="modal" data-target="#deleteUserModal"
-                        data-codigo="<?php echo $codigo;?>"
-                        data-user="<?php echo $user;?>"
-                        title="Eliminar"><i class="fas fa-user-times"></i></button>
+                <button type="button" class="btn btn-app bg-danger btn-delete"
+                         data-toggle="modal" data-target="#deleteUserModal"
+                         data-codigo="<?php echo $codigo;?>"
+                         data-user="<?php echo $user;?>"
+                         title="Eliminar"><i class="fas fa-user-times"></i></button>
               </td>
             </tr>
             <?php } // end while ?>
@@ -392,4 +392,4 @@ $(function () {
 });
 </script>
 </body>
-</php>
+</html>
