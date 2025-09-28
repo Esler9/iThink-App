@@ -621,6 +621,56 @@
                     </li>
                     <?php } ?>
 
+                    <!-- Guías -->
+                    <?php if(Tiene_permiso($permisos_user, 'ver-guias')) { ?>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-shipping-fast"></i>
+                            <p>
+                                Guías
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <?php if(Tiene_permiso($permisos_user, 'generar-guia')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/guias/generar.php" class="nav-link">
+                                    <i class="fas fa-plus nav-icon"></i>
+                                    <p>Generar Guía</p>
+                                </a>
+                            </li>
+                            <?php } ?>
+
+                            <?php if(Tiene_permiso($permisos_user, 'recibir-guia')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/guias/recibir.php" class="nav-link">
+                                    <i class="fas fa-inbox nav-icon"></i>
+                                    <p>Recibir Guía</p>
+                                </a>
+                            </li>
+                            <?php } ?>
+
+                            <?php if(Tiene_permiso($permisos_user, 'ver-listado-guias')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/guias/listado_guias.php" class="nav-link">
+                                    <i class="fas fa-list nav-icon"></i>
+                                    <p>Listado de Guías</p>
+                                </a>
+                            </li>
+                            <?php } ?>
+
+                            <?php if(Tiene_permiso($permisos_user, 'ver-direcciones')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/guias/direcciones_guardadas.php" class="nav-link">
+                                    <i class="fas fa-map-marker-alt nav-icon"></i>
+                                    <p>Direcciones Guardadas</p>
+                                </a>
+                            </li>
+                            <?php } ?>
+                        </ul>
+                    </li>
+                    <?php } ?>
+
                 </ul>
             </nav>
         </div>
