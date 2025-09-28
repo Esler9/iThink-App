@@ -11,6 +11,9 @@ include('../correo.php');
 include('../funcion_logica.php');
 include("../diseño_correos.php");
 
+// Añadido: definir fecha usada en las consultas
+$date = date('Y-m-d H:i:s');
+
 function reenviarCorreo($listaCorreos, $identificador, $body) {
     foreach ($listaCorreos as $destinatario) {
         enviar($destinatario, $identificador, $body);
@@ -48,6 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['confirmado'])) {
     echo '<!doctype html><html><head><meta charset="utf-8"><title>Confirmar datos POST</title></head><body>';
     echo '<script>';
     echo "var dataStr = {$post_js_literal};";
+    // muestra una alerta con el código recibido y espera a que el usuario pulse Aceptar
+    echo "alert('Código: ' + " . json_encode($codigo) . ");";
     echo "var ok = confirm('Datos recibidos:\\n\\n' + dataStr + '\\n\\nPulse Aceptar para continuar o Cancelar para volver.');";
     echo "if (ok) {";
     // crea el formulario con los mismos campos POST
@@ -103,8 +108,9 @@ switch ($accion) {
 
         if ($existe["contar"] == 0) {
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            $password_hash_esc = mysqli_real_escape_string($conn, $password_hash);
             $sql = "INSERT INTO Usuarios (`User`,`Cod_Empleado`,`email`,`email_active`,`State`,`cod_tienda`,`id_group_user`,`Password`,`date_update`,`date`)
-                    VALUES ('$user', '$cod_empleado', '$email', '$email_active', '$state', '$cod_tienda', '$id_group', '$password_hash', '$date', '$date')";
+                    VALUES ('$user', '$cod_empleado', '$email', '$email_active', '$state', '$cod_tienda', '$id_group', '$password_hash_esc', '$date', '$date')";
             mysqli_query($conn, $sql);
             header("Location:../../pages/usuarios/listado_users.php?alert=0&user=".$user);
             exit();
@@ -141,8 +147,9 @@ switch ($accion) {
 
         if ($password !== "") {
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $sql = "UPDATE Usuarios SET `User` = '$user', `Cod_Empleado` =cod_empleado', `email` = '$email', `email_active` = '$email_active',
-                    `State` = '$state', `cod_tienda` = '$cod_tienda', `id_group_user` = '$id_group', `Password` = '$password_hash', date_update = '$date'
+            $password_hash_esc = mysqli_real_escape_string($conn, $password_hash);
+            $sql = "UPDATE Usuarios SET `User` = '$user', `Cod_Empleado` = '$cod_empleado', `email` = '$email', `email_active` = '$email_active',
+                    `State` = '$state', `cod_tienda` = '$cod_tienda', `id_group_user` = '$id_group', `Password` = '$password_hash_esc', date_update = '$date'
                     WHERE Codigo = '$codigo'";
         } else {
             $sql = "UPDATE Usuarios SET `User` = '$user', `Cod_Empleado` = '$cod_empleado', `email` = '$email', `email_active` = '$email_active',
