@@ -53,10 +53,11 @@ switch ($accion) {
         }
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("INSERT INTO `Usuarios` (`User`, `Password`, `Cod_Empleado`, `email`, `id_group_user`, `cod_tienda`, `State`, `email_active`, `date_created`) VALUES (?,?,?,?,?,?,?,?,?)");
+        // Inserción sin columnas de fecha (según tu esquema)
+        $stmt = $conn->prepare("INSERT INTO `Usuarios` (`User`, `Password`, `Cod_Empleado`, `email`, `id_group_user`, `cod_tienda`, `State`, `email_active`) VALUES (?,?,?,?,?,?,?,?)");
         if (!$stmt) debug_and_exit("Prepare failed (insert)", ['error' => $conn->error]);
-        // types: 6 strings, 2 ints, 1 string => "ssssssiis"
-        $stmt->bind_param("ssssssiis", $user, $hash, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active, $date);
+        // tipos: 6 strings (user,hash,cod_empleado,email,id_group_user,cod_tienda), 2 ints (state,email_active)
+        $stmt->bind_param("ssssssii", $user, $hash, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active);
         $ok = $stmt->execute();
         $last_id = $conn->insert_id;
         $stmt->close();
@@ -100,15 +101,16 @@ switch ($accion) {
 
         if (!empty($password)) {
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("UPDATE `Usuarios` SET `User`=?, `Password`=?, `Cod_Empleado`=?, `email`=?, `id_group_user`=?, `cod_tienda`=?, `State`=?, `email_active`=?, `date_update`=? WHERE `Codigo`=?");
+            // UPDATE sin date_update
+            $stmt = $conn->prepare("UPDATE `Usuarios` SET `User`=?, `Password`=?, `Cod_Empleado`=?, `email`=?, `id_group_user`=?, `cod_tienda`=?, `State`=?, `email_active`=? WHERE `Codigo`=?");
             if (!$stmt) debug_and_exit("Prepare failed (update pw)", ['error' => $conn->error]);
-            // types: 6 strings, 2 ints, 1 string, 1 int => "ssssssiisi"
-            $stmt->bind_param("ssssssiisi", $user, $hash, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active, $date, $codigo);
+            // tipos: 6 strings, 3 ints (state,email_active,codigo)
+            $stmt->bind_param("ssssssiii", $user, $hash, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active, $codigo);
         } else {
-            $stmt = $conn->prepare("UPDATE `Usuarios` SET `User`=?, `Cod_Empleado`=?, `email`=?, `id_group_user`=?, `cod_tienda`=?, `State`=?, `email_active`=?, `date_update`=? WHERE `Codigo`=?");
+            $stmt = $conn->prepare("UPDATE `Usuarios` SET `User`=?, `Cod_Empleado`=?, `email`=?, `id_group_user`=?, `cod_tienda`=?, `State`=?, `email_active`=? WHERE `Codigo`=?");
             if (!$stmt) debug_and_exit("Prepare failed (update no pw)", ['error' => $conn->error]);
-            // types: 5 strings, 2 ints, 1 string, 1 int => "sssssiisi"
-            $stmt->bind_param("sssssiisi", $user, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active, $date, $codigo);
+            // tipos: 5 strings, 3 ints (state,email_active,codigo)
+            $stmt->bind_param("sssssiii", $user, $cod_empleado, $email, $id_group_user, $cod_tienda, $state, $email_active, $codigo);
         }
         $ok = $stmt->execute();
         $affected = $stmt->affected_rows;
