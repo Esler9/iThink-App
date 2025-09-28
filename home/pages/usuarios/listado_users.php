@@ -372,6 +372,72 @@ while ($u = mysqli_fetch_assoc($res_users)) {
       } catch(err) { console.error('btn-delete error', err); }
     });
 
+    // Cargar tiendas y grupos para los selects
+    function cargarSelectsUsuarios() {
+      console.log('Iniciando carga de selects...');
+      
+      // Tiendas
+      $.ajax({
+        url: 'usuarios_ajax.php',
+        type: 'POST',
+        data: { action: 'get_tiendas' },
+        dataType: 'json',
+        success: function(resp) {
+          console.log('Tiendas recibidas:', resp);
+          var opts = '<option value="">Seleccione...</option>';
+          if (resp && Array.isArray(resp) && resp.length > 0) {
+            resp.forEach(function(t) {
+              opts += '<option value="'+t.cod_tienda+'">'+t.nombre+'</option>';
+            });
+          } else {
+            console.warn('No hay tiendas o respuesta inválida');
+          }
+          $('#c_cod_tienda, #e_cod_tienda').html(opts);
+        },
+        error: function(xhr, status, error) {
+          console.error('Error cargando tiendas:', error, xhr.responseText);
+          $('#c_cod_tienda, #e_cod_tienda').html('<option value="">Error al cargar</option>');
+        }
+      });
+      
+      // Grupos
+      $.ajax({
+        url: 'usuarios_ajax.php',
+        type: 'POST',
+        data: { action: 'get_grupos' },
+        dataType: 'json',
+        success: function(resp) {
+          console.log('Grupos recibidos:', resp);
+          var opts = '<option value="">Seleccione...</option>';
+          if (resp && Array.isArray(resp) && resp.length > 0) {
+            resp.forEach(function(g) {
+              opts += '<option value="'+g.codigo+'">'+g.nombre_grupo+'</option>';
+            });
+          } else {
+            console.warn('No hay grupos o respuesta inválida');
+          }
+          $('#c_id_group, #e_id_group').html(opts);
+        },
+        error: function(xhr, status, error) {
+          console.error('Error cargando grupos:', error, xhr.responseText);
+          $('#c_id_group, #e_id_group').html('<option value="">Error al cargar</option>');
+        }
+      });
+    }
+
+    // Eventos de modales
+    $('#createUserModal').on('show.bs.modal', function(){
+      $('#c_cod_tienda').html('<option value="">Cargando...</option>');
+      $('#c_id_group').html('<option value="">Cargando...</option>');
+      cargarSelectsUsuarios();
+    });
+
+    $('#editUserModal').on('show.bs.modal', function(){
+      $('#e_cod_tienda').html('<option value="">Cargando...</option>');
+      $('#e_id_group').html('<option value="">Cargando...</option>');
+      cargarSelectsUsuarios();
+    });
+
     // Reportar errores JS en consola (no suprimir)
     window.onerror = function(msg, url, line, col, error) {
       console.error('JS error:', msg, 'at', url+':'+line+':'+col, error);
