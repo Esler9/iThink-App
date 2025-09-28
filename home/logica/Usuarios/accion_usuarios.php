@@ -1,14 +1,14 @@
 <?php
 session_start();
 if (!isset($_SESSION["username"])) {
-    header('location:login.php');
+    header('location:../../login.php');
     exit();
 }
 
-include("../../conexion.php");
-include('correo.php');          // mantenido igual que en accion.php
-include('funcion_logica.php');
-include("diseño_correos.php");
+include("../../../conexion.php");
+include('../correo.php');          // mismos archivos pero en ../ (logica)
+include('../funcion_logica.php');
+include("../diseño_correos.php");
 
 // (Opcional) función para reenviar correos si en algún caso la lógica lo requiere
 function reenviarCorreo($listaCorreos, $identificador, $body) {
@@ -35,7 +35,7 @@ switch ($accion) {
         // Creación de usuario
         // Campos esperados en el form: c_user, c_password, c_cod_empleado, c_email, c_id_group, c_cod_tienda, c_state, c_email_active
         if (empty($_POST['c_user']) || empty($_POST['c_password'])) {
-            header("location:../pages/usuarios/crear.php?alert=DataMissing");
+            header("location:../../pages/usuarios/crear.php?alert=DataMissing");
             exit();
         }
 
@@ -62,9 +62,9 @@ switch ($accion) {
             // Si hay notificaciones por correo, se puede usar $datos para generar cuerpo
             // $datos = [ ... ]; $body = correo_enviar("usuario_creado", $datos); reenviarCorreo($correos, $user, $body);
 
-            header("location:../pages/usuarios/listado_users.php?alert=0&user=".$user);
+            header("location:../../pages/usuarios/listado_users.php?alert=0&user=".$user);
         } else {
-            header("location:../pages/usuarios/crear.php?alert=33&user=".$user);
+            header("location:../../pages/usuarios/crear.php?alert=33&user=".$user);
         }
         break;
 
@@ -72,7 +72,7 @@ switch ($accion) {
         // Edición de usuario
         // Campos esperados: user, password (opcional), cod_empleado, email, id_group, cod_tienda, state, email_active
         if (empty($codigo)) {
-            header("location:../pages/usuarios/listado_users.php?alert=DataMissing");
+            header("location:../../pages/usuarios/listado_users.php?alert=DataMissing");
             exit();
         }
 
@@ -91,7 +91,7 @@ switch ($accion) {
             $consulta = mysqli_query($conn, $sql_chk);
             $r = mysqli_fetch_array($consulta);
             if ($r) {
-                header("location:../pages/usuarios/editar.php?alert=DuplicateUser&codigo=".$codigo);
+                header("location:../../pages/usuarios/editar.php?alert=DuplicateUser&codigo=".$codigo);
                 exit();
             }
         }
@@ -108,7 +108,7 @@ switch ($accion) {
         }
 
         mysqli_query($conn, $sql);
-        header("location:../pages/usuarios/listado_users.php?alert=1&codigo=".$codigo);
+        header("location:../../pages/usuarios/listado_users.php?alert=1&codigo=".$codigo);
         break;
 
     case "2":
@@ -116,26 +116,26 @@ switch ($accion) {
         // Se acepta codigo por GET o POST (paralelo a accion.php)
         $codigo_del = isset($_POST['codigo']) ? $_POST['codigo'] : (isset($_GET['codigo']) ? $_GET['codigo'] : "");
         if (empty($codigo_del)) {
-            header("location:../pages/usuarios/listado_users.php?alert=DataMissing");
+            header("location:../../pages/usuarios/listado_users.php?alert=DataMissing");
             exit();
         }
         $sql = "DELETE FROM Usuarios WHERE Codigo = '$codigo_del'";
         mysqli_query($conn, $sql);
-        header("location:../pages/usuarios/listado_users.php?alert=2&codigo=".$codigo_del);
+        header("location:../../pages/usuarios/listado_users.php?alert=2&codigo=".$codigo_del);
         break;
 
     case "3":
         // Toggle email_active (similar a otros casos: usa checkbox)
         $codigo_toggle = isset($_POST['codigo']) ? $_POST['codigo'] : (isset($_GET['codigo']) ? $_GET['codigo'] : "");
         if (empty($codigo_toggle)) {
-            header("location:../pages/usuarios/listado_users.php?alert=DataMissing");
+            header("location:../../pages/usuarios/listado_users.php?alert=DataMissing");
             exit();
         }
         // checkbox enviado => activar, sino desactivar
         $email_active = isset($_POST['email_active']) ? 1 : 0;
         $sql = "UPDATE Usuarios SET email_active = '$email_active', date_update = '$date' WHERE Codigo = '$codigo_toggle'";
         mysqli_query($conn, $sql);
-        header("location:../pages/usuarios/listado_users.php?alert=3&codigo=".$codigo_toggle);
+        header("location:../../pages/usuarios/listado_users.php?alert=3&codigo=".$codigo_toggle);
         break;
 
     default:
