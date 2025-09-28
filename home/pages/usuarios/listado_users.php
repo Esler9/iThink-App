@@ -203,12 +203,160 @@ if (!$res_users) {
 
 <script>
 $(function () {
+  // DataTable init
   $("#usersTable").DataTable({
     "responsive": true, "lengthChange": false, "autoWidth": false,
     "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
   }).buttons().container().appendTo('#usersTable_wrapper .col-md-6:eq(0)');
 
-  // Handlers básicos para botones (llenan modales con data-*)
+  function populateSelect($sel, items, valueKey, textKey, placeholder) {
+    $sel.empty();
+    if (placeholder) $sel.append($('<option>').val('').text(placeholder));
+    if (!Array.isArray(items)) return;
+    items.forEach(function(it){
+      if ($sel.find('option[value="' + it[valueKey] + '"]').length === 0) {
+        $sel.append($('<option>').val(it[valueKey]).text(it[textKey]));
+      }
+    });
+  }
+
+  function loadGroupsAndTiendas(opts) {
+    var gSel = opts.groupSel;
+    var tSel = opts.tiendaSel;
+    var selG = (typeof opts.selectedGroup !== 'undefined') ? String(opts.selectedGroup) : '';
+    var selT = (typeof opts.selectedTienda !== 'undefined') ? String(opts.selectedTienda) : '';
+
+    var url = 'usuarios_ajax.php';
+    var gReq = $.getJSON(url, { action: 'list_groups' });
+    var tReq = $.getJSON(url, { action: 'list_tiendas' });
+
+    $.when(gReq, tReq).done(function(gRes, tRes){
+      var groups = gRes[0];
+      var tiendas = tRes[0];
+      populateSelect(gSel, groups, 'codigo', 'nombre', 'Seleccione grupo');
+      populateSelect(tSel, tiendas, 'cod_tienda', 'nombre', 'Seleccione tienda');
+      if (selG !== '' && gSel.find('option[value="' + selG + '"]').length) gSel.val(selG);
+      if (selT !== '' && tSel.find('option[value="' + selT + '"]').length) tSel.val(selT);
+    }).fail(function(jq, textStatus, errorThrown){
+      console.error('Error cargando grupos/tiendas:', textStatus, errorThrown);
+      gSel.empty().append($('<option>').val('').text('Error al cargar'));
+      tSel.empty().append($('<option>').val('').text('Error al cargar'));
+    });
+  }
+
+  // Crear
+  $('#formCreateUser').on('submit', function (e) {
+    e.preventDefault();
+    var $f = $(this);
+    var data = $f.serialize();
+    $.post('usuarios_ajax.php?action=create_user', data, null, 'json')
+      .done(function(resp){
+        if (resp.success) {
+          $('#createUserModal').modal('hide');
+          location.reload();
+        } else {
+          alert(resp.error || 'Error creando usuario');
+        }
+      })
+      .fail(function(xhr){
+        console.error('create_user error:', xhr.responseText);
+        alert('Error de servidor al crear usuario');
+      });
+  });
+
+  // Abrir Create modal -> cargar selects
+  $('#createUserModal').on('show.bs.modal', function () {
+    loadGroupsAndTiendas({ groupSel: $('#c_id_group'), tiendaSel: $('#c_cod_tienda') });
+    $('#formCreateUser')[0].reset();
+    $('#c_email_active').prop('checked', false);
+  });
+
+  // Abrir Edit modal -> obtener datos si es necesario y poblar selects
+  $('#editUserModal').on('show.bs.modal', function (e) {
+    var trigger = $(e.relatedTarget);
+    var codigo = trigger.data('codigo') || $('#e_codigo').val();
+    if (!codigo) {
+      return;
+    }
+    $.getJSON('usuarios_ajax.php', { action: 'get_user', codigo: codigo })
+      .done(function(res){
+        if (res.success && res.data) {
+          var d = res.data;
+          $('#e_codigo').val(d.Codigo);
+          $('#e_user').val(d.User);
+          $('#e_cod_empleado').val(d.Cod_Empleado);
+          $('#e_email').val(d.email);
+          $('#e_state').val(d.State);
+          $('#e_email_active').prop('checked', d.email_active == 1);
+          loadGroupsAndTiendas({
+            groupSel: $('#e_id_group'),
+            tiendaSel: $('#e_cod_tienda'),
+            selectedGroup: d.id_group_user,
+            selectedTienda: d.cod_tienda
+          });
+        } else {
+          alert(res.error || 'Usuario no encontrado');
+          $('#editUserModal').modal('hide');
+        }
+      })
+      .fail(function(xhr){
+        console.error('get_user error:', xhr.responseText);
+        alert('Error al obtener datos del usuario');
+        $('#editUserModal').modal('hide');
+      });
+  });
+
+  // Enviar edición
+  $('#formEditUser').on('submit', function (e) {
+    e.preventDefault();
+    var $f = $(this);
+    var data = $f.serialize();
+    $.post('usuarios_ajax.php?action=update_user', data, null, 'json')
+      .done(function(resp){
+        if (resp.success) {
+          $('#editUserModal').modal('hide');
+          location.reload();
+        } else {
+          alert(resp.error || 'Error actualizando usuario');
+        }
+      })
+      .fail(function(xhr){
+        console.error('update_user error:', xhr.responseText);
+        alert('Error de servidor al actualizar usuario');
+      });
+  });
+
+  // Delete open
+  $('#deleteUserModal').on('show.bs.modal', function (e) {
+    var trigger = $(e.relatedTarget);
+    var codigo = trigger.data('codigo') || '';
+    var user = trigger.data('user') || '';
+    $('#d_codigo').val(codigo);
+    $('#d_user').text(user || '-');
+    $('#d_codigo_txt').text(codigo || '-');
+  });
+
+  // Enviar eliminación
+  $('#formDeleteUser').on('submit', function (e) {
+    e.preventDefault();
+    var codigo = $('#d_codigo').val();
+    if (!codigo) { alert('Código inválido'); return; }
+    $.post('usuarios_ajax.php?action=delete_user', { codigo: codigo }, null, 'json')
+      .done(function(resp){
+        if (resp.success) {
+          $('#deleteUserModal').modal('hide');
+          location.reload();
+        } else {
+          alert(resp.error || 'Error eliminando usuario');
+        }
+      })
+      .fail(function(xhr){
+        console.error('delete_user error:', xhr.responseText);
+        alert('Error de servidor al eliminar usuario');
+      });
+  });
+
+  // Botones tabla -> abrir modales (si usan data-target ya abren; estos solo llenan campos)
   $(document).on('click', '.btn-view', function(){
     var $b = $(this);
     $('#v_codigo').text($b.data('codigo') || '-');
@@ -224,16 +372,14 @@ $(function () {
 
   $(document).on('click', '.btn-edit', function(){
     var $b = $(this);
-    // Triggea apertura del modal; el evento show.bs.modal en listado_users.php se encargará de cargar selects
+    // rellenar algunos campos antes de show.bs.modal (show.bs.modal hará la petición get_user)
     $('#e_codigo').val($b.data('codigo') || '');
     $('#e_user').val($b.data('user') || '');
     $('#e_cod_empleado').val($b.data('cod_empleado') || '');
     $('#e_email').val($b.data('email') || '');
     $('#e_state').val($b.data('state') || '1');
     $('#e_email_active').prop('checked', $b.data('email_active') ? true : false);
-    // Forzar abrir modal (si no se abre por data-target)
     $('#editUserModal').modal('show');
-    // Los selects serán poblados en show.bs.modal usando loadGroupsAndTiendas (si existe)
   });
 
   $(document).on('click', '.btn-delete', function(){
