@@ -1,8 +1,27 @@
 <?php
 session_start();
+
+// activar debug añadiendo ?debug_post=1 al action del form
+$debug = isset($_GET['debug_post']) && $_GET['debug_post'] === '1';
+
+// Si no hay sesión y estamos en modo debug -> mostrar alert con POST/GET y no redirigir
 if (!isset($_SESSION["username"])) {
-    header('location:../../login.php');
-    exit();
+    if ($debug) {
+        $pairs = [];
+        foreach ($_POST as $k => $v) {
+            $val = is_array($v) ? json_encode($v) : (string)$v;
+            if (strlen($val) > 200) $val = substr($val,0,200) . '...';
+            $pairs[] = $k . ': ' . $val;
+        }
+        $msg = "Sin sesión.\\nPOST:\\n" . (!empty($pairs) ? implode("\\n", $pairs) : "(vacío)") . "\\n\\nGET: " . json_encode($_GET);
+        echo "<!doctype html><html><head><meta charset='utf-8'></head><body>";
+        echo "<script>alert(" . json_encode($msg) . ");</script>";
+        echo "</body></html>";
+        exit();
+    } else {
+        header('location:../../login.php');
+        exit();
+    }
 }
 
 include("../../../conexion.php");
