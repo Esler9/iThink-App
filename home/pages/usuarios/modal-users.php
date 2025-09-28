@@ -1,3 +1,30 @@
+<?php
+// modal-users.php — seguro: no asume que las queries siempre funcionan
+// Debe incluirse después de que $conn exista (en listado_users.php).
+
+// Inicializar
+$grupos_q = false;
+$tiendas_q = false;
+
+// Usar $conn si está disponible y conectado
+if (isset($conn) && $conn && @mysqli_ping($conn)) {
+    $grupos_q = @mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
+    $tiendas_q = @mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
+}
+
+// Helper: generar <option> desde resultado seguro
+function render_options($res, $valField, $labelField) {
+    if (!($res && $res instanceof mysqli_result)) return '';
+    $html = '';
+    mysqli_data_seek($res, 0);
+    while ($r = mysqli_fetch_assoc($res)) {
+        $v = htmlspecialchars($r[$valField] ?? '');
+        $l = htmlspecialchars($r[$labelField] ?? '');
+        $html .= "<option value=\"{$v}\">{$l}</option>\n";
+    }
+    return $html;
+}
+?>
 <!-- Crear Usuario -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
@@ -7,6 +34,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
+        <!-- formulario simplificado -->
         <div class="form-row">
           <div class="form-group col-md-6">
             <label>Usuario</label>
@@ -31,10 +59,7 @@
             <label>Grupo</label>
             <select name="c_id_group" id="c_id_group" class="form-control">
               <option value="">-</option>
-              <?php if ($grupos_q && $grupos_q instanceof mysqli_result) mysqli_data_seek($grupos_q, 0); ?>
-              <?php while($g = ($grupos_q && $grupos_q instanceof mysqli_result) ? mysqli_fetch_assoc($grupos_q) : null): ?>
-                <option value="<?php echo htmlspecialchars($g['codigo']); ?>"><?php echo htmlspecialchars($g['nombre_grupo']); ?></option>
-              <?php endwhile; ?>
+              <?php echo render_options($grupos_q, 'codigo', 'nombre_grupo'); ?>
             </select>
           </div>
         </div>
@@ -44,10 +69,7 @@
             <label>Tienda</label>
             <select name="c_cod_tienda" id="c_cod_tienda" class="form-control">
               <option value="">-</option>
-              <?php if ($tiendas_q && $tiendas_q instanceof mysqli_result) mysqli_data_seek($tiendas_q, 0); ?>
-              <?php while($t = ($tiendas_q && $tiendas_q instanceof mysqli_result) ? mysqli_fetch_assoc($tiendas_q) : null): ?>
-                <option value="<?php echo htmlspecialchars($t['cod_tienda']); ?>"><?php echo htmlspecialchars($t['tienda_nombre']); ?></option>
-              <?php endwhile; ?>
+              <?php echo render_options($tiendas_q, 'cod_tienda', 'tienda_nombre'); ?>
             </select>
           </div>
           <div class="form-group col-md-3 d-flex align-items-center">
@@ -107,10 +129,7 @@
             <label>Grupo</label>
             <select name="id_group" id="e_id_group" class="form-control">
               <option value="">-</option>
-              <?php if ($grupos_q && $grupos_q instanceof mysqli_result) mysqli_data_seek($grupos_q, 0); ?>
-              <?php while($g = ($grupos_q && $grupos_q instanceof mysqli_result) ? mysqli_fetch_assoc($grupos_q) : null): ?>
-                <option value="<?php echo htmlspecialchars($g['codigo']); ?>"><?php echo htmlspecialchars($g['nombre_grupo']); ?></option>
-              <?php endwhile; ?>
+              <?php echo render_options($grupos_q, 'codigo', 'nombre_grupo'); ?>
             </select>
           </div>
         </div>
@@ -120,10 +139,7 @@
             <label>Tienda</label>
             <select name="cod_tienda" id="e_cod_tienda" class="form-control">
               <option value="">-</option>
-              <?php if ($tiendas_q && $tiendas_q instanceof mysqli_result) mysqli_data_seek($tiendas_q, 0); ?>
-              <?php while($t = ($tiendas_q && $tiendas_q instanceof mysqli_result) ? mysqli_fetch_assoc($tiendas_q) : null): ?>
-                <option value="<?php echo htmlspecialchars($t['cod_tienda']); ?>"><?php echo htmlspecialchars($t['tienda_nombre']); ?></option>
-              <?php endwhile; ?>
+              <?php echo render_options($tiendas_q, 'cod_tienda', 'tienda_nombre'); ?>
             </select>
           </div>
           <div class="form-group col-md-3 d-flex align-items-center">
