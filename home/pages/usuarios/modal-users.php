@@ -1,16 +1,12 @@
 <?php
-// modal-users.php — versión limpia sin marcadores de depuración
+// modal-users.php — versión con marcadores de depuración
 if (!isset($grupos) || !is_array($grupos)) $grupos = [];
 if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
 if (!isset($states) || !is_array($states)) $states = [];
 
-// helper para etiquetas de estado
-function state_label($s){
-    if ($s === null) return '-';
-    if ($s === '1' || $s === 1) return 'Activo';
-    if ($s === '0' || $s === 0) return 'Inactivo';
-    return (string)$s;
-}
+// PHP / HTML markers
+echo "<!-- DEBUG_MODAL: include start -->\n";
+echo "<!-- DEBUG_MODAL: grupos_count=" . count($grupos) . " tiendas_count=" . count($tiendas) . " states_count=" . count($states) . " -->\n";
 ?>
 <!-- Crear Usuario -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -47,7 +43,9 @@ function state_label($s){
               <option value="">-</option>
               <?php if (!empty($grupos)): foreach ($grupos as $g): ?>
                 <option value="<?php echo htmlspecialchars($g['codigo'] ?? ''); ?>"><?php echo htmlspecialchars($g['nombre_grupo'] ?? ''); ?></option>
-              <?php endforeach; endif; ?>
+              <?php endforeach; else: ?>
+                <!-- DEBUG_MODAL: no grupos available -->
+              <?php endif; ?>
             </select>
           </div>
         </div>
@@ -59,22 +57,22 @@ function state_label($s){
               <option value="">-</option>
               <?php if (!empty($tiendas)): foreach ($tiendas as $t): ?>
                 <option value="<?php echo htmlspecialchars($t['cod_tienda'] ?? ''); ?>"><?php echo htmlspecialchars($t['tienda_nombre'] ?? ''); ?></option>
-              <?php endforeach; endif; ?>
+              <?php endforeach; else: ?>
+                <!-- DEBUG_MODAL: no tiendas available -->
+              <?php endif; ?>
             </select>
           </div>
 
-          <!-- State ahora es select (soporta >2 estados) -->
           <div class="form-group col-md-3">
             <label>Estado</label>
             <select name="c_state" id="c_state" class="form-control">
               <option value="">-</option>
               <?php foreach ($states as $st): ?>
-                <option value="<?php echo htmlspecialchars($st); ?>"><?php echo htmlspecialchars(state_label($st)); ?></option>
+                <option value="<?php echo htmlspecialchars($st); ?>"><?php echo htmlspecialchars($st); ?></option>
               <?php endforeach; ?>
             </select>
           </div>
 
-          <!-- Email active como switch -->
           <div class="form-group col-md-3 d-flex align-items-center">
             <div class="custom-control custom-switch">
               <input type="checkbox" class="custom-control-input" id="c_email_active" name="c_email_active" value="1">
@@ -92,7 +90,7 @@ function state_label($s){
   </div>
 </div>
 
-<!-- Editar Usuario -->
+<!-- Editar / Ver / Eliminar (sin cambios funcionales, con logs JS abajo) -->
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <form id="formEditUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=1" class="modal-content">
@@ -149,7 +147,7 @@ function state_label($s){
             <select name="state" id="e_state" class="form-control">
               <option value="">-</option>
               <?php foreach ($states as $st): ?>
-                <option value="<?php echo htmlspecialchars($st); ?>"><?php echo htmlspecialchars(state_label($st)); ?></option>
+                <option value="<?php echo htmlspecialchars($st); ?>"><?php echo htmlspecialchars($st); ?></option>
               <?php endforeach; ?>
             </select>
           </div>
@@ -183,6 +181,7 @@ function state_label($s){
         <dt class="col-sm-4">Email</dt><dd class="col-sm-8" id="v_email">-</dd>
         <dt class="col-sm-4">Grupo</dt><dd class="col-sm-8" id="v_grupo">-</dd>
         <dt class="col-sm-4">Tienda</dt><dd class="col-sm-8" id="v_tienda">-</dd>
+        <dt class="col-sm-4">Estado</dt><dd class="col-sm-8" id="v_state">-</dd>
       </dl>
     </div>
     <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button></div>
@@ -207,8 +206,12 @@ function state_label($s){
 
 <script>
 jQuery(function($){
-  // Crear: reset y defaults
-  $('#createUserModal').on('show.bs.modal', function () {
+  // debug: indicar que el script de modales se cargó y contar arrays
+  console.log('DEBUG_MODAL: handlers attached', {grupos_count: <?php echo count($grupos); ?>, tiendas_count: <?php echo count($tiendas); ?>, states_count: <?php echo count($states); ?>});
+
+  // Crear: reset y defaults (con logs)
+  $('#createUserModal').on('show.bs.modal', function (e) {
+    console.log('DEBUG_MODAL: show createUserModal, trigger=', e && e.relatedTarget);
     var f = $('#formCreateUser')[0];
     if (f) f.reset();
     $('#c_id_group,#c_cod_tienda,#c_state').val('');
@@ -218,26 +221,25 @@ jQuery(function($){
   // Edit: rellenar (state -> select, email_active -> switch)
   $('#editUserModal').on('show.bs.modal', function (e) {
     var b = $(e.relatedTarget);
+    console.log('DEBUG_MODAL: show editUserModal, data=', b.data());
     $('#e_codigo').val(b.data('codigo') || '');
     $('#e_user').val(b.data('user') || '');
     $('#e_cod_empleado').val(b.data('cod_empleado') || '');
     $('#e_email').val(b.data('email') || '');
     $('#e_id_group').val(b.data('id_group') || '');
     $('#e_cod_tienda').val(b.data('cod_tienda') || '');
-    // set state select by raw value
     $('#e_state').val(typeof b.data('state') !== 'undefined' ? b.data('state') : '');
-    // email_active switch (data may be 1/0)
     $('#e_email_active').prop('checked', (b.data('email_active') == 1 || b.data('email_active') === true));
     $('#e_password').val('');
   });
 
-  // View modal uses displayed label (if you prefer raw, map with state_label server-side)
+  // View modal
   $('#viewUserModal').on('show.bs.modal', function (e) {
     var b = $(e.relatedTarget);
+    console.log('DEBUG_MODAL: show viewUserModal, data=', b.data());
     $('#v_codigo').text(b.data('codigo') || '-');
     $('#v_user').text(b.data('user') || '-');
     $('#v_email').text(b.data('email') || '-');
-    // state: if trigger has raw state, map on client for readability
     var st = b.data('state');
     var stLabel = (st === 1 || st === '1') ? 'Activo' : (st === 0 || st === '0') ? 'Inactivo' : (st || '-');
     $('#v_tienda').text(b.data('tienda') || '-');
@@ -245,9 +247,10 @@ jQuery(function($){
     $('#v_state').text(stLabel);
   });
 
-  // Delete modal unchanged
+  // Delete modal
   $('#deleteUserModal').on('show.bs.modal', function (e) {
     var b = $(e.relatedTarget);
+    console.log('DEBUG_MODAL: show deleteUserModal, data=', b.data());
     $('#d_codigo').val(b.data('codigo') || '');
     $('#d_user').text(b.data('user') || '-');
   });
@@ -256,4 +259,5 @@ jQuery(function($){
 
 <?php
 // fin del include
+echo "<!-- DEBUG_MODAL: include end -->\n";
 ?>
