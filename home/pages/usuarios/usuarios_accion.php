@@ -29,6 +29,18 @@ dbg("_COOKIE: ".json_encode($_COOKIE));
 dbg("_SESSION keys: ".json_encode(isset($_SESSION)?array_keys($_SESSION):[]));
 dbg("REMOTE_ADDR: ".($_SERVER['REMOTE_ADDR'] ?? 'unknown')." URI: ".($_SERVER['REQUEST_URI'] ?? ''));
 
+// Preferir datos desde POST
+$DATA = $_POST;
+dbg("_POST explicit: ".json_encode($DATA));
+
+// helper para obtener valor bruto (POST preferente, luego REQUEST)
+function gv($k){
+  global $DATA;
+  if (isset($DATA[$k])) return $DATA[$k];
+  if (isset($_REQUEST[$k])) return $_REQUEST[$k];
+  return null;
+}
+
 // Guardar estructura para incluirla en JSON cuando debug=1
 $DEBUG_RECEIVED = [
   'headers' => $HDRS,
@@ -54,7 +66,8 @@ if (!isset($conn) || !$conn) {
 }
 
 // --- Modificar finish para adjuntar debug_received cuando corresponde ---
-$is_ajax = (isset($_REQUEST['ajax']) && $_REQUEST['ajax']=='1');
+$is_ajax = ((isset($DATA['ajax']) && $DATA['ajax']=='1') || (isset($_REQUEST['ajax']) && $_REQUEST['ajax']=='1'));
+
 function finish($data, $redirect=true, $is_ajax=false){
   global $DEBUG_RECEIVED;
   if ($is_ajax) {
@@ -67,21 +80,29 @@ function finish($data, $redirect=true, $is_ajax=false){
   exit;
 }
 
-// Helper: leer campo desde REQUEST y escapar
-function rstr($k){ global $conn; return isset($_REQUEST[$k]) ? mysqli_real_escape_string($conn, trim($_REQUEST[$k])) : ''; }
+// Helper: leer campo desde POST preferente y escapar
+function rstr($k){ global $conn, $DATA; 
+  if (isset($DATA[$k])) return mysqli_real_escape_string($conn, trim($DATA[$k]));
+  if (isset($_REQUEST[$k])) return mysqli_real_escape_string($conn, trim($_REQUEST[$k]));
+  return '';
+}
 
+// Asegurar action (POST preferente)
+$action = gv('action') ?? '';
+
+// --- RUTINAS ---
 switch ($action) {
 
   case 'create_user':
     // permitir GET/POST según requerimiento (evitar usar GET para password en producción)
     $user = rstr('user');
     $cod_empleado = rstr('cod_empleado');
-    $password = isset($_REQUEST['password']) ? $_REQUEST['password'] : '';
+    $password = gv('password') ?? '';
     $state = rstr('state') ?: '1';
-    $cod_tienda = isset($_REQUEST['cod_tienda']) ? intval($_REQUEST['cod_tienda']) : 0;
+    $cod_tienda = intval(gv('cod_tienda') ?? 0);
     $email = rstr('email');
-    $email_active = isset($_REQUEST['email_active']) ? 1 : 0;
-    $id_group = isset($_REQUEST['id_group']) ? intval($_REQUEST['id_group']) : 0;
+    $email_active = (gv('email_active') !== null && gv('email_active') !== '') ? 1 : 0;
+    $id_group = intval(gv('id_group') ?? 0);
 
     dbg("create_user payload user={$user} cod_tienda={$cod_tienda} id_group={$id_group}");
 
@@ -128,17 +149,17 @@ switch ($action) {
     break;
 
   case 'update_user':
-    $codigo = isset($_REQUEST['codigo']) ? intval($_REQUEST['codigo']) : 0;
+    $codigo = intval(gv('codigo') ?? 0);
     if ($codigo <= 0) finish(['error'=>true,'message'=>'Código inválido'], true, $is_ajax);
 
     $user = rstr('user');
     $cod_empleado = rstr('cod_empleado');
-    $password = isset($_REQUEST['password']) ? $_REQUEST['password'] : '';
+    $password = gv('password') ?? '';
     $state = rstr('state') ?: '1';
-    $cod_tienda = isset($_REQUEST['cod_tienda']) ? intval($_REQUEST['cod_tienda']) : 0;
+    $cod_tienda = intval(gv('cod_tienda') ?? 0);
     $email = rstr('email');
-    $email_active = isset($_REQUEST['email_active']) ? 1 : 0;
-    $id_group = isset($_REQUEST['id_group']) ? intval($_REQUEST['id_group']) : 0;
+    $email_active = (gv('email_active') !== null && gv('email_active') !== '') ? 1 : 0;
+    $id_group = intval(gv('id_group') ?? 0);
 
     // validación detallada para update
     $missing = [];
@@ -172,7 +193,7 @@ switch ($action) {
     break;
 
   case 'delete_user':
-    $codigo = isset($_REQUEST['codigo']) ? intval($_REQUEST['codigo']) : 0;
+    $codigo = intval(gv('codigo') ?? 0);
     if ($codigo <= 0) finish(['error'=>true,'message'=>'Código inválido'], true, $is_ajax);
     $sql = "DELETE FROM `Usuarios` WHERE Codigo = {$codigo}";
     dbg("delete_user sql: ".$sql);
