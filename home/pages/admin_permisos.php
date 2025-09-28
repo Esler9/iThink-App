@@ -1,4 +1,6 @@
-<?php include '../../conexion.php';
+<?php
+session_start();
+include '../../conexion.php';
 
 // Obtener grupos de permisos
 $grupos = $conn->query("SELECT * FROM grupo_permiso");
@@ -62,6 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
 
+<?php
+// Incluir el sidebar (usa la ruta relativa dentro de /home/pages)
+include_once __DIR__ . '/sidebar.php';
+?>
 
     <div class="container mt-5">
         <?php if (isset($_GET['msg'])): ?>
