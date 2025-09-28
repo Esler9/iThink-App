@@ -9,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['__debug_post_check']
     echo '<!doctype html><html><head><meta charset="utf-8"><title>Debug POST</title></head><body>';
     echo '<script>';
     echo "alert('POST recibido:\\n\\n' + {$post_js});";
-    echo "history.back();";
     echo '</script></body></html>';
     exit;
 }
