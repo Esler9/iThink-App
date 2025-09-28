@@ -930,6 +930,13 @@
       transform: rotate(-90deg); /* indicar abierto */
   }
 
+  /* Ocultar el icono toggle cuando la barra lateral está colapsada / en modo mini (AdminLTE) */
+  .sidebar-mini .nav-sidebar .tree-toggle,
+  body.sidebar-collapse .nav-sidebar .tree-toggle {
+      display: none !important;
+      pointer-events: none;
+  }
+
   /* Pequeño ajuste para que los enlaces puedan recibir focus claramente */
   .nav-sidebar .nav-link {
       outline: none;
