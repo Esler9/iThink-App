@@ -1,8 +1,9 @@
 <?php
 session_start();
 
-// activar debug añadiendo ?debug_post=1 al action del form
-$debug = isset($_GET['debug_post']) && $_GET['debug_post'] === '1';
+// activar debug por defecto; para desactivar usa ?debug_post=0
+$debug = !(isset($_GET['debug_post']) && $_GET['debug_post'] === '0');
+/* Antes: $debug = isset($_GET['debug_post']) && $_GET['debug_post'] === '1'; */
 
 // helper: safe redirect — en modo debug muestra alert con POST y enlace para continuar
 function safe_redirect($url, $exit = true) {
@@ -185,7 +186,8 @@ switch ($accion) {
         // Edición de usuario
         // Campos esperados: user, password (opcional), cod_empleado, email, id_group, cod_tienda, state, email_active
         if (empty($codigo)) {
-            alert_and_redirect_with_post_check("../../pages/usuarios/listado_users.php?alert=DataMissing");
+            // En modo debug (?debug_post=1) safe_redirect mostrará el alert con POST y no hará redirect automático.
+            safe_redirect("../../pages/usuarios/listado_users.php?alert=DataMissing");
         }
 
         $user        = mysqli_real_escape_string($conn, $_POST['user'] ?? "");
