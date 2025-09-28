@@ -2,11 +2,11 @@
 session_start();
 include_once "../../../conexion.php";
 
-// CSRF simple
-if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
-  echo json_encode(['ok'=>false, 'msg'=>'CSRF inválido.']);
-  exit;
-}
+// Elimina o comenta la validación CSRF:
+// if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+//   echo json_encode(['ok'=>false, 'msg'=>'CSRF inválido.']);
+//   exit;
+// }
 
 $action = $_POST['form_action'] ?? '';
 $response = ['ok'=>false, 'msg'=>'Acción no válida.'];
