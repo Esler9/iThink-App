@@ -77,7 +77,9 @@ if (!Tiene_permiso($permisos_user,'ver-usuarios')) {
             <div class="card-header">
               <h3 class="card-title">Listado de Usuarios</h3>
               <div class="card-tools">
-                <a href="crear_usuario.php" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Nuevo</a>
+                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#createUserModal">
+                  <i class="fas fa-plus"></i> Nuevo
+                </button>
               </div>
             </div>
             <div class="card-body">
