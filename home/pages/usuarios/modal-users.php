@@ -219,73 +219,9 @@ if (isset($conn)) {
   </div>
 </div>
 
+<!-- deshabilitado temporalmente el envío por fetch para probar envío normal -->
 <script>
-(function(){
-  function submitAjax(form){
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      var btn = form.querySelector('button[type="submit"]');
-      if (btn) btn.disabled = true;
-      var url = form.getAttribute('action') || './usuarios_accion.php';
-      var fd = new FormData(form);
-      console.log('DEBUG: FormData to send for', form.id, Array.from(fd.entries()));
-
-      var opts = {
-        method: 'POST',
-        body: fd,
-        credentials: 'same-origin',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'Accept': 'application/json, text/plain, */*'
-        }
-      };
-
-      // no usar redirect: 'manual' — permitir seguir redirecciones
-      fetch(url, opts)
-      .then(function(r){
-        console.log('Fetch response status:', r.status, 'ok:', r.ok, 'redirected:', r.redirected, 'url:', r.url);
-        return r.text().then(function(t){ return { status: r.status, text: t, url: r.url }; });
-      })
-      .then(function(res){
-        console.log('Response body:', res.text);
-        // si el servidor devolvió HTML (p. ej. página de login) detectarlo
-        var bodyLower = (res.text||'').toLowerCase();
-        if (res.status === 0) {
-          alert('Error de red (status 0). Revisa consola Network.');
-        } else if (res.status >= 300 && res.status < 400) {
-          alert('Redirección detectada. Revisa Network → Location header.');
-        } else if (bodyLower.indexOf('<form') !== -1 && (bodyLower.indexOf('login') !== -1 || bodyLower.indexOf('signin') !== -1)) {
-          alert('Respuesta parece ser la página de login (la sesión pudo expirar). Revisa que estés logueado.');
-          console.warn('Server returned login HTML:', res.url);
-        } else {
-          try {
-            var j = JSON.parse(res.text);
-            console.log('JSON parsed:', j);
-            if (j.success) location.reload();
-            else if (j.debug_received) {
-              alert('Debug servidor: ' + (j.message || JSON.stringify(j.debug_received)));
-            } else {
-              alert('Servidor respondió: ' + (j.message || JSON.stringify(j)));
-            }
-          } catch(err){
-            console.warn('Respuesta no es JSON, contenido:', res.text);
-            alert('Respuesta no es JSON. Ver consola para más detalle.');
-          }
-        }
-      })
-      .catch(function(err){
-        console.error('Fetch error', err);
-        alert('Error en fetch: '+err);
-      })
-      .finally(function(){ if (btn) btn.disabled = false; });
-    });
-  }
-
-  var f = document.getElementById('formCreateUser');
-  if (f) submitAjax(f);
-  var fe = document.getElementById('formEditUser');
-  if (fe) submitAjax(fe);
-  var fd = document.getElementById('formDeleteUser');
-  if (fd) submitAjax(fd);
-})();
+  // debug rápido: mostrar cookies y evitar interceptar submit
+  console.log('Cookies actuales:', document.cookie);
+  // Si quieres volver al envío AJAX más adelante, elimina este script
 </script>
