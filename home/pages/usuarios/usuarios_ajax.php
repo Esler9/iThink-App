@@ -57,63 +57,44 @@ switch ($action) {
     $email_active = isset($_POST['email_active']) ? 1 : 0;
     $id_group = isset($_POST['id_group']) ? intval($_POST['id_group']) : 0;
 
-    // Validaciones básicas
     if ($user === '' || $password === '' || $id_group <= 0 || $cod_tienda === '' || $email === '') {
       resp(['error' => 'Faltan campos requeridos'], 400);
     }
 
-    // Verificar usuario único
-    $chk = mysqli_prepare($conn, "SELECT 1 FROM `Usuarios` WHERE `User` = ? LIMIT 1");
-    if (!$chk) resp(['error' => 'DB prepare failed', 'detail' => mysqli_error($conn)], 500);
-    mysqli_stmt_bind_param($chk, "s", $user);
-    mysqli_stmt_execute($chk);
-    mysqli_stmt_store_result($chk);
-    if (mysqli_stmt_num_rows($chk) > 0) {
-      resp(['error' => 'Usuario ya existe'], 409);
-    }
-    mysqli_stmt_close($chk);
+    // Verificación rápida de unicidad y existencia (similar a accion.php estilo)
+    $u_esc = mysqli_real_escape_string($conn, $user);
+    $check = mysqli_query($conn, "SELECT 1 FROM `Usuarios` WHERE `User` = '{$u_esc}' LIMIT 1");
+    if ($check === false) resp(['error' => 'DB error', 'detail' => mysqli_error($conn)], 500);
+    if (mysqli_num_rows($check) > 0) resp(['error' => 'Usuario ya existe'], 409);
 
-    // Verificar grupo existe
-    $chk = mysqli_prepare($conn, "SELECT 1 FROM `grupo_user` WHERE codigo = ? LIMIT 1");
-    if (!$chk) resp(['error' => 'DB prepare failed', 'detail' => mysqli_error($conn)], 500);
-    mysqli_stmt_bind_param($chk, "i", $id_group);
-    mysqli_stmt_execute($chk);
-    mysqli_stmt_store_result($chk);
-    if (mysqli_stmt_num_rows($chk) === 0) {
-      resp(['error' => 'Grupo no existe'], 400);
-    }
-    mysqli_stmt_close($chk);
+    $id_group_int = intval($id_group);
+    $chk = mysqli_query($conn, "SELECT 1 FROM `grupo_user` WHERE codigo = {$id_group_int} LIMIT 1");
+    if ($chk === false) resp(['error' => 'DB error', 'detail' => mysqli_error($conn)], 500);
+    if (mysqli_num_rows($chk) === 0) resp(['error' => 'Grupo no existe'], 400);
 
-    // Verificar tienda existe
-    $tienda_int = intval($cod_tienda);
-    $chk = mysqli_prepare($conn, "SELECT 1 FROM `tienda` WHERE cod_tienda = ? LIMIT 1");
-    if (!$chk) resp(['error' => 'DB prepare failed', 'detail' => mysqli_error($conn)], 500);
-    mysqli_stmt_bind_param($chk, "i", $tienda_int);
-    mysqli_stmt_execute($chk);
-    mysqli_stmt_store_result($chk);
-    if (mysqli_stmt_num_rows($chk) === 0) {
-      resp(['error' => 'Tienda no existe'], 400);
-    }
-    mysqli_stmt_close($chk);
+    $cod_tienda_int = intval($cod_tienda);
+    $chk2 = mysqli_query($conn, "SELECT 1 FROM `tienda` WHERE cod_tienda = {$cod_tienda_int} LIMIT 1");
+    if ($chk2 === false) resp(['error' => 'DB error', 'detail' => mysqli_error($conn)], 500);
+    if (mysqli_num_rows($chk2) === 0) resp(['error' => 'Tienda no existe'], 400);
 
-    // Hash contraseña
+    // Hash de contraseña
     $hash = password_hash($password, PASSWORD_DEFAULT);
 
-    // Insert (bind como strings para evitar issues de tipos)
-    $stmt = mysqli_prepare($conn, "INSERT INTO `Usuarios` (`User`, `Cod_Empleado`, `Password`, `State`, `cod_tienda`, `email`, `email_active`, `id_group_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    if (!$stmt) resp(['error' => 'Prepare failed', 'detail' => mysqli_error($conn)], 500);
+    // Escape antes de insertar (estilo accion.php)
+    $user_q = mysqli_real_escape_string($conn, $user);
+    $cod_emp_q = mysqli_real_escape_string($conn, $cod_empleado);
+    $hash_q = mysqli_real_escape_string($conn, $hash);
+    $state_q = mysqli_real_escape_string($conn, $state);
+    $email_q = mysqli_real_escape_string($conn, $email);
+    $email_active_q = intval($email_active);
 
-    $cod_tienda_str = (string)$tienda_int;
-    $id_group_str = (string)$id_group;
-    $email_active_str = (string)$email_active;
-    if (!mysqli_stmt_bind_param($stmt, "ssssssss", $user, $cod_empleado, $hash, $state, $cod_tienda_str, $email, $email_active_str, $id_group_str)) {
-      resp(['error' => 'Bind failed', 'detail' => mysqli_stmt_error($stmt)], 500);
-    }
+    $sql = "INSERT INTO `Usuarios` (`User`, `Cod_Empleado`, `Password`, `State`, `cod_tienda`, `email`, `email_active`, `id_group_user`)
+            VALUES ('{$user_q}', '{$cod_emp_q}', '{$hash_q}', '{$state_q}', {$cod_tienda_int}, '{$email_q}', {$email_active_q}, {$id_group_int})";
 
-    if (mysqli_stmt_execute($stmt)) {
+    if (mysqli_query($conn, $sql)) {
       resp(['success' => true, 'message' => 'Usuario creado', 'id' => mysqli_insert_id($conn)]);
     } else {
-      resp(['error' => 'Execute failed', 'detail' => mysqli_stmt_error($stmt), 'errno' => mysqli_stmt_errno($stmt)], 500);
+      resp(['error' => 'Insert failed', 'detail' => mysqli_error($conn)], 500);
     }
     break;
 
