@@ -226,26 +226,43 @@ if (!$res_users) {
 <script src="../../dist/js/adminlte.min.js"></script>
 
 <?php
-// Preparar arrays simples para los selects (seguro)
 $grupos = [];
 $tiendas = [];
 $states = [];
 
-if (isset($conn) && $conn && @mysqli_ping($conn)) {
-    $q = mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
-    if ($q) { while ($r = mysqli_fetch_assoc($q)) $grupos[] = $r; }
+// Usar $conn de forma simple; evitar funciones avanzadas que puedan fallar
+if (!empty($conn)) {
 
-    $q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
-    if ($q) { while ($r = mysqli_fetch_assoc($q)) $tiendas[] = $r; }
+    // Grupos
+    $res = mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
+    if ($res) {
+        while ($r = mysqli_fetch_assoc($res)) {
+            $grupos[] = $r;
+        }
+        mysqli_free_result($res);
+    }
 
-}
+    // Tiendas
+    $res = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
+    if ($res) {
+        while ($r = mysqli_fetch_assoc($res)) {
+            $tiendas[] = $r;
+        }
+        mysqli_free_result($res);
+    }
 
-// Incluir modales (modal-users.php leerá $grupos, $tiendas, $states)
-$modalFile = __DIR__ . '/modal-users.php';
-if (file_exists($modalFile) && is_readable($modalFile)) {
-    include $modalFile;
+    // Estados (permite más de 2 estados)
+    $res = mysqli_query($conn, "SELECT DISTINCT `State` AS st FROM `Usuarios` ORDER BY `State`");
+    if ($res) {
+        while ($r = mysqli_fetch_assoc($res)) {
+            $states[] = $r['st'];
+        }
+        mysqli_free_result($res);
+    }
 }
 ?>
+
+<?php include("modal-users.php");?>
 
 <!-- Scripts de inicialización (DataTable y modales ya definidos en modal-users.php) -->
 <script>
