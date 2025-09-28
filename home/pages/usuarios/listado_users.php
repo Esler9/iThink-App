@@ -259,67 +259,59 @@ while ($u = mysqli_fetch_assoc($res_users)) {
 <!-- JS: inicializar DataTables, toggle y handlers de modales -->
 <script>
   $(function () {
-    console.log('users ready');
-
-    // Inicializar DataTable
-    try {
-    } catch (e) { console.error('DataTable init error', e); }
-
-    // Cargar grupos y tiendas en los selects de los modales
-    function populateSelect($select, items, valueKey, textKey, placeholder) {
-      $select.empty();
-      if (placeholder) {
-        $select.append($('<option>').val('').text(placeholder));
-      }
+    // Utilidades
+    function populateSelect($sel, items, valueKey, textKey, placeholder) {
+      $sel.empty();
+      if (placeholder) $sel.append($('<option>').val('').text(placeholder));
+      if (!Array.isArray(items)) return;
       items.forEach(function(it){
-        $select.append($('<option>').val(it[valueKey]).text(it[textKey]));
+        // Evitar option duplicadas
+        if ($sel.find('option[value="' + it[valueKey] + '"]').length === 0) {
+          $sel.append($('<option>').val(it[valueKey]).text(it[textKey]));
+        }
       });
     }
 
-    function loadGroupsAndTiendas(options) {
-      // options: {groupSel: jQuery, tiendaSel: jQuery, selectedGroup: val, selectedTienda: val}
-      var gSel = options.groupSel;
-      var tSel = options.tiendaSel;
-      var selG = options.selectedGroup || '';
-      var selT = options.selectedTienda || '';
+    // Carga combinada de grupos y tiendas; selected opcional
+    function loadGroupsAndTiendas(opts) {
+      var gSel = opts.groupSel;
+      var tSel = opts.tiendaSel;
+      var selG = (typeof opts.selectedGroup !== 'undefined') ? opts.selectedGroup : '';
+      var selT = (typeof opts.selectedTienda !== 'undefined') ? opts.selectedTienda : '';
 
-      // Grupos
-      $.getJSON('usuarios_ajax.php', { action: 'list_groups' })
-        .done(function(data){
-          populateSelect(gSel, data, 'codigo', 'nombre', 'Seleccione grupo');
-          if (selG) gSel.val(selG);
-        })
-        .fail(function(jq,x,y){
-          console.error('Error cargando grupos', x, y);
-          gSel.empty().append($('<option>').val('').text('Error al cargar'));
-        });
+      var url = 'usuarios_ajax.php';
 
-      // Tiendas
-      $.getJSON('usuarios_ajax.php', { action: 'list_tiendas' })
-        .done(function(data){
-          populateSelect(tSel, data, 'cod_tienda', 'nombre', 'Seleccione tienda');
-          if (selT) tSel.val(selT);
-        })
-        .fail(function(jq,x,y){
-          console.error('Error cargando tiendas', x, y);
-          tSel.empty().append($('<option>').val('').text('Error al cargar'));
-        });
+      var gReq = $.getJSON(url, { action: 'list_groups' });
+      var tReq = $.getJSON(url, { action: 'list_tiendas' });
+
+      $.when(gReq, tReq).done(function(gRes, tRes){
+        // gRes[0] y tRes[0] contienen los arrays de datos
+        var groups = gRes[0];
+        var tiendas = tRes[0];
+
+        populateSelect(gSel, groups, 'codigo', 'nombre', 'Seleccione grupo');
+        populateSelect(tSel, tiendas, 'cod_tienda', 'nombre', 'Seleccione tienda');
+
+        if (selG !== '' && gSel.find('option[value="' + selG + '"]').length) gSel.val(selG);
+        if (selT !== '' && tSel.find('option[value="' + selT + '"]').length) tSel.val(selT);
+      }).fail(function(jq, textStatus, errorThrown){
+        console.error('Error cargando grupos/tiendas:', textStatus, errorThrown);
+        gSel.empty().append($('<option>').val('').text('Error al cargar grupos'));
+        tSel.empty().append($('<option>').val('').text('Error al cargar tiendas'));
+      });
     }
 
-    // Cuando se abra el modal Crear: poblar selects (sin seleccionados)
+    // Al abrir Crear: poblar (sin seleccionados) y resetear formulario
     $('#createUserModal').on('show.bs.modal', function () {
       loadGroupsAndTiendas({
         groupSel: $('#c_id_group'),
         tiendaSel: $('#c_cod_tienda')
       });
-      // Reset del formulario
       $('#formCreateUser')[0].reset();
       $('#c_email_active').prop('checked', false);
     });
 
-    // Cuando se abra el modal Editar: poblar selects y luego (si trae data) seleccionar valores
-    // Se asume que el trigger contiene data-codigo y otros datos, por ejemplo:
-    // <button class="btn-edit" data-codigo="1" data-user="juan" data-id_group="2" data-cod_tienda="5">Editar</button>
+    // Al abrir Editar: leer data-* del trigger y poblar, seleccionar valores
     $('#editUserModal').on('show.bs.modal', function (e) {
       var trigger = $(e.relatedTarget);
       var codigo = trigger.data('codigo') || '';
@@ -331,7 +323,6 @@ while ($u = mysqli_fetch_assoc($res_users)) {
       var state = (typeof trigger.data('state') !== 'undefined') ? trigger.data('state') : '1';
       var email_active = trigger.data('email_active') ? true : false;
 
-      // Rellenar básicos (la carga de selects puede tardar; los valores se seleccionan tras poblar)
       $('#e_codigo').val(codigo);
       $('#e_user').val(user);
       $('#e_cod_empleado').val(cod_empleado);
@@ -348,8 +339,7 @@ while ($u = mysqli_fetch_assoc($res_users)) {
       });
     });
 
-    // Ejemplo: Si quieres añadir botones en la tabla que abren los modales, aquí hay un handler genérico
-    // (Asegúrate de generar botones en el PHP con data-* correspondientes)
+    // Handler básico para Ver (si usas botones con data-*)
     $(document).on('click', '.btn-view', function(){
       var $b = $(this);
       $('#v_codigo').text($b.data('codigo') || '-');
@@ -363,207 +353,12 @@ while ($u = mysqli_fetch_assoc($res_users)) {
       $('#viewUserModal').modal('show');
     });
 
-    // Toggle email_active (AJAX) - placeholder si ya tenías lógica
-    $(document).on('change', '.toggle-email', function(){
-      // implementar según tu API
+    // Depuración: informa si no encuentra el endpoint
+    $.ajaxSetup({
+      error: function (jqXHR, textStatus, errorThrown) {
+        // No sobreescribir globales si ya tienes manejo
+      }
     });
-
-    // Lectura robusta de data-* (soporte dataset, .data() y .attr())
-    function getBtnData($btn){
-      var el = $btn.get(0);
-      var ds = (el && el.dataset) ? el.dataset : {};
-      return {
-        codigo: ds.codigo || $btn.attr('data-codigo') || $btn.data('codigo') || $btn.data('codCodigo') || '',
-        user: ds.user || $btn.attr('data-user') || $btn.data('user') || '',
-        codEmpleado: ds.codEmpleado || $btn.attr('data-cod-empleado') || $btn.data('codEmpleado') || $btn.data('cod-empleado') || '',
-        email: ds.email || $btn.attr('data-email') || $btn.data('email') || '',
-        emailActive: ds.emailActive || $btn.attr('data-email-active') || $btn.data('emailActive') || $btn.data('email-active') || 0,
-        idGroup: ds.idGroup || $btn.attr('data-id-group') || $btn.data('idGroup') || $btn.data('id-group') || '',
-        grupo: ds.grupo || $btn.attr('data-grupo') || $btn.data('grupo') || '',
-        codTienda: ds.codTienda || $btn.attr('data-cod-tienda') || $btn.data('codTienda') || $btn.data('cod-tienda') || '',
-        tienda: ds.tienda || $btn.attr('data-tienda') || $btn.data('tienda') || '',
-        state: ds.state || $btn.attr('data-state') || $btn.data('state') || ''
-      };
-    }
-
-    // Ver modal
-    $(document).on('click', '.btn-view', function(e){
-      try {
-        e.preventDefault();
-        var d = getBtnData($(this));
-        console.log('open view', d);
-        if ($('#viewUserModal').length === 0) { console.warn('Modal #viewUserModal no encontrado'); return; }
-        $('#v_codigo').text(d.codigo || '');
-        $('#v_user').text(d.user || '');
-        $('#v_cod_empleado').text(d.codEmpleado || '');
-        $('#v_email').text(d.email || '');
-        $('#v_email_active').text((parseInt(d.emailActive) === 1) ? 'Si' : 'No');
-        $('#v_grupo').text(d.grupo || d.idGroup || '');
-        $('#v_tienda').text(d.tienda || d.codTienda || '');
-        $('#v_state').text((parseInt(d.state) === 1) ? 'Activo' : ((parseInt(d.state) === 0) ? 'Inactivo' : (d.state || '')));
-        $('#viewUserModal').modal('show');
-      } catch(err) { console.error('btn-view error', err); }
-    });
-
-    // Editar modal
-    $(document).on('click', '.btn-edit', function(e){
-      try {
-        e.preventDefault();
-        var d = getBtnData($(this));
-        console.log('open edit', d);
-        if ($('#editUserModal').length === 0) { console.warn('Modal #editUserModal no encontrado'); return; }
-        $('#e_codigo').val(d.codigo || '');
-        $('#e_user').val(d.user || '');
-        $('#e_cod_empleado').val(d.codEmpleado || '');
-        $('#e_email').val(d.email || '');
-        $('#e_email_active').prop('checked', parseInt(d.emailActive) === 1);
-        $('#e_id_group').val(d.idGroup || '');
-        $('#e_cod_tienda').val(d.codTienda || '');
-        $('#e_state').val(d.state || '');
-        $('#e_password').val('');
-        $('#editUserModal').modal('show');
-      } catch(err) { console.error('btn-edit error', err); }
-    });
-
-    // Eliminar modal
-    $(document).on('click', '.btn-delete', function(e){
-      try {
-        e.preventDefault();
-        var d = getBtnData($(this));
-        console.log('open delete', d);
-        if ($('#deleteUserModal').length === 0) { console.warn('Modal #deleteUserModal no encontrado'); return; }
-        $('#d_codigo').val(d.codigo || '');
-        $('#d_user').text(d.user || '');
-        $('#d_codigo_txt').text(d.codigo || '');
-        $('#deleteUserModal').modal('show');
-      } catch(err) { console.error('btn-delete error', err); }
-    });
-
-    // Cargar tiendas y grupos para los selects
-    function cargarSelectsUsuarios() {
-      console.log('Iniciando carga de selects...');
-      
-      // Tiendas
-      $.ajax({
-        url: 'usuarios_ajax.php',
-        type: 'POST',
-        data: { action: 'get_tiendas' },
-        dataType: 'json',
-        success: function(resp) {
-          console.log('Tiendas recibidas:', resp);
-          var opts = '<option value="">Seleccione...</option>';
-          if (resp && Array.isArray(resp) && resp.length > 0) {
-            resp.forEach(function(t) {
-              opts += '<option value="'+t.cod_tienda+'">'+t.nombre+'</option>';
-            });
-          } else {
-            console.warn('No hay tiendas o respuesta inválida');
-          }
-          $('#c_cod_tienda, #e_cod_tienda').html(opts);
-        },
-        error: function(xhr, status, error) {
-          console.error('Error cargando tiendas:', error, xhr.responseText);
-          $('#c_cod_tienda, #e_cod_tienda').html('<option value="">Error al cargar</option>');
-        }
-      });
-      
-      // Grupos
-      $.ajax({
-        url: 'usuarios_ajax.php',
-        type: 'POST',
-        data: { action: 'get_grupos' },
-        dataType: 'json',
-        success: function(resp) {
-          console.log('Grupos recibidos:', resp);
-          var opts = '<option value="">Seleccione...</option>';
-          if (resp && Array.isArray(resp) && resp.length > 0) {
-            resp.forEach(function(g) {
-              opts += '<option value="'+g.codigo+'">'+g.nombre_grupo+'</option>';
-            });
-          } else {
-            console.warn('No hay grupos o respuesta inválida');
-          }
-          $('#c_id_group, #e_id_group').html(opts);
-        },
-        error: function(xhr, status, error) {
-          console.error('Error cargando grupos:', error, xhr.responseText);
-          $('#c_id_group, #e_id_group').html('<option value="">Error al cargar</option>');
-        }
-      });
-    }
-
-    // Eventos de modales
-    $('#createUserModal').on('show.bs.modal', function(){
-      $('#c_cod_tienda').html('<option value="">Cargando...</option>');
-      $('#c_id_group').html('<option value="">Cargando...</option>');
-      cargarSelectsUsuarios();
-    });
-
-    $('#editUserModal').on('show.bs.modal', function(){
-      $('#e_cod_tienda').html('<option value="">Cargando...</option>');
-      $('#e_id_group').html('<option value="">Cargando...</option>');
-      cargarSelectsUsuarios();
-    });
-
-    // Envío formulario crear usuario
-    $('#formCreateUser').on('submit', function(e){
-      e.preventDefault();
-      var formData = $(this).serialize() + '&action=create_user';
-      $.post('usuarios_ajax.php', formData)
-        .done(function(resp){
-          var j = (typeof resp === 'object') ? resp : JSON.parse(resp);
-          if (j.success) {
-            alert('Usuario creado correctamente');
-            $('#createUserModal').modal('hide');
-            location.reload();
-          } else {
-            alert('Error: ' + j.message);
-          }
-        })
-        .fail(function(){ alert('Error de conexión'); });
-    });
-
-    // Envío formulario editar usuario
-    $('#formEditUser').on('submit', function(e){
-      e.preventDefault();
-      var formData = $(this).serialize() + '&action=edit_user';
-      $.post('usuarios_ajax.php', formData)
-        .done(function(resp){
-          var j = (typeof resp === 'object') ? resp : JSON.parse(resp);
-          if (j.success) {
-            alert('Usuario actualizado correctamente');
-            $('#editUserModal').modal('hide');
-            location.reload();
-          } else {
-            alert('Error: ' + j.message);
-          }
-        })
-        .fail(function(){ alert('Error de conexión'); });
-    });
-
-    // Envío formulario eliminar usuario
-    $('#formDeleteUser').on('submit', function(e){
-      e.preventDefault();
-      var formData = $(this).serialize() + '&action=delete_user';
-      $.post('usuarios_ajax.php', formData)
-        .done(function(resp){
-          var j = (typeof resp === 'object') ? resp : JSON.parse(resp);
-          if (j.success) {
-            alert('Usuario eliminado correctamente');
-            $('#deleteUserModal').modal('hide');
-            location.reload();
-          } else {
-            alert('Error: ' + j.message);
-          }
-        })
-        .fail(function(){ alert('Error de conexión'); });
-    });
-
-    // Reportar errores JS en consola (no suprimir)
-    window.onerror = function(msg, url, line, col, error) {
-      console.error('JS error:', msg, 'at', url+':'+line+':'+col, error);
-      return false;
-    };
   });
 </script>
 </body>
