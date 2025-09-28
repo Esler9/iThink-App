@@ -1,18 +1,20 @@
 <?php
-
-// Simple endpoints para listados usados por los modales (grupos / tiendas)
 header('Content-Type: application/json; charset=utf-8');
-
 if (session_status() == PHP_SESSION_NONE) session_start();
 
 // Ajusta la ruta si es necesario (igual que en listado_users.php)
 include_once("../../../conexion.php");
 
+function resp($data, $code = 200) {
+  http_response_code($code);
+  echo json_encode($data);
+  exit;
+}
+
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
 
 if (!$conn) {
-  echo json_encode(['error' => 'No DB connection']);
-  exit;
+  resp(['error' => 'No DB connection'], 500);
 }
 
 switch ($action) {
@@ -23,12 +25,10 @@ switch ($action) {
       while ($r = mysqli_fetch_assoc($res)) {
         $out[] = ['codigo' => $r['codigo'], 'nombre' => $r['nombre_grupo']];
       }
+      resp($out);
     } else {
-      http_response_code(500);
-      echo json_encode(['error' => mysqli_error($conn)]);
-      exit;
+      resp(['error' => mysqli_error($conn)], 500);
     }
-    echo json_encode($out);
     break;
 
   case 'list_tiendas':
@@ -38,17 +38,107 @@ switch ($action) {
       while ($r = mysqli_fetch_assoc($res)) {
         $out[] = ['cod_tienda' => $r['cod_tienda'], 'nombre' => $r['nombre']];
       }
+      resp($out);
     } else {
-      http_response_code(500);
-      echo json_encode(['error' => mysqli_error($conn)]);
-      exit;
+      resp(['error' => mysqli_error($conn)], 500);
     }
-    echo json_encode($out);
+    break;
+
+  case 'create_user':
+    // Espera POST
+    $user = isset($_POST['user']) ? trim($_POST['user']) : '';
+    $cod_empleado = isset($_POST['cod_empleado']) ? trim($_POST['cod_empleado']) : null;
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
+    $state = isset($_POST['state']) ? $_POST['state'] : '1';
+    $cod_tienda = isset($_POST['cod_tienda']) ? $_POST['cod_tienda'] : null;
+    $email = isset($_POST['email']) ? trim($_POST['email']) : null;
+    $email_active = isset($_POST['email_active']) ? 1 : 0;
+    $id_group = isset($_POST['id_group']) ? $_POST['id_group'] : null;
+
+    if ($user === '' || $password === '' || $id_group === null || $cod_tienda === null || $email === null) {
+      resp(['error' => 'Faltan campos requeridos'], 400);
+    }
+
+    // Hash de contraseña (ajusta si tu sistema usa otro método)
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+
+    $stmt = mysqli_prepare($conn, "INSERT INTO `Usuarios` (`User`, `Cod_Empleado`, `Password`, `State`, `cod_tienda`, `email`, `email_active`, `id_group_user`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    if (!$stmt) resp(['error' => mysqli_error($conn)], 500);
+    mysqli_stmt_bind_param($stmt, "sssssssi", $user, $cod_empleado, $hash, $state, $cod_tienda, $email, $email_active, $id_group);
+    if (mysqli_stmt_execute($stmt)) {
+      resp(['success' => true, 'message' => 'Usuario creado', 'id' => mysqli_insert_id($conn)]);
+    } else {
+      resp(['error' => mysqli_stmt_error($stmt)], 500);
+    }
+    break;
+
+  case 'get_user':
+    $codigo = isset($_GET['codigo']) ? intval($_GET['codigo']) : 0;
+    if ($codigo <= 0) resp(['error' => 'Código inválido'], 400);
+    $sql = "SELECT Codigo, `User`, Cod_Empleado, State, cod_tienda, email, email_active, id_group_user FROM `Usuarios` WHERE Codigo = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    if (!$stmt) resp(['error' => mysqli_error($conn)], 500);
+    mysqli_stmt_bind_param($stmt, "i", $codigo);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($res);
+    if ($row) {
+      resp(['success' => true, 'data' => $row]);
+    } else {
+      resp(['error' => 'Usuario no encontrado'], 404);
+    }
+    break;
+
+  case 'update_user':
+    $codigo = isset($_POST['codigo']) ? intval($_POST['codigo']) : 0;
+    if ($codigo <= 0) resp(['error' => 'Código inválido'], 400);
+    $user = isset($_POST['user']) ? trim($_POST['user']) : '';
+    $cod_empleado = isset($_POST['cod_empleado']) ? trim($_POST['cod_empleado']) : null;
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
+    $state = isset($_POST['state']) ? $_POST['state'] : '1';
+    $cod_tienda = isset($_POST['cod_tienda']) ? $_POST['cod_tienda'] : null;
+    $email = isset($_POST['email']) ? trim($_POST['email']) : null;
+    $email_active = isset($_POST['email_active']) ? 1 : 0;
+    $id_group = isset($_POST['id_group']) ? $_POST['id_group'] : null;
+
+    if ($user === '' || $id_group === null || $cod_tienda === null || $email === null) {
+      resp(['error' => 'Faltan campos requeridos'], 400);
+    }
+
+    if ($password !== '') {
+      $hash = password_hash($password, PASSWORD_DEFAULT);
+      $sql = "UPDATE `Usuarios` SET `User` = ?, `Cod_Empleado` = ?, `Password` = ?, `State` = ?, `cod_tienda` = ?, `email` = ?, `email_active` = ?, `id_group_user` = ? WHERE Codigo = ?";
+      $stmt = mysqli_prepare($conn, $sql);
+      mysqli_stmt_bind_param($stmt, "ssssssiii", $user, $cod_empleado, $hash, $state, $cod_tienda, $email, $email_active, $id_group, $codigo);
+    } else {
+      $sql = "UPDATE `Usuarios` SET `User` = ?, `Cod_Empleado` = ?, `State` = ?, `cod_tienda` = ?, `email` = ?, `email_active` = ?, `id_group_user` = ? WHERE Codigo = ?";
+      $stmt = mysqli_prepare($conn, $sql);
+      mysqli_stmt_bind_param($stmt, "ssssssii", $user, $cod_empleado, $state, $cod_tienda, $email, $email_active, $id_group, $codigo);
+    }
+
+    if (!$stmt) resp(['error' => mysqli_error($conn)], 500);
+    if (mysqli_stmt_execute($stmt)) {
+      resp(['success' => true, 'message' => 'Usuario actualizado']);
+    } else {
+      resp(['error' => mysqli_stmt_error($stmt)], 500);
+    }
+    break;
+
+  case 'delete_user':
+    $codigo = isset($_POST['codigo']) ? intval($_POST['codigo']) : 0;
+    if ($codigo <= 0) resp(['error' => 'Código inválido'], 400);
+    $stmt = mysqli_prepare($conn, "DELETE FROM `Usuarios` WHERE Codigo = ?");
+    if (!$stmt) resp(['error' => mysqli_error($conn)], 500);
+    mysqli_stmt_bind_param($stmt, "i", $codigo);
+    if (mysqli_stmt_execute($stmt)) {
+      resp(['success' => true, 'message' => 'Usuario eliminado']);
+    } else {
+      resp(['error' => mysqli_stmt_error($stmt)], 500);
+    }
     break;
 
   default:
-    http_response_code(400);
-    echo json_encode(['error' => 'Acción no válida']);
+    resp(['error' => 'Acción no válida'], 400);
     break;
 }
 ?>
