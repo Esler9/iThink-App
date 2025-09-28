@@ -374,14 +374,7 @@
                                 </a>
                             </li>
                             <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'crear-usuario')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/usuarios/crear.php" class="nav-link">
-                                    <i class="fas fa-user-plus nav-icon"></i>
-                                    <p>Nuevo Usuario</p>
-                                </a>
-                            </li>
-                            <?php } ?>
+                            
                         </ul>
                     </li>
                     <?php } ?>
