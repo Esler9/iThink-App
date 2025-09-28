@@ -8,9 +8,7 @@ if (!isset($_SESSION["username"])) {
 }
 
 include("../../../conexion.php");
-include('../correo.php');
-include('../funcion_logica.php');
-include("../diseño_correos.php");
+
 
 // Fecha para campos date/date_update
 $date = date('Y-m-d H:i:s');
