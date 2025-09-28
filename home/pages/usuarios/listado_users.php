@@ -331,5 +331,26 @@ $(function () {
 
 });
 </script>
+
+<script>
+console.log('DEBUG jQuery version:', (window.jQuery && jQuery.fn && jQuery.fn.jquery) || 'NO_JQUERY');
+console.log('DEBUG modal plugin:', (window.jQuery && $.fn && $.fn.modal) ? 'OK' : 'NO_MODAL_PLUGIN');
+console.log('DEBUG #createUserModal found:', !!document.getElementById('createUserModal'));
+
+var btn = document.createElement('button');
+btn.textContent = 'TEST Abrir modal';
+btn.style = 'position:fixed;right:10px;bottom:10px;z-index:99999';
+btn.onclick = function(){
+  try {
+    if (window.jQuery && $.fn && $.fn.modal) {
+      $('#createUserModal').modal('show');
+      console.log('Intento abrir #createUserModal');
+    } else {
+      console.error('Plugin modal no disponible');
+    }
+  } catch(e) { console.error(e); }
+};
+document.body.appendChild(btn);
+</script>
 </body>
 </html>
