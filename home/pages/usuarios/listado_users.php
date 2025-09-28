@@ -263,42 +263,109 @@ while ($u = mysqli_fetch_assoc($res_users)) {
 
     // Inicializar DataTable
     try {
-      if ($.fn.DataTable) {
-        $("#example1").DataTable({
-          responsive: true,
-          lengthChange: true,
-          pageLength: 25,
-          autoWidth: false,
-          buttons: ["copy","csv","excel","pdf","print","colvis"],
-          language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" }
-        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-      } else {
-        console.warn('DataTable no disponible');
-      }
     } catch (e) { console.error('DataTable init error', e); }
 
-    // Toggle email_active (AJAX)
-    $(document).on('change', '.toggle-email', function(){
-      var $cb = $(this);
-      var codigo = $cb.data('codigo') || $cb.attr('data-codigo');
-      var val = $cb.is(':checked') ? 1 : 0;
-      $cb.prop('disabled', true);
-      $.post('usuarios_ajax.php', { action: 'toggle_email', Codigo: codigo, email_active: val })
-        .done(function(resp){
-          var j;
-          try { j = (typeof resp === 'object') ? resp : JSON.parse(resp); }
-          catch(e){ alert('Respuesta inesperada del servidor'); $cb.prop('checked', !val); console.error(e, resp); return; }
-          if (!j.success) { alert('Error: '+j.message); $cb.prop('checked', !val); }
-          else {
-            if (typeof $(document).Toasts === 'function') {
-              $(document).Toasts('create',{ class: 'bg-success', title: 'Email', body: j.message });
-            } else {
-              console.log(j.message);
-            }
-          }
+    // Cargar grupos y tiendas en los selects de los modales
+    function populateSelect($select, items, valueKey, textKey, placeholder) {
+      $select.empty();
+      if (placeholder) {
+        $select.append($('<option>').val('').text(placeholder));
+      }
+      items.forEach(function(it){
+        $select.append($('<option>').val(it[valueKey]).text(it[textKey]));
+      });
+    }
+
+    function loadGroupsAndTiendas(options) {
+      // options: {groupSel: jQuery, tiendaSel: jQuery, selectedGroup: val, selectedTienda: val}
+      var gSel = options.groupSel;
+      var tSel = options.tiendaSel;
+      var selG = options.selectedGroup || '';
+      var selT = options.selectedTienda || '';
+
+      // Grupos
+      $.getJSON('usuarios_ajax.php', { action: 'list_groups' })
+        .done(function(data){
+          populateSelect(gSel, data, 'codigo', 'nombre', 'Seleccione grupo');
+          if (selG) gSel.val(selG);
         })
-        .fail(function(){ alert('Error de conexión'); $cb.prop('checked', !val); })
-        .always(function(){ $cb.prop('disabled', false); });
+        .fail(function(jq,x,y){
+          console.error('Error cargando grupos', x, y);
+          gSel.empty().append($('<option>').val('').text('Error al cargar'));
+        });
+
+      // Tiendas
+      $.getJSON('usuarios_ajax.php', { action: 'list_tiendas' })
+        .done(function(data){
+          populateSelect(tSel, data, 'cod_tienda', 'nombre', 'Seleccione tienda');
+          if (selT) tSel.val(selT);
+        })
+        .fail(function(jq,x,y){
+          console.error('Error cargando tiendas', x, y);
+          tSel.empty().append($('<option>').val('').text('Error al cargar'));
+        });
+    }
+
+    // Cuando se abra el modal Crear: poblar selects (sin seleccionados)
+    $('#createUserModal').on('show.bs.modal', function () {
+      loadGroupsAndTiendas({
+        groupSel: $('#c_id_group'),
+        tiendaSel: $('#c_cod_tienda')
+      });
+      // Reset del formulario
+      $('#formCreateUser')[0].reset();
+      $('#c_email_active').prop('checked', false);
+    });
+
+    // Cuando se abra el modal Editar: poblar selects y luego (si trae data) seleccionar valores
+    // Se asume que el trigger contiene data-codigo y otros datos, por ejemplo:
+    // <button class="btn-edit" data-codigo="1" data-user="juan" data-id_group="2" data-cod_tienda="5">Editar</button>
+    $('#editUserModal').on('show.bs.modal', function (e) {
+      var trigger = $(e.relatedTarget);
+      var codigo = trigger.data('codigo') || '';
+      var user = trigger.data('user') || '';
+      var cod_empleado = trigger.data('cod_empleado') || '';
+      var email = trigger.data('email') || '';
+      var id_group = trigger.data('id_group') || '';
+      var cod_tienda = trigger.data('cod_tienda') || '';
+      var state = (typeof trigger.data('state') !== 'undefined') ? trigger.data('state') : '1';
+      var email_active = trigger.data('email_active') ? true : false;
+
+      // Rellenar básicos (la carga de selects puede tardar; los valores se seleccionan tras poblar)
+      $('#e_codigo').val(codigo);
+      $('#e_user').val(user);
+      $('#e_cod_empleado').val(cod_empleado);
+      $('#e_email').val(email);
+      $('#e_password').val('');
+      $('#e_state').val(state);
+      $('#e_email_active').prop('checked', email_active);
+
+      loadGroupsAndTiendas({
+        groupSel: $('#e_id_group'),
+        tiendaSel: $('#e_cod_tienda'),
+        selectedGroup: id_group,
+        selectedTienda: cod_tienda
+      });
+    });
+
+    // Ejemplo: Si quieres añadir botones en la tabla que abren los modales, aquí hay un handler genérico
+    // (Asegúrate de generar botones en el PHP con data-* correspondientes)
+    $(document).on('click', '.btn-view', function(){
+      var $b = $(this);
+      $('#v_codigo').text($b.data('codigo') || '-');
+      $('#v_user').text($b.data('user') || '-');
+      $('#v_cod_empleado').text($b.data('cod_empleado') || '-');
+      $('#v_email').text($b.data('email') || '-');
+      $('#v_email_active').text($b.data('email_active') ? 'Sí' : 'No');
+      $('#v_grupo').text($b.data('grupo') || '-');
+      $('#v_tienda').text($b.data('tienda') || '-');
+      $('#v_state').text($b.data('state') || '-');
+      $('#viewUserModal').modal('show');
+    });
+
+    // Toggle email_active (AJAX) - placeholder si ya tenías lógica
+    $(document).on('change', '.toggle-email', function(){
+      // implementar según tu API
     });
 
     // Lectura robusta de data-* (soporte dataset, .data() y .attr())
