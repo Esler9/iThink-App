@@ -1,8 +1,6 @@
 <?php
 include("../../../conexion.php");
-include('../correo.php');
-include('../funcion_logica.php');
-include("../diseño_correos.php");
+
 
 // Bloque de debug simple: muestra alert si recibe POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['__debug_post_check']) || isset($_GET['debug_post']))) {
