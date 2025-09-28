@@ -3,8 +3,6 @@ session_start();
 
 // Config / mantenimiento
 include_once __DIR__ . '/../../Setting.php';
-
-// Si hay mantenimiento detener
 if (isset($mantenimiento) && $mantenimiento === true) {
     echo "<h3>Sitio en mantenimiento</h3>";
     exit();
@@ -24,18 +22,10 @@ include_once __DIR__ . '/../../conexion.php';
 include_once __DIR__ . '/../logica/ac_permiso.php';
 include_once __DIR__ . '/../datos/dt_permisos.php';
 
-// Traer grupos y permisos (función Traer_grupo_usuario asumida en dt_permisos.php)
+// Obtener grupos y permisos
 $grupos = Traer_grupo_usuario($conn);
 
-// Construir arreglo de permisos por grupo (si dt_permisos provee permisos)
-$groupPermissionsArray = [];
-if (function_exists('Traer_permisos_por_grupo')) {
-    foreach ($grupos as $g) {
-        $groupPermissionsArray[$g['codigo']] = Traer_permisos_por_grupo($conn, $g['codigo']);
-    }
-}
-
-// Manejo de formulario (crear/editar permiso) - similar a la versión previa pero compatible con la estructura de permisos_view
+// Manejo de formulario (crear/editar permiso)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $codigo = $_POST['codigo'] ?? null;
     $nombre_permiso = trim($_POST['nombre_permiso'] ?? '');
@@ -90,141 +80,242 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Admin Permisos</title>
 
-  <!-- estilos (puedes cambiar por AdminLTE si lo usas) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
+  <!-- Mantener consistencia con permisos_view: AdminLTE / DataTables / FontAwesome -->
+  <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+  <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+  <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <style>
-    :root{--sidebar-width:260px}
-    html,body{height:100%;margin:0}
-    .wrapper{display:flex;min-height:100vh}
-    .main-sidebar{width:var(--sidebar-width);flex:0 0 var(--sidebar-width);background:#343a40;color:#fff;padding:1rem;overflow:auto}
-    .main-sidebar a{color:#cfd8dc;display:block;padding:.5rem 1rem;text-decoration:none}
-    .main-sidebar a:hover{background:rgba(255,255,255,.03);color:#fff}
-    .content-area{flex:1;padding:1.25rem;background:#f4f6f9;min-width:0}
-    .content-inner{max-width:1200px;margin:0 auto}
-    .table-responsive{overflow:auto}
-    @media (max-width:768px){.wrapper{flex-direction:column}.main-sidebar{width:100%}}
+    /* Ajustes menores para que el contenido no desborde el sidebar */
+    .group-list { max-height: 420px; overflow:auto; }
+    #formCrear { display:none; }
+    .card .card-body.table-responsive { max-height: 480px; overflow:auto; }
   </style>
 </head>
-<body>
-<div class="wrapper">
-  <!-- Sidebar -->
-  <?php include_once __DIR__ . '/sidebar.php'; ?>
+<body class="hold-transition sidebar-mini layout-fixed">
+  <div class="wrapper">
 
-  <!-- Contenido -->
-  <main class="content-area">
-    <div class="content-inner">
-
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="m-0">Administrar Permisos</h3>
-        <div>
-          <button id="nuevoPermisoBtn" class="btn btn-primary">Nuevo Permiso</button>
-        </div>
-      </div>
-
-      <!-- Mensaje -->
-      <?php if (!empty($_GET['msg'])): ?>
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-          <?php echo htmlspecialchars($_GET['msg']); ?>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-      <?php endif; ?>
-
-      <!-- Formulario creación -->
-      <div id="formCrear" class="card mb-4" style="display:none;">
-        <div class="card-body">
-          <form method="post" id="formPermiso">
-            <input type="hidden" name="codigo" id="codigoPermiso" value="">
-            <div class="mb-3">
-              <label class="form-label">Nombre permiso</label>
-              <input class="form-control" name="nombre_permiso" id="nombrePermiso" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Descripción</label>
-              <textarea class="form-control" name="des_permiso" id="desPermiso"></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Grupo</label>
-              <select class="form-select" name="group_permiso" id="groupPermiso" required>
-                <?php
-                // $grupos puede ser array o mysqli_result dependiendo de Traer_grupo_usuario
-                if (is_array($grupos)) {
-                    foreach ($grupos as $g) {
-                        echo '<option value="'.htmlspecialchars($g['codigo']).'">'.htmlspecialchars($g['nombre_grupo_p'] ?? $g['nombre']).'</option>';
-                    }
-                } else {
-                    while ($g = $grupos->fetch_assoc()) {
-                        echo '<option value="'.htmlspecialchars($g['codigo']).'">'.htmlspecialchars($g['nombre_grupo_p'] ?? $g['nombre']).'</option>';
-                    }
-                }
-                ?>
-              </select>
-            </div>
-            <button class="btn btn-success" type="submit">Guardar</button>
-            <button type="button" id="cancelCrear" class="btn btn-secondary">Cancelar</button>
-          </form>
-        </div>
-      </div>
-
-      <!-- Tabla de permisos -->
-      <div class="card">
-        <div class="card-body table-responsive">
-          <table class="table table-striped" id="tablaPermisos">
-            <thead>
-              <tr><th>Código</th><th>Nombre</th><th>Descripción</th><th>Grupo</th><th>Slug</th><th>Acciones</th></tr>
-            </thead>
-            <tbody>
-              <?php
-              $q = $conn->query("SELECT p.codigo, p.nombre_permiso, p.des_permiso, g.nombre_grupo_p, p.slug FROM Permiso p LEFT JOIN grupo_permiso g ON p.group_permiso = g.codigo ORDER BY p.codigo DESC");
-              while ($row = $q->fetch_assoc()):
-              ?>
-                <tr>
-                  <td><?php echo $row['codigo']; ?></td>
-                  <td><?php echo htmlspecialchars($row['nombre_permiso']); ?></td>
-                  <td><?php echo htmlspecialchars($row['des_permiso']); ?></td>
-                  <td><?php echo htmlspecialchars($row['nombre_grupo_p']); ?></td>
-                  <td><?php echo htmlspecialchars($row['slug']); ?></td>
-                  <td>
-                    <button class="btn btn-sm btn-warning editarBtn"
-                      data-codigo="<?php echo $row['codigo']; ?>"
-                      data-nombre="<?php echo htmlspecialchars($row['nombre_permiso'], ENT_QUOTES); ?>"
-                      data-des="<?php echo htmlspecialchars($row['des_permiso'], ENT_QUOTES); ?>"
-                      data-grupo="<?php echo htmlspecialchars($row['nombre_grupo_p'], ENT_QUOTES); ?>">
-                      <i class="fa fa-edit"></i>
-                    </button>
-                  </td>
-                </tr>
-              <?php endwhile; ?>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
+    <!-- Sidebar (uso igual que permisos_view) -->
+    <div id="sidebarContainer">
+      <?php include("sidebar.php"); ?>
     </div>
-  </main>
-</div>
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  (function($){
-    $('#nuevoPermisoBtn').on('click', function(){ $('#formCrear').slideToggle(); });
-    $('#cancelCrear').on('click', function(){ $('#formCrear').slideUp(); $('#formPermiso')[0].reset(); });
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Administrar Permisos</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="../dashboard.php">Home</a></li>
+                <li class="breadcrumb-item active">Permisos</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    // editar: cargar datos en formulario y mostrar
-    $('.editarBtn').on('click', function(){
-      var btn = $(this);
-      $('#codigoPermiso').val(btn.data('codigo'));
-      $('#nombrePermiso').val(btn.data('nombre'));
-      $('#desPermiso').val(btn.data('des'));
-      // intentar seleccionar grupo por texto (si coincide)
-      $('#groupPermiso option').filter(function(){ return $(this).text() === btn.data('grupo'); }).prop('selected', true);
-      $('#formCrear').slideDown();
-      $('html,body').animate({scrollTop: $('#formCrear').offset().top - 20}, 300);
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <!-- Grupos -->
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Grupos de Usuarios</h3>
+                </div>
+                <div class="card-body group-list">
+                  <ul id="groupList" class="list-group">
+                    <?php
+                    if (is_array($grupos)) {
+                        foreach ($grupos as $grupo) {
+                            echo '<li class="list-group-item" data-group="'.htmlspecialchars($grupo['codigo']).'">'.htmlspecialchars($grupo['nombre_grupo_p'] ?? $grupo['nombre_grupo']).'</li>';
+                        }
+                    } else {
+                        while ($grupo = $grupos->fetch_assoc()) {
+                            echo '<li class="list-group-item" data-group="'.htmlspecialchars($grupo['codigo']).'">'.htmlspecialchars($grupo['nombre_grupo_p'] ?? $grupo['nombre_grupo']).'</li>';
+                        }
+                    }
+                    ?>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Permisos y tabla -->
+            <div class="col-md-8">
+              <!-- Form crear/editar -->
+              <div id="formCrear" class="card mb-3">
+                <div class="card-header">
+                  <h3 class="card-title">Crear / Editar Permiso</h3>
+                </div>
+                <div class="card-body">
+                  <form method="post" id="formPermiso">
+                    <input type="hidden" name="codigo" id="codigoPermiso" value="">
+                    <div class="form-group">
+                      <label>Nombre permiso</label>
+                      <input class="form-control" name="nombre_permiso" id="nombrePermiso" required>
+                    </div>
+                    <div class="form-group">
+                      <label>Descripción</label>
+                      <textarea class="form-control" name="des_permiso" id="desPermiso"></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label>Grupo</label>
+                      <select class="form-control" name="group_permiso" id="groupPermiso" required>
+                        <?php
+                        // reutilizar $grupos para opciones
+                        if (is_array($grupos)) {
+                            foreach ($grupos as $g) {
+                                echo '<option value="'.htmlspecialchars($g['codigo']).'">'.htmlspecialchars($g['nombre_grupo_p'] ?? $g['nombre']).'</option>';
+                            }
+                        } else {
+                            // si $grupos fue recorrido antes, recargar consulta
+                            $gq = $conn->query("SELECT * FROM grupo_permiso");
+                            while ($g = $gq->fetch_assoc()) {
+                                echo '<option value="'.htmlspecialchars($g['codigo']).'">'.htmlspecialchars($g['nombre_grupo_p'] ?? $g['nombre']).'</option>';
+                            }
+                        }
+                        ?>
+                      </select>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                      <button type="submit" class="btn btn-success mr-2">Guardar</button>
+                      <button type="button" id="cancelCrear" class="btn btn-secondary">Cancelar</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Tabla de permisos -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Listado de Permisos</h3>
+                  <div class="card-tools">
+                    <div class="input-group input-group-sm" style="width: 250px;">
+                      <input type="text" id="tableSearch" class="form-control float-right" placeholder="Buscar permisos">
+                      <div class="input-group-append">
+                        <button class="btn btn-default"><i class="fas fa-search"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body table-responsive">
+                  <table id="tablaPermisos" class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Grupo</th>
+                        <th>Slug</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php
+                      $q = $conn->query("SELECT p.codigo, p.nombre_permiso, p.des_permiso, g.nombre_grupo_p, p.slug FROM Permiso p LEFT JOIN grupo_permiso g ON p.group_permiso = g.codigo ORDER BY p.codigo DESC");
+                      while ($row = $q->fetch_assoc()):
+                      ?>
+                        <tr>
+                          <td><?php echo $row['codigo']; ?></td>
+                          <td><?php echo htmlspecialchars($row['nombre_permiso']); ?></td>
+                          <td><?php echo htmlspecialchars($row['des_permiso']); ?></td>
+                          <td><?php echo htmlspecialchars($row['nombre_grupo_p']); ?></td>
+                          <td><?php echo htmlspecialchars($row['slug']); ?></td>
+                          <td>
+                            <button class="btn btn-sm btn-warning editarBtn"
+                              data-codigo="<?php echo $row['codigo']; ?>"
+                              data-nombre="<?php echo htmlspecialchars($row['nombre_permiso'], ENT_QUOTES); ?>"
+                              data-des="<?php echo htmlspecialchars($row['des_permiso'], ENT_QUOTES); ?>"
+                              data-grupo="<?php echo htmlspecialchars($row['nombre_grupo_p'], ENT_QUOTES); ?>">
+                              <i class="fa fa-edit"></i> Editar
+                            </button>
+                          </td>
+                        </tr>
+                      <?php endwhile; ?>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+      <div class="float-right d-none d-sm-block">
+        <b>Version</b> 1
+      </div>
+      <strong>Copyright &copy; <?php echo date('Y'); ?> <a href="https://hexasystems.com">Hexa Systems</a>.</strong> Todos los derechos reservados.
+    </footer>
+
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+  </div>
+
+  <!-- Scripts (mantener mismos plugins que permisos_view para compatibilidad con sidebar) -->
+  <script src="../plugins/jquery/jquery.min.js"></script>
+  <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <script src="../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+  <script src="../dist/js/adminlte.min.js"></script>
+
+  <script>
+    $(function() {
+      // Inicializar DataTable
+      $('#tablaPermisos').DataTable({
+        responsive: true,
+        paging: true,
+        lengthChange: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        autoWidth: false,
+      });
+
+      // Mostrar/ocultar formulario
+      $('#nuevoPermisoBtn').on('click', function(){ $('#formCrear').slideToggle(); });
+      $('#cancelCrear').on('click', function(){ $('#formCrear').slideUp(); $('#formPermiso')[0].reset(); });
+
+      // Cargar datos al editar
+      $('#tablaPermisos').on('click', '.editarBtn', function(){
+        var btn = $(this);
+        $('#codigoPermiso').val(btn.data('codigo'));
+        $('#nombrePermiso').val(btn.data('nombre'));
+        $('#desPermiso').val(btn.data('des'));
+        // seleccionar grupo por texto si coincide
+        $("#groupPermiso option").filter(function(){ return $(this).text() === btn.data('grupo'); }).prop('selected', true);
+        $('#formCrear').slideDown();
+        $('html,body').animate({scrollTop: $('#formCrear').offset().top - 20}, 300);
+      });
+
+      // Cargar permisos a la derecha al hacer clic en grupo (compatibilidad con permisos_view UX)
+      $('#groupList').on('click', 'li', function(){
+        var grupo = $(this).data('group');
+        $('#groupList li').removeClass('active');
+        $(this).addClass('active');
+        // Opcional: filtrar tabla para mostrar sólo permisos del grupo seleccionado (por columna Grupo)
+        var table = $('#tablaPermisos').DataTable();
+        table.column(3).search($(this).text()).draw();
+      });
+
+      // Búsqueda rápida vinculada al input de header
+      $('#tableSearch').on('keyup', function(){
+        var table = $('#tablaPermisos').DataTable();
+        table.search(this.value).draw();
+      });
     });
-  })(jQuery);
-</script>
+  </script>
 </body>
 </html>
