@@ -235,7 +235,28 @@ if (isset($conn) && $conn && @mysqli_ping($conn)) {
 }
 ?>
 <!-- incluir modales justo antes de los scripts -->
-<?php include("modal-users.php"); ?>
+<?php
+$modalFile = __DIR__ . '/modal-users.php';
+if (file_exists($modalFile) && is_readable($modalFile)) {
+    include $modalFile;
+} else {
+    // DEBUG: mostrar comentario HTML y modal de fallback mínimo para pruebas
+    echo "<!-- ERROR: modal-users.php no encontrado en: {$modalFile} -->";
+    ?>
+    <!-- Modal fallback mínimo para pruebas -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h5 class="modal-title">Crear usuario (fallback)</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button></div>
+          <div class="modal-body">Modal de fallback: modal-users.php faltante o no legible.</div>
+          <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button></div>
+        </div>
+      </div>
+    </div>
+    <?php
+}
+?>
 
 <script>
 $(function () {
