@@ -248,25 +248,10 @@ jQuery(function($){
     $('#d_user').text(b.data('user') || '-');
   });
 
-  // Agrega confirmación visual antes de enviar: muestra action, method y pares clave=valor
-  $('#formCreateUser, #formEditUser, #formDeleteUser').on('submit', function(e){
-    var form = this;
-    var fd = new FormData(form);
-    var entries = [];
-    for (var pair of fd.entries()) {
-      var k = pair[0], v = pair[1];
-      // mostrar sólo strings cortos para evitar alert muy largo
-      var vs = (typeof v === 'string') ? v : String(v);
-      if (vs.length > 200) vs = vs.slice(0,200) + '...';
-      entries.push(k + ': ' + vs);
-    }
-    var msg = 'Se enviará por POST a:\\n' + form.action + '\\nMétodo: ' + (form.method || 'post') + '\\n\\nCampos:\\n' + (entries.length ? entries.join('\\n') : '(vacío)');
-    // usar confirm para permitir cancelar
-    if (!confirm(msg)) {
-      e.preventDefault();
-      return false;
-    }
-    // si confirma, permitir envío normal (no hacemos e.preventDefault())
+  // Quitar confirmaciones; sólo prevenir envíos dobles deshabilitando el botón submit
+  $('#formCreateUser, #formEditUser, #formDeleteUser').on('submit', function () {
+    $(this).find('button[type="submit"]').attr('disabled', true);
+    // permitir el envío normal
   });
 
 });
