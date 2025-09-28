@@ -687,25 +687,143 @@
 <!-- Script para el menú Sidebar con animaciones y Dark Mode para header y sidebar -->
 <script>
   $(document).ready(function() {
-      // Toggle submenús
-      $('.nav-item.has-treeview > a').on('click', function(e) {
-          e.preventDefault();
-          var $parent = $(this).parent();
+      // Inicializar ids para persistencia
+      $('.nav-item.has-treeview').each(function(index) {
+          $(this).attr('data-menu-id', 'menu-' + index);
+      });
+
+      // Añadir toggles accesibles a cada item con submenú
+      $('.nav-item.has-treeview').each(function() {
+          var $item = $(this);
+          var $link = $item.children('a').first();
+
+          // Crear botón toggle solo si no existe
+          if ($link.find('.tree-toggle').length === 0) {
+              var $toggle = $('<button>', {
+                  'class': 'tree-toggle',
+                  'type': 'button',
+                  'aria-expanded': 'false',
+                  'aria-label': 'Expandir menú'
+              }).html('<i class="fas fa-angle-left"></i>');
+              // insertar al final del enlace para posicionar a la derecha
+              $link.append($toggle);
+          }
+      });
+
+      // Cargar estado de menús abiertos desde localStorage
+      var openMenus = JSON.parse(localStorage.getItem('openMenus') || '[]');
+      openMenus.forEach(function(id) {
+          var $m = $('.nav-item.has-treeview[data-menu-id="' + id + '"]');
+          if ($m.length) {
+              $m.addClass('menu-open');
+              $m.find('ul.nav-treeview').show();
+              $m.find('.tree-toggle').attr('aria-expanded', 'true');
+          }
+      });
+
+      // Detección de la ruta actual para marcar link activo y abrir padres
+      var path = window.location.pathname;
+      $('a.nav-link').each(function() {
+          var href = $(this).attr('href');
+          if (href && href !== '#' && path.indexOf(href) !== -1) {
+              $(this).addClass('active');
+              var $parent = $(this).closest('.nav-item.has-treeview');
+              $parent.addClass('menu-open');
+              $parent.find('ul.nav-treeview').show();
+              $parent.find('.tree-toggle').attr('aria-expanded', 'true');
+              // asegurar que quede guardado en openMenus
+              var id = $parent.attr('data-menu-id');
+              if (id && openMenus.indexOf(id) === -1) {
+                  openMenus.push(id);
+              }
+          }
+      });
+      localStorage.setItem('openMenus', JSON.stringify(openMenus));
+
+      // Función para actualizar localStorage cuando se abren/cerran menús
+      function updateOpenMenus(id, opened) {
+          var arr = JSON.parse(localStorage.getItem('openMenus') || '[]');
+          if (opened) {
+              if (arr.indexOf(id) === -1) arr.push(id);
+          } else {
+              var i = arr.indexOf(id);
+              if (i !== -1) arr.splice(i, 1);
+          }
+          localStorage.setItem('openMenus', JSON.stringify(arr));
+      }
+
+      // Manejo de clicks en toggles (accesible)
+      $(document).on('click', '.tree-toggle', function(e) {
+          e.stopPropagation();
+          var $btn = $(this);
+          var $parent = $btn.closest('.nav-item');
           var $submenu = $parent.find('ul.nav-treeview').first();
+          var id = $parent.attr('data-menu-id');
           if ($parent.hasClass('menu-open')) {
-              $submenu.slideUp(300, function() {
+              $submenu.slideUp(200, function() {
                   $parent.removeClass('menu-open');
+                  $btn.attr('aria-expanded', 'false');
+                  if (id) updateOpenMenus(id, false);
               });
           } else {
-              // Cerrar otros submenús abiertos
+              // cerrar otros abiertos
               $('.nav-item.has-treeview.menu-open').not($parent).each(function() {
-                  $(this).find('ul.nav-treeview').slideUp(300, function() {
-                      $(this).closest('.nav-item').removeClass('menu-open');
+                  var $other = $(this);
+                  $other.find('ul.nav-treeview').slideUp(200, function() {
+                      $other.removeClass('menu-open');
+                      $other.find('.tree-toggle').attr('aria-expanded', 'false');
+                      updateOpenMenus($other.attr('data-menu-id'), false);
                   });
               });
-              $submenu.slideDown(300, function() {
+              $submenu.slideDown(200, function() {
                   $parent.addClass('menu-open');
+                  $btn.attr('aria-expanded', 'true');
+                  if (id) updateOpenMenus(id, true);
               });
+          }
+      });
+
+      // Click en el enlace principal: si href === '#' toggle, si tiene ruta real, navegar
+      $('.nav-item.has-treeview > a.nav-link').on('click', function(e) {
+          var href = $(this).attr('href');
+          // si es un enlace 'placeholder', evitar navegar y alternar
+          if (!href || href.trim() === '#' ) {
+              e.preventDefault();
+              $(this).find('.tree-toggle').trigger('click');
+          }
+      });
+
+      // Navegación por teclado: Enter / Space para toggles, flechas para moverse
+      $(document).on('keydown', '.tree-toggle, .nav-link', function(e) {
+          var $focused = $(this);
+          if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if ($focused.hasClass('tree-toggle')) {
+                  $focused.trigger('click');
+              } else if ($focused.is('a.nav-link')) {
+                  $focused.trigger('click');
+              }
+          } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+              e.preventDefault();
+              // crear lista de elementos navegables
+              var $items = $('.nav-sidebar .nav-link:visible');
+              var idx = $items.index($focused);
+              if (e.key === 'ArrowDown' && idx < $items.length - 1) {
+                  $items.eq(idx + 1).focus();
+              } else if (e.key === 'ArrowUp' && idx > 0) {
+                  $items.eq(idx - 1).focus();
+              }
+          } else if (e.key === 'ArrowRight') {
+              // abrir menú si existe
+              if ($(this).closest('.nav-item.has-treeview').length) {
+                  $(this).closest('.nav-item').find('.tree-toggle').first().trigger('click');
+              }
+          } else if (e.key === 'ArrowLeft') {
+              // cerrar menú si existe
+              var $parentMenu = $(this).closest('.nav-item.has-treeview.menu-open');
+              if ($parentMenu.length) {
+                  $parentMenu.find('.tree-toggle').first().trigger('click');
+              }
           }
       });
 
@@ -727,8 +845,6 @@
       });
   });
 </script>
-
-<!-- Estilos para Light y Dark Mode (solo header y sidebar cambian de tema) -->
 <style>
   /* Light Mode (por defecto) */
   .main-header {
@@ -789,6 +905,47 @@
       color: #ffffff !important;
   }
   /* Estilos para la pestaña activa */
+  .nav-sidebar .nav-link.active {
+      background-color: #007bff !important;
+      color: #ffffff !important;
+  }
+
+  /* Estilos para el botón toggle que añade control visual sin romper el layout */
+  .tree-toggle {
+      background: transparent;
+      border: none;
+      color: inherit;
+      float: right;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 8px;
+  }
+  .tree-toggle:focus {
+      outline: 2px solid #80bdff;
+      outline-offset: 2px;
+  }
+  .tree-toggle i {
+      transition: transform 0.2s ease;
+  }
+  .nav-item.menu-open > a .tree-toggle i {
+      transform: rotate(-90deg); /* indicar abierto */
+  }
+
+  /* Pequeño ajuste para que los enlaces puedan recibir focus claramente */
+  .nav-sidebar .nav-link {
+      outline: none;
+  }
+  .nav-sidebar .nav-link:focus {
+      background-color: rgba(0,123,255,0.1);
+      color: inherit !important;
+  }
+
+  /* Mantener el comportamiento visual previo para active */
   .nav-sidebar .nav-link.active {
       background-color: #007bff !important;
       color: #ffffff !important;
