@@ -1,4 +1,5 @@
 <?php
+// Este archivo es la versión renombrada de usuarios_Accion.php -> usuarios_accion.php
 session_start();
 require_once("../../../conexion.php"); // usa $conn
 
@@ -18,7 +19,6 @@ function json_resp($data, $code = 200){
 
 if (!isset($conn) || !$conn) {
   dbg("No DB connection");
-  // si es AJAX pedimos JSON, si no redirigimos
   if (isset($_REQUEST['ajax']) && $_REQUEST['ajax']=='1') json_resp(['error'=>'No DB connection'],500);
   $_SESSION['error_usuario'] = "Error de conexión a BD.";
   header('Location: listado_users.php'); exit;
@@ -26,7 +26,7 @@ if (!isset($conn) || !$conn) {
 
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
 
-dbg("usuarios_Accion action={$action} method={$_SERVER['REQUEST_METHOD']} REQUEST=".json_encode($_REQUEST));
+dbg("usuarios_accion action={$action} method={$_SERVER['REQUEST_METHOD']} REQUEST=".json_encode($_REQUEST));
 
 // Acciones que siempre devuelven JSON
 if ($action === 'list_groups') {
