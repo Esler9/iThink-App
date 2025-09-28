@@ -353,6 +353,28 @@ while ($u = mysqli_fetch_assoc($res_users)) {
       $('#viewUserModal').modal('show');
     });
 
+    // Crear usuario: manejar formulario
+    $('#formCreateUser').on('submit', function(e){
+      e.preventDefault();
+      var $f = $(this);
+      var data = $f.serialize();
+      console.log('Enviando create_user payload:', data);
+      $.post('usuarios_ajax.php?action=create_user', data, null, 'json')
+        .done(function(resp){
+          console.log('create_user response:', resp);
+          if (resp.success) {
+            $('#createUserModal').modal('hide');
+            location.reload();
+          } else {
+            alert(resp.error || 'Error creando usuario');
+          }
+        })
+        .fail(function(xhr){
+          console.error('AJAX error:', xhr.responseText);
+          alert('Error de servidor. Revisa la consola o Network.');
+        });
+    });
+
     // Depuración: informa si no encuentra el endpoint
     $.ajaxSetup({
       error: function (jqXHR, textStatus, errorThrown) {

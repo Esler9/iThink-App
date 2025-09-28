@@ -1,3 +1,4 @@
+<?php
 <!-- Modal: Crear usuario -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
@@ -9,65 +10,53 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+
         <div class="modal-body">
           <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="c_user">Usuario</label>
-                <input type="text" class="form-control" id="c_user" name="user" placeholder="Usuario" required>
-              </div>
+            <div class="col-md-6 form-group">
+              <label for="c_user">Usuario</label>
+              <input type="text" id="c_user" name="user" class="form-control" required>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="c_cod_empleado">Código Empleado</label>
-                <input type="text" class="form-control" id="c_cod_empleado" name="cod_empleado" placeholder="Código del empleado">
-              </div>
+            <div class="col-md-6 form-group">
+              <label for="c_cod_empleado">Código Empleado</label>
+              <input type="text" id="c_cod_empleado" name="cod_empleado" class="form-control">
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="c_email">Email</label>
-                <input type="email" class="form-control" id="c_email" name="email" placeholder="correo@dominio.com" required>
-              </div>
+            <div class="col-md-6 form-group">
+              <label for="c_password">Contraseña</label>
+              <input type="password" id="c_password" name="password" class="form-control" required>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="c_password">Contraseña</label>
-                <input type="password" class="form-control" id="c_password" name="password" placeholder="Contraseña" required>
-              </div>
+            <div class="col-md-6 form-group">
+              <label for="c_email">Email</label>
+              <input type="email" id="c_email" name="email" class="form-control" required>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="c_id_group">Grupo</label>
-                <select class="form-control" id="c_id_group" name="id_group" required>
-                  <option value="">Cargando...</option>
-                </select>
-              </div>
+            <div class="col-md-6 form-group">
+              <label for="c_id_group">Grupo</label>
+              <select id="c_id_group" name="id_group" class="form-control" required>
+                <option value="">Cargando...</option>
+              </select>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="c_cod_tienda">Tienda</label>
-                <select class="form-control" id="c_cod_tienda" name="cod_tienda" required>
-                  <option value="">Cargando...</option>
-                </select>
-              </div>
+            <div class="col-md-6 form-group">
+              <label for="c_cod_tienda">Tienda</label>
+              <select id="c_cod_tienda" name="cod_tienda" class="form-control" required>
+                <option value="">Cargando...</option>
+              </select>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="c_state">Estado</label>
-                <select class="form-control" id="c_state" name="state" required>
-                  <option value="1">Activo</option>
-                  <option value="0">Inactivo</option>
-                </select>
-              </div>
+            <div class="col-md-6 form-group">
+              <label for="c_state">Estado</label>
+              <select id="c_state" name="state" class="form-control">
+                <option value="1">Activo</option>
+                <option value="0">Inactivo</option>
+              </select>
             </div>
-            <div class="col-md-6 d-flex align-items-center">
-              <div class="custom-control custom-switch mt-3">
-                <input type="checkbox" class="custom-control-input" id="c_email_active" name="email_active" value="1">
-                <label class="custom-control-label" for="c_email_active">Email activo</label>
+            <div class="col-md-6 form-group d-flex align-items-center">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="c_email_active" name="email_active" value="1">
+                <label class="form-check-label" for="c_email_active">Email activo</label>
               </div>
             </div>
           </div>
         </div>
+
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
           <button type="submit" class="btn btn-success">Guardar</button>
