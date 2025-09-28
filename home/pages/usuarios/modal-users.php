@@ -26,7 +26,8 @@ if (isset($conn)) {
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form id="formCreateUser" method="get" action="./usuarios_Accion.php?action=create_user">
+      <form id="formCreateUser" method="post" action="./usuarios_Accion.php?action=create_user">
+        <input type="hidden" name="action" value="create_user">
         <div class="modal-header">
           <h5 class="modal-title">Crear usuario</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
@@ -126,7 +127,8 @@ if (isset($conn)) {
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form id="formEditUser" method="get" action="./usuarios_Accion.php?action=update_user">
+      <form id="formEditUser" method="post" action="./usuarios_Accion.php?action=update_user">
+        <input type="hidden" name="action" value="update_user">
         <input type="hidden" id="e_codigo" name="codigo">
         <div class="modal-header">
           <h5 class="modal-title">Editar usuario</h5>
@@ -191,7 +193,8 @@ if (isset($conn)) {
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form id="formDeleteUser" method="get" action="./usuarios_Accion.php?action=delete_user">
+      <form id="formDeleteUser" method="post" action="./usuarios_Accion.php?action=delete_user">
+        <input type="hidden" name="action" value="delete_user">
         <input type="hidden" id="d_codigo" name="codigo">
         <div class="modal-header">
           <h5 class="modal-title">Eliminar usuario</h5>
