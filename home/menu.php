@@ -374,7 +374,38 @@
                                 </a>
                             </li>
                             <?php } ?>
-                            
+                        </ul>
+                    </li>
+                    <?php } ?>
+
+                    <!-- Correos -->
+                    <?php if(Tiene_permiso($permisos_user, 'ver-correos')) { ?>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-envelope"></i>
+                            <p>
+                                Correos
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <?php if(Tiene_permiso($permisos_user, 'asignar-correos')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/correos/asignacion_correos.php" class="nav-link">
+                                    <i class="fas fa-user-plus nav-icon"></i>
+                                    <p>Asignación Correos</p>
+                                </a>
+                            </li>
+                            <?php } ?>
+
+                            <?php if(Tiene_permiso($permisos_user, 'ver-tipos-correo')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/correos/tipos_correo.php" class="nav-link">
+                                    <i class="fas fa-tags nav-icon"></i>
+                                    <p>Tipos correo</p>
+                                </a>
+                            </li>
+                            <?php } ?>
                         </ul>
                     </li>
                     <?php } ?>
@@ -560,6 +591,29 @@
                                 <a href="/home/pages/configuracion/permisos.php" class="nav-link">
                                     <i class="fas fa-user-shield nav-icon"></i>
                                     <p>Gestionar Permisos</p>
+                                </a>
+                            </li>
+                            <?php } ?>
+                        </ul>
+                    </li>
+                    <?php } ?>
+
+                    <!-- Reparaciones -->
+                    <?php if(Tiene_permiso($permisos_user, 'ver-reparaciones')) { ?>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-tools"></i>
+                            <p>
+                                Reparaciones
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <?php if(Tiene_permiso($permisos_user, 'ver-reparaciones')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/reparaciones/listado_reparaciones.php" class="nav-link">
+                                    <i class="fas fa-list nav-icon"></i>
+                                    <p>Listado de Reparaciones</p>
                                 </a>
                             </li>
                             <?php } ?>
