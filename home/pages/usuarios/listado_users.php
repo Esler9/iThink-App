@@ -226,7 +226,24 @@ if (!$res_users) {
 <script src="../../dist/js/adminlte.min.js"></script>
 
 <?php
-// Incluir modales de forma simple (se espera que modal-users.php use $grupos/$tiendas si los preparaste antes)
+// Preparar arrays simples para los selects (seguro)
+$grupos = [];
+$tiendas = [];
+$states = [];
+
+if (isset($conn) && $conn && @mysqli_ping($conn)) {
+    $q = mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
+    if ($q) { while ($r = mysqli_fetch_assoc($q)) $grupos[] = $r; }
+
+    $q = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
+    if ($q) { while ($r = mysqli_fetch_assoc($q)) $tiendas[] = $r; }
+
+    // Traer estados distintos para permitir más de dos opciones
+    $q = mysqli_query($conn, "SELECT DISTINCT State FROM `Usuarios` ORDER BY State");
+    if ($q) { while ($r = mysqli_fetch_assoc($q)) $states[] = $r['State']; }
+}
+
+// Incluir modales (modal-users.php leerá $grupos, $tiendas, $states)
 $modalFile = __DIR__ . '/modal-users.php';
 if (file_exists($modalFile) && is_readable($modalFile)) {
     include $modalFile;
