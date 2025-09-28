@@ -2,15 +2,14 @@
 session_start();
 include_once "../../../conexion.php";
 
-// CSRF
-if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+// CSRF simple
+if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
   echo json_encode(['ok'=>false, 'msg'=>'CSRF inválido.']);
   exit;
 }
 
 $action = $_POST['form_action'] ?? '';
-$flash_message = '';
-$flash_success = false;
+$response = ['ok'=>false, 'msg'=>'Acción no válida.'];
 
 if ($action === 'create_user') {
   $user        = trim($_POST['User'] ?? '');
@@ -23,9 +22,9 @@ if ($action === 'create_user') {
   $password    = $_POST['Password'] ?? '';
 
   if ($user === '' || $password === '') {
-    $flash_message = 'Usuario y contraseña son obligatorios.';
+    $response['msg'] = 'Usuario y contraseña son obligatorios.';
   } elseif ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $flash_message = 'Email inválido.';
+    $response['msg'] = 'Email inválido.';
   } else {
     $hash = password_hash($password, PASSWORD_DEFAULT);
     $sql = "INSERT INTO usuarios (user, cod_empleado, email, email_active, id_group_user, cod_tienda, state, password)
@@ -39,25 +38,51 @@ if ($action === 'create_user') {
       mysqli_stmt_close($stmt);
 
       if ($ok) {
-        $flash_message = 'Usuario creado correctamente.';
-        $flash_success = true;
+        $response = ['ok'=>true, 'msg'=>'Usuario creado correctamente.'];
       } else {
-        $flash_message = 'No se pudo crear el usuario. ' . ($err ?: '');
+        $response['msg'] = 'No se pudo crear el usuario. ' . ($err ?: '');
       }
     } else {
-      $flash_message = 'Error al preparar INSERT.';
+      $response['msg'] = 'Error al preparar INSERT.';
     }
   }
 }
 
 if ($action === 'edit_user') {
-  // ...igual que tu lógica actual...
+  $codigo = (int)($_POST['Codigo'] ?? 0);
+  $user = trim($_POST['User'] ?? '');
+  if ($codigo <= 0 || $user === '') {
+    $response['msg'] = 'Datos inválidos.';
+  } else {
+    $sql = "UPDATE usuarios SET user=? WHERE codigo=?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "si", $user, $codigo);
+    if (mysqli_stmt_execute($stmt)) {
+      $response = ['ok'=>true, 'msg'=>'Usuario actualizado.'];
+    } else {
+      $response['msg'] = 'Error al actualizar: ' . mysqli_error($conn);
+    }
+    mysqli_stmt_close($stmt);
+  }
 }
 
 if ($action === 'delete_user') {
-  // ...igual que tu lógica actual...
+  $codigo = (int)($_POST['Codigo'] ?? 0);
+  if ($codigo <= 0) {
+    $response['msg'] = 'Código inválido.';
+  } else {
+    $sql = "DELETE FROM usuarios WHERE codigo=?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $codigo);
+    if (mysqli_stmt_execute($stmt)) {
+      $response = ['ok'=>true, 'msg'=>'Usuario eliminado.'];
+    } else {
+      $response['msg'] = 'Error al eliminar: ' . mysqli_error($conn);
+    }
+    mysqli_stmt_close($stmt);
+  }
 }
 
-echo json_encode(['ok'=>$flash_success, 'msg'=>$flash_message]);
+echo json_encode($response);
 exit;
 ?>

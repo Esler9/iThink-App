@@ -468,19 +468,11 @@ $(document).on('click','.btn-delete',function(e){
 function ajaxForm($form, modalId) {
   var data = $form.serialize();
   $.post('usuarios_ajax.php', data, function(resp){
-    try {
-      var r = typeof resp === 'string' ? JSON.parse(resp) : resp;
-      var alertClass = r.ok ? 'success' : 'danger';
-      var msg = '<div class="alert alert-' + alertClass + ' mt-2">' + r.msg + '</div>';
-      $form.closest('.modal-content').find('.modal-body').prepend(msg);
-      if (r.ok) {
-        setTimeout(function(){
-          $(modalId).modal('hide');
-          location.reload();
-        }, 1200);
-      }
-    } catch(e) {
-      alert('Error en la respuesta del servidor.');
+    var r = typeof resp === 'string' ? JSON.parse(resp) : resp;
+    alert(r.msg);
+    if (r.ok) {
+      $(modalId).modal('hide');
+      location.reload();
     }
   });
   return false;
@@ -488,19 +480,14 @@ function ajaxForm($form, modalId) {
 
 $('#formCreateUser').on('submit', function(e){
   e.preventDefault();
-  $(this).find('.alert').remove();
   ajaxForm($(this), '#createUserModal');
 });
-
 $('#formEditUser').on('submit', function(e){
   e.preventDefault();
-  $(this).find('.alert').remove();
   ajaxForm($(this), '#editUserModal');
 });
-
 $('#formDeleteUser').on('submit', function(e){
   e.preventDefault();
-  $(this).find('.alert').remove();
   ajaxForm($(this), '#deleteUserModal');
 });
 </script>
