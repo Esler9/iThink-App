@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_action'])) {
           if ($stmt = mysqli_prepare($conn, $sql)) {
             // s s s i i s i s
             // user, cod_empleado, email, email_active, id_group_user, cod_tienda, state, password
-            mysqli_stmt_bind_param($stmt, "sssii sis",
+            mysqli_stmt_bind_param($stmt, "sssiiiss",
               /*s*/ $user,
               /*s*/ $codEmp,
               /*s*/ $email,
