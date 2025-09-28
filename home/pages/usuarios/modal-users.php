@@ -1,5 +1,3 @@
-
-
 <!-- Crear Usuario -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
@@ -33,7 +31,8 @@
             <label>Grupo</label>
             <select name="c_id_group" id="c_id_group" class="form-control">
               <option value="">-</option>
-              <?php mysqli_data_seek($grupos_q,0); while($g = mysqli_fetch_assoc($grupos_q)): ?>
+              <?php if ($grupos_q && $grupos_q instanceof mysqli_result) mysqli_data_seek($grupos_q, 0); ?>
+              <?php while($g = ($grupos_q && $grupos_q instanceof mysqli_result) ? mysqli_fetch_assoc($grupos_q) : null): ?>
                 <option value="<?php echo htmlspecialchars($g['codigo']); ?>"><?php echo htmlspecialchars($g['nombre_grupo']); ?></option>
               <?php endwhile; ?>
             </select>
@@ -45,7 +44,8 @@
             <label>Tienda</label>
             <select name="c_cod_tienda" id="c_cod_tienda" class="form-control">
               <option value="">-</option>
-              <?php mysqli_data_seek($tiendas_q,0); while($t = mysqli_fetch_assoc($tiendas_q)): ?>
+              <?php if ($tiendas_q && $tiendas_q instanceof mysqli_result) mysqli_data_seek($tiendas_q, 0); ?>
+              <?php while($t = ($tiendas_q && $tiendas_q instanceof mysqli_result) ? mysqli_fetch_assoc($tiendas_q) : null): ?>
                 <option value="<?php echo htmlspecialchars($t['cod_tienda']); ?>"><?php echo htmlspecialchars($t['tienda_nombre']); ?></option>
               <?php endwhile; ?>
             </select>
@@ -107,7 +107,8 @@
             <label>Grupo</label>
             <select name="id_group" id="e_id_group" class="form-control">
               <option value="">-</option>
-              <?php mysqli_data_seek($grupos_q,0); while($g = mysqli_fetch_assoc($grupos_q)): ?>
+              <?php if ($grupos_q && $grupos_q instanceof mysqli_result) mysqli_data_seek($grupos_q, 0); ?>
+              <?php while($g = ($grupos_q && $grupos_q instanceof mysqli_result) ? mysqli_fetch_assoc($grupos_q) : null): ?>
                 <option value="<?php echo htmlspecialchars($g['codigo']); ?>"><?php echo htmlspecialchars($g['nombre_grupo']); ?></option>
               <?php endwhile; ?>
             </select>
@@ -119,7 +120,8 @@
             <label>Tienda</label>
             <select name="cod_tienda" id="e_cod_tienda" class="form-control">
               <option value="">-</option>
-              <?php mysqli_data_seek($tiendas_q,0); while($t = mysqli_fetch_assoc($tiendas_q)): ?>
+              <?php if ($tiendas_q && $tiendas_q instanceof mysqli_result) mysqli_data_seek($tiendas_q, 0); ?>
+              <?php while($t = ($tiendas_q && $tiendas_q instanceof mysqli_result) ? mysqli_fetch_assoc($tiendas_q) : null): ?>
                 <option value="<?php echo htmlspecialchars($t['cod_tienda']); ?>"><?php echo htmlspecialchars($t['tienda_nombre']); ?></option>
               <?php endwhile; ?>
             </select>

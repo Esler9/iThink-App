@@ -225,6 +225,15 @@ if (!$res_users) {
 <!-- AdminLTE App -->
 <script src="../../dist/js/adminlte.min.js"></script>
 
+<?php
+// <-- añadir esto antes de incluir los modales -->
+$grupos_q = false;
+$tiendas_q = false;
+if (isset($conn) && $conn && @mysqli_ping($conn)) {
+    $grupos_q = @mysqli_query($conn, "SELECT codigo, nombre_grupo FROM grupo_user ORDER BY nombre_grupo");
+    $tiendas_q = @mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
+}
+?>
 <!-- incluir modales justo antes de los scripts -->
 <?php include("modal-users.php"); ?>
 
