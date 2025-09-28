@@ -35,12 +35,17 @@ function cargarSelectsUsuarios() {
 	});
 }
 
-// Abrir modal crear usuario: cargar selects
+
+// Abrir modal crear usuario: cargar selects y limpiar valor
 $('#createUserModal').on('show.bs.modal', function(){
+	$('#c_cod_tienda').html('<option value="">Cargando...</option>');
+	$('#c_id_group').html('<option value="">Cargando...</option>');
 	cargarSelectsUsuarios();
 });
-// Abrir modal editar usuario: cargar selects
+// Abrir modal editar usuario: cargar selects y limpiar valor
 $('#editUserModal').on('show.bs.modal', function(){
+	$('#e_cod_tienda').html('<option value="">Cargando...</option>');
+	$('#e_id_group').html('<option value="">Cargando...</option>');
 	cargarSelectsUsuarios();
 });
 </script>
