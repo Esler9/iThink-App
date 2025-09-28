@@ -226,6 +226,8 @@ if (!$res_users) {
 <script src="../../dist/js/adminlte.min.js"></script>
 
 <?php
+
+echo "<!-- DEBUG_MODAL: include start -->\n";
 $grupos = [];
 $tiendas = [];
 $states = [];
@@ -241,7 +243,7 @@ if (!empty($conn)) {
         }
         mysqli_free_result($res);
     }
-
+    echo "<!-- DEBUG_MODAL: include 2 -->\n";
     // Tiendas
     $res = mysqli_query($conn, "SELECT cod_tienda, tienda_nombre FROM tienda ORDER BY tienda_nombre");
     if ($res) {
@@ -260,9 +262,9 @@ if (!empty($conn)) {
         mysqli_free_result($res);
     }
 }
+echo "<!-- DEBUG_MODAL: include 3 -->\n";
+include("modal-users.php");
 ?>
-
-<?php include("modal-users.php");?>
 
 <!-- Scripts de inicialización (DataTable y modales ya definidos en modal-users.php) -->
 <script>
