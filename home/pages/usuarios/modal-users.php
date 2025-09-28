@@ -26,7 +26,7 @@ if (isset($conn)) {
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-labelledby="createUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form id="formCreateUser" method="post" action="./usuarios_accion.php?action=create_user">
+      <form id="formCreateUser" method="post" action="/home/pages/usuarios/usuarios_accion.php?action=create_user">
         <input type="hidden" name="action" value="create_user">
         <input type="hidden" name="debug" value="1"> <!-- temporal -->
         <div class="modal-header">
@@ -128,7 +128,7 @@ if (isset($conn)) {
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form id="formEditUser" method="post" action="./usuarios_accion.php?action=update_user">
+      <form id="formEditUser" method="post" action="/home/pages/usuarios/usuarios_accion.php?action=update_user">
         <input type="hidden" name="action" value="update_user">
         <input type="hidden" id="e_codigo" name="codigo">
         <input type="hidden" name="debug" value="1"> <!-- temporal -->
@@ -195,7 +195,7 @@ if (isset($conn)) {
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form id="formDeleteUser" method="post" action="./usuarios_accion.php?action=delete_user">
+      <form id="formDeleteUser" method="post" action="/home/pages/usuarios/usuarios_accion.php?action=delete_user">
         <input type="hidden" name="action" value="delete_user">
         <input type="hidden" id="d_codigo" name="codigo">
         <div class="modal-header">
@@ -220,12 +220,14 @@ if (isset($conn)) {
 document.querySelectorAll('#formCreateUser,#formEditUser,#formDeleteUser').forEach(function(f){
   f.addEventListener('submit', function(e){
     try {
-      var s = new URLSearchParams(new FormData(f)).toString();
-      console.log('Enviando formulario', f.id, s);
+      var params = new URLSearchParams(new FormData(f));
+      console.log('Enviando formulario', f.id, params.toString());
+      // alerta temporal para confirmar qué se envía
+      alert('Enviando ' + f.id + '\\n' + params.toString());
     } catch(err){
       console.log('Form logging error', err);
     }
-    // no hacemos preventDefault: el formulario sigue su envío normal
+    // no prevenimos envío
   });
 });
 </script>
