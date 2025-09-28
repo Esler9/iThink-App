@@ -35,11 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond('Método no permitido', 'Este endpoint acepta únicamente peticiones POST.');
 }
 
-// Debug rápido: si se envía el flag, mostrar $_POST y salir (útil en pruebas)
-if (isset($_POST['__debug_post_check'])) {
-    respond('Debug POST', 'POST recibido (debug).', $_POST);
-}
-
 // Acción (viene por GET ?accion=N)
 $accion = isset($_GET['accion']) ? (int)$_GET['accion'] : 0;
 
