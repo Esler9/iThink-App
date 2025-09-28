@@ -1,10 +1,15 @@
 <?php
-// modal-users.php (versión básica): espera $grupos y $tiendas como arrays.
-// Si no existen, inicializa vacío para evitar warnings.
+// modal-users.php (versión básica con marcadores de depuración)
+// Espera $grupos y $tiendas como arrays; si no existen se inicializan vacíos
 if (!isset($grupos) || !is_array($grupos)) $grupos = [];
 if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
+
+// MARKER PHP: inicio del include
+echo "<!-- MARKER_MODAL: start modal-users.php -->\n";
+echo "<!-- MARKER_MODAL: grupos_count=" . count($grupos) . " tiendas_count=" . count($tiendas) . " -->\n";
 ?>
 <!-- Crear Usuario -->
+<!-- MARKER_MODAL: create modal start -->
 <div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <form id="formCreateUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=0" class="modal-content">
@@ -13,6 +18,7 @@ if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
         <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">&times;</button>
       </div>
       <div class="modal-body">
+        <!-- campos básicos -->
         <div class="form-row">
           <div class="form-group col-md-6">
             <label>Usuario</label>
@@ -37,9 +43,16 @@ if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
             <label>Grupo</label>
             <select name="c_id_group" id="c_id_group" class="form-control">
               <option value="">-</option>
-              <?php foreach ($grupos as $g): ?>
-                <option value="<?php echo htmlspecialchars($g['codigo']); ?>"><?php echo htmlspecialchars($g['nombre_grupo']); ?></option>
-              <?php endforeach; ?>
+              <?php
+              // MARKER PHP: render grupos
+              if (!empty($grupos) && is_array($grupos)):
+                foreach ($grupos as $g): ?>
+                  <option value="<?php echo htmlspecialchars($g['codigo'] ?? ''); ?>"><?php echo htmlspecialchars($g['nombre_grupo'] ?? ''); ?></option>
+                <?php endforeach;
+              else:
+                echo "<!-- MARKER_MODAL: WARNING no grupos to render -->\n";
+              endif;
+              ?>
             </select>
           </div>
         </div>
@@ -49,9 +62,16 @@ if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
             <label>Tienda</label>
             <select name="c_cod_tienda" id="c_cod_tienda" class="form-control">
               <option value="">-</option>
-              <?php foreach ($tiendas as $t): ?>
-                <option value="<?php echo htmlspecialchars($t['cod_tienda']); ?>"><?php echo htmlspecialchars($t['tienda_nombre']); ?></option>
-              <?php endforeach; ?>
+              <?php
+              // MARKER PHP: render tiendas
+              if (!empty($tiendas) && is_array($tiendas)):
+                foreach ($tiendas as $t): ?>
+                  <option value="<?php echo htmlspecialchars($t['cod_tienda'] ?? ''); ?>"><?php echo htmlspecialchars($t['tienda_nombre'] ?? ''); ?></option>
+                <?php endforeach;
+              else:
+                echo "<!-- MARKER_MODAL: WARNING no tiendas to render -->\n";
+              endif;
+              ?>
             </select>
           </div>
           <div class="form-group col-md-3 d-flex align-items-center">
@@ -75,8 +95,10 @@ if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
     </form>
   </div>
 </div>
+<!-- MARKER_MODAL: create modal end -->
 
 <!-- Editar Usuario -->
+<!-- MARKER_MODAL: edit modal start -->
 <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <form id="formEditUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=1" class="modal-content">
@@ -86,6 +108,7 @@ if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
         <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">&times;</button>
       </div>
       <div class="modal-body">
+        <!-- campos -->
         <div class="form-row">
           <div class="form-group col-md-6">
             <label>Usuario</label>
@@ -110,9 +133,15 @@ if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
             <label>Grupo</label>
             <select name="id_group" id="e_id_group" class="form-control">
               <option value="">-</option>
-              <?php foreach ($grupos as $g): ?>
-                <option value="<?php echo htmlspecialchars($g['codigo']); ?>"><?php echo htmlspecialchars($g['nombre_grupo']); ?></option>
-              <?php endforeach; ?>
+              <?php
+              if (!empty($grupos) && is_array($grupos)):
+                foreach ($grupos as $g): ?>
+                  <option value="<?php echo htmlspecialchars($g['codigo'] ?? ''); ?>"><?php echo htmlspecialchars($g['nombre_grupo'] ?? ''); ?></option>
+                <?php endforeach;
+              else:
+                echo "<!-- MARKER_MODAL: WARNING no grupos in edit -->\n";
+              endif;
+              ?>
             </select>
           </div>
         </div>
@@ -122,9 +151,15 @@ if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
             <label>Tienda</label>
             <select name="cod_tienda" id="e_cod_tienda" class="form-control">
               <option value="">-</option>
-              <?php foreach ($tiendas as $t): ?>
-                <option value="<?php echo htmlspecialchars($t['cod_tienda']); ?>"><?php echo htmlspecialchars($t['tienda_nombre']); ?></option>
-              <?php endforeach; ?>
+              <?php
+              if (!empty($tiendas) && is_array($tiendas)):
+                foreach ($tiendas as $t): ?>
+                  <option value="<?php echo htmlspecialchars($t['cod_tienda'] ?? ''); ?>"><?php echo htmlspecialchars($t['tienda_nombre'] ?? ''); ?></option>
+                <?php endforeach;
+              else:
+                echo "<!-- MARKER_MODAL: WARNING no tiendas in edit -->\n";
+              endif;
+              ?>
             </select>
           </div>
           <div class="form-group col-md-3 d-flex align-items-center">
@@ -148,8 +183,10 @@ if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
     </form>
   </div>
 </div>
+<!-- MARKER_MODAL: edit modal end -->
 
-<!-- Ver Usuario (sólo texto) -->
+<!-- Ver Usuario -->
+<!-- MARKER_MODAL: view modal start -->
 <div class="modal fade" id="viewUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document"><div class="modal-content">
     <div class="modal-header"><h5 class="modal-title">Ver usuario</h5>
@@ -166,8 +203,10 @@ if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
     <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button></div>
   </div></div>
 </div>
+<!-- MARKER_MODAL: view modal end -->
 
 <!-- Eliminar Usuario -->
+<!-- MARKER_MODAL: delete modal start -->
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <form id="formDeleteUser" method="post" action="../../logica/Usuarios/accion_usuarios.php?accion=2" class="modal-content">
@@ -182,10 +221,17 @@ if (!isset($tiendas) || !is_array($tiendas)) $tiendas = [];
     </form>
   </div>
 </div>
+<!-- MARKER_MODAL: delete modal end -->
 
 <script>
 jQuery(function($){
-  $('#createUserModal').on('show.bs.modal', function () { $('#formCreateUser')[0].reset(); $('#c_id_group,#c_cod_tienda').val(''); $('#c_email_active,#c_state').prop('checked',false); });
+  // MARKER JS: modal-users handlers attached
+  $('#createUserModal').on('show.bs.modal', function () {
+    var f = $('#formCreateUser')[0];
+    if (f) f.reset();
+    $('#c_id_group,#c_cod_tienda').val('');
+    $('#c_email_active,#c_state').prop('checked',false);
+  });
 
   $('#editUserModal').on('show.bs.modal', function (e) {
     var b = $(e.relatedTarget);
@@ -215,5 +261,11 @@ jQuery(function($){
     $('#d_user').text(b.data('user') || '-');
   });
 
+  console.log('MARKER JS: modal-users loaded, grupos_count=', <?php echo json_encode(count($grupos)); ?>, 'tiendas_count=', <?php echo json_encode(count($tiendas)); ?>);
 });
 </script>
+
+<?php
+// MARKER PHP: fin del include
+echo "<!-- MARKER_MODAL: end modal-users.php -->\n";
+?>
