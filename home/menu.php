@@ -90,15 +90,15 @@
             <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    <!-- Dashboard -->
+
+                    <!-- PRINCIPAL -->
+                    <li class="nav-header">PRINCIPAL</li>
                     <li class="nav-item">
-                        <a href="/home/dashboard.php" class="nav-link active">
+                        <a href="/home/dashboard.php" class="nav-link <?php echo ($_SERVER['PHP_SELF'] === '/home/dashboard.php') ? 'active' : ''; ?>">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>Dashboard</p>
                         </a>
                     </li>
-
-                    <!-- Liberaciones (alto uso) -->
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-file-alt"></i>
@@ -110,88 +110,48 @@
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="/home/pages/liberaciones/crear.php" class="nav-link">
-                                    <i class="fas fa-plus nav-icon"></i>
-                                    <p>Crear Consulta</p>
+                                    <i class="fas fa-plus nav-icon"></i><p>Crear Consulta</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="/home/pages/liberaciones/consultas.php" class="nav-link">
-                                    <i class="fas fa-question-circle nav-icon"></i>
-                                    <p>Consultas</p>
+                                    <i class="fas fa-question-circle nav-icon"></i><p>Consultas</p>
                                     <span class="badge badge-info right"><?php echo $con; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="/home/pages/liberaciones/pendientes.php" class="nav-link">
-                                    <i class="fas fa-exclamation-triangle nav-icon"></i>
-                                    <p>Pendientes</p>
+                                    <i class="fas fa-exclamation-triangle nav-icon"></i><p>Pendientes</p>
                                     <span class="badge badge-danger right"><?php echo $pen; ?></span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="/home/pages/liberaciones/aprobadas.php" class="nav-link">
-                                    <i class="fas fa-check-circle nav-icon"></i>
-                                    <p>Aprobadas</p>
+                                    <i class="fas fa-check-circle nav-icon"></i><p>Aprobadas</p>
                                     <span class="badge badge-success right"><?php echo $apro; ?></span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/home/pages/liberaciones/finalizadas.php" class="nav-link">
-                                    <i class="fas fa-handshake nav-icon"></i>
-                                    <p>Finalizadas</p>
-                                    <span class="badge badge-warning right"><?php echo $fin; ?></span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/home/pages/liberaciones/rechazadas.php" class="nav-link">
-                                    <i class="fas fa-times-circle nav-icon"></i>
-                                    <p>Rechazadas</p>
-                                    <span class="badge badge-danger right"><?php echo $recha; ?></span>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- Guías (seguido de liberaciones) -->
                     <?php if(Tiene_permiso($permisos_user, 'ver-guias')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-shipping-fast"></i>
-                            <p>
-                                Guías
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
+                            <p>Guías <i class="fas fa-angle-left right"></i></p>
                         </a>
                         <ul class="nav nav-treeview">
                             <?php if(Tiene_permiso($permisos_user, 'generar-guia')) { ?>
                             <li class="nav-item">
                                 <a href="/home/pages/guias/generar.php" class="nav-link">
-                                    <i class="fas fa-plus nav-icon"></i>
-                                    <p>Generar Guía</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'recibir-guia')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/guias/recibir.php" class="nav-link">
-                                    <i class="fas fa-inbox nav-icon"></i>
-                                    <p>Recibir Guía</p>
+                                    <i class="fas fa-plus nav-icon"></i><p>Generar Guía</p>
                                 </a>
                             </li>
                             <?php } ?>
                             <?php if(Tiene_permiso($permisos_user, 'ver-listado-guias')) { ?>
                             <li class="nav-item">
                                 <a href="/home/pages/guias/listado_guias.php" class="nav-link">
-                                    <i class="fas fa-list nav-icon"></i>
-                                    <p>Listado de Guías</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'ver-direcciones')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/guias/direcciones_guardadas.php" class="nav-link">
-                                    <i class="fas fa-map-marker-alt nav-icon"></i>
-                                    <p>Direcciones Guardadas</p>
+                                    <i class="fas fa-list nav-icon"></i><p>Listado de Guías</p>
                                 </a>
                             </li>
                             <?php } ?>
@@ -199,472 +159,212 @@
                     </li>
                     <?php } ?>
 
-                    <!-- Tareas -->
-                    <?php if(Tiene_permiso($permisos_user, 'ver-tareas')) { ?>
-                    <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-tasks"></i>
-                            <p>
-                                Tareas
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <?php if(Tiene_permiso($permisos_user, 'crear-tarea')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/tares/crear.php" class="nav-link">
-                                    <i class="fas fa-plus nav-icon"></i>
-                                    <p>Crear Tarea</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'editar-tarea')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/tares/editar.php" class="nav-link">
-                                    <i class="fas fa-edit nav-icon"></i>
-                                    <p>Editar Tarea</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'eliminar-tarea')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/tares/eliminar.php" class="nav-link">
-                                    <i class="fas fa-trash nav-icon"></i>
-                                    <p>Eliminar Tarea</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'ver-tareas')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/tares/lista.php" class="nav-link">
-                                    <i class="fas fa-list nav-icon"></i>
-                                    <p>Ver Tareas</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                        </ul>
-                    </li>
-                    <?php } ?>
-
-                    <!-- Clientes -->
-                    <?php if(Tiene_permiso($permisos_user, 'ver-garantia')) { ?>
-                    <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-shield-alt"></i>
-                            <p>
-                                Clientes
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="/home/pages/clientes/clientes.php" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i>
-                                    <p>Lista de Clientes</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/home/pages/clientes/seguimiento.php" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i>
-                                    <p>Seguimientos de Clientes</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <?php } ?>
-
-                    <!-- Reparaciones -->
-                    <?php if(Tiene_permiso($permisos_user, 'ver-reparaciones')) { ?>
-                    <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-tools"></i>
-                            <p>
-                                Reparaciones
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <?php if(Tiene_permiso($permisos_user, 'ver-reparaciones')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/reparaciones/listado_reparaciones.php" class="nav-link">
-                                    <i class="fas fa-list nav-icon"></i>
-                                    <p>Listado de Reparaciones</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                        </ul>
-                    </li>
-                    <?php } ?>
-
-                    <!-- Garantías -->
-                    <?php if(Tiene_permiso($permisos_user, 'ver-garantia')) { ?>
-                    <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-shield-alt"></i>
-                            <p>
-                                Garantías
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="/home/pages/form_garantia.php" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i>
-                                    <p>Iniciar Garantía</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <?php } ?>
-
-                    <!-- Empleados -->
-                    <?php if(Tiene_permiso($permisos_user, 'ver-empleados')) { ?>
-                    <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-user"></i>
-                            <p>
-                                Empleados
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="/home/pages/empleados/lista.php" class="nav-link">
-                                    <i class="fas fa-list nav-icon"></i>
-                                    <p>Listado de Empleados</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/home/pages/empleados/nuevo.php" class="nav-link">
-                                    <i class="fas fa-user-plus nav-icon"></i>
-                                    <p>Nuevo Empleado</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <?php } ?>
-
-                    <!-- Usuarios -->
-                    <?php if(Tiene_permiso($permisos_user, 'ver-usuarios')) { ?>
-                    <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-users-cog"></i>
-                            <p>
-                                Usuarios
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <?php if(Tiene_permiso($permisos_user, 'ver-usuarios')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/usuarios/listado_users.php" class="nav-link">
-                                    <i class="fas fa-list nav-icon"></i>
-                                    <p>Listado de Usuarios</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                        </ul>
-                    </li>
-                    <?php } ?>
-
-                    <!-- Permisos -->
-                    <?php if(Tiene_permiso($permisos_user, 'ver_permiso')) { ?>
-                    <li class="nav-item has-treeview">
-                        <a href="/home/pages/permisos_view.php" class="nav-link">
-                            <i class="nav-icon fas fa-user-shield"></i>
-                            <p>
-                                Permisos
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="/home/pages/permisos_view.php" class="nav-link">
-                                    <i class="fas fa-users nav-icon"></i>
-                                    <p>Permisos para Grupos</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/home/pages/admin_permisos.php" class="nav-link">
-                                    <i class="fas fa-user-cog nav-icon"></i>
-                                    <p>Administrar Permisos</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <?php } ?>
-
-                    <!-- iCloud (permisos) -->
-                    <?php if(Tiene_permiso($permisos_user, 'ver-icloud')) { ?>
-                    <li class="nav-item has-treeview">
-                        <a href="/home/pages/permisos_view.php" class="nav-link">
-                            <i class="nav-icon fas fa-cloud"></i>
-                            <p>
-                                iCloud
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="/home/pages/guardar_icloud.php" class="nav-link">
-                                    <i class="fas fa-cloud-upload-alt nav-icon"></i>
-                                    <p>Guardar iCloud</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/home/pages/admin_permisos.php" class="nav-link">
-                                    <i class="fas fa-envelope nav-icon"></i>
-                                    <p>Enviar Correo a iCloud</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <?php } ?>
-
-                    <!-- Ventas -->
+                    <!-- OPERACIONES -->
+                    <li class="nav-header">OPERACIONES</li>
                     <?php if(Tiene_permiso($permisos_user, 'crear-venta') || Tiene_permiso($permisos_user, 'editar-venta') || Tiene_permiso($permisos_user, 'eliminar-venta')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-dollar-sign"></i>
-                            <p>
-                                Ventas
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
+                            <p>Ventas <i class="fas fa-angle-left right"></i></p>
                         </a>
                         <ul class="nav nav-treeview">
                             <?php if(Tiene_permiso($permisos_user, 'crear-venta')) { ?>
                             <li class="nav-item">
-                                <a href="/home/pages/ventas/crear.php" class="nav-link">
-                                    <i class="fas fa-plus nav-icon"></i>
-                                    <p>Crear Venta</p>
-                                </a>
+                                <a href="/home/pages/ventas/crear.php" class="nav-link"><i class="fas fa-plus nav-icon"></i><p>Crear Venta</p></a>
                             </li>
                             <?php } ?>
                             <?php if(Tiene_permiso($permisos_user, 'editar-venta')) { ?>
                             <li class="nav-item">
-                                <a href="/home/pages/ventas/editar.php" class="nav-link">
-                                    <i class="fas fa-edit nav-icon"></i>
-                                    <p>Editar Venta</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'eliminar-venta')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/ventas/eliminar.php" class="nav-link">
-                                    <i class="fas fa-trash nav-icon"></i>
-                                    <p>Eliminar Venta</p>
-                                </a>
+                                <a href="/home/pages/ventas/editar.php" class="nav-link"><i class="fas fa-edit nav-icon"></i><p>Editar Venta</p></a>
                             </li>
                             <?php } ?>
                         </ul>
                     </li>
                     <?php } ?>
 
-                    <!-- Compras -->
                     <?php if(Tiene_permiso($permisos_user, 'crear-compra') || Tiene_permiso($permisos_user, 'editar-compra') || Tiene_permiso($permisos_user, 'eliminar-compra')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-shopping-cart"></i>
-                            <p>
-                                Compras
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
+                            <p>Compras <i class="fas fa-angle-left right"></i></p>
                         </a>
                         <ul class="nav nav-treeview">
                             <?php if(Tiene_permiso($permisos_user, 'crear-compra')) { ?>
                             <li class="nav-item">
-                                <a href="/home/pages/compras/crear.php" class="nav-link">
-                                    <i class="fas fa-plus nav-icon"></i>
-                                    <p>Crear Compra</p>
-                                </a>
+                                <a href="/home/pages/compras/crear.php" class="nav-link"><i class="fas fa-plus nav-icon"></i><p>Crear Compra</p></a>
                             </li>
                             <?php } ?>
                             <?php if(Tiene_permiso($permisos_user, 'editar-compra')) { ?>
                             <li class="nav-item">
-                                <a href="/home/pages/compras/editar.php" class="nav-link">
-                                    <i class="fas fa-edit nav-icon"></i>
-                                    <p>Editar Compra</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'eliminar-compra')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/compras/eliminar.php" class="nav-link">
-                                    <i class="fas fa-trash nav-icon"></i>
-                                    <p>Eliminar Compra</p>
-                                </a>
+                                <a href="/home/pages/compras/editar.php" class="nav-link"><i class="fas fa-edit nav-icon"></i><p>Editar Compra</p></a>
                             </li>
                             <?php } ?>
                         </ul>
                     </li>
                     <?php } ?>
 
-                    <!-- Inventario -->
-                    <?php if(Tiene_permiso($permisos_user, 'ver-inventario') || Tiene_permiso($permisos_user, 'modificar-inventario') || Tiene_permiso($permisos_user, 'eliminar-inventario')) { ?>
+                    <?php if(Tiene_permiso($permisos_user, 'ver-inventario') || Tiene_permiso($permisos_user, 'modificar-inventario')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-boxes"></i>
-                            <p>
-                                Inventario
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
+                            <p>Inventario <i class="fas fa-angle-left right"></i></p>
                         </a>
                         <ul class="nav nav-treeview">
                             <?php if(Tiene_permiso($permisos_user, 'ver-inventario')) { ?>
                             <li class="nav-item">
-                                <a href="/home/pages/inventario/ver.php" class="nav-link">
-                                    <i class="fas fa-eye nav-icon"></i>
-                                    <p>Ver Inventario</p>
-                                </a>
+                                <a href="/home/pages/inventario/ver.php" class="nav-link"><i class="fas fa-eye nav-icon"></i><p>Ver Inventario</p></a>
                             </li>
                             <?php } ?>
                             <?php if(Tiene_permiso($permisos_user, 'modificar-inventario')) { ?>
                             <li class="nav-item">
-                                <a href="/home/pages/inventario/modificar.php" class="nav-link">
-                                    <i class="fas fa-edit nav-icon"></i>
-                                    <p>Modificar Inventario</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'eliminar-inventario')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/inventario/eliminar.php" class="nav-link">
-                                    <i class="fas fa-trash nav-icon"></i>
-                                    <p>Eliminar Inventario</p>
-                                </a>
+                                <a href="/home/pages/inventario/modificar.php" class="nav-link"><i class="fas fa-edit nav-icon"></i><p>Modificar Inventario</p></a>
                             </li>
                             <?php } ?>
                         </ul>
                     </li>
                     <?php } ?>
 
-                    <!-- Horarios -->
-                    <?php if(Tiene_permiso($permisos_user, 'ver-horario')) { ?>
+                    <!-- PERSONAS -->
+                    <li class="nav-header">PERSONAS</li>
+                    <?php if(Tiene_permiso($permisos_user, 'ver-garantia')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-clock"></i>
-                            <p>
-                                Horarios
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
+                            <i class="nav-icon fas fa-shield-alt"></i>
+                            <p>Clientes <i class="fas fa-angle-left right"></i></p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/home/pages/horarios/configurar.php" class="nav-link">
-                                    <i class="fas fa-cog nav-icon"></i>
-                                    <p>Configurar Horarios</p>
-                                </a>
+                                <a href="/home/pages/clientes/clientes.php" class="nav-link"><i class="fas fa-file-alt nav-icon"></i><p>Lista de Clientes</p></a>
                             </li>
                             <li class="nav-item">
-                                <a href="/home/pages/horarios/marcar.php" class="nav-link">
-                                    <i class="fas fa-edit nav-icon"></i>
-                                    <p>Marcar Asistencia</p>
-                                </a>
+                                <a href="/home/pages/clientes/seguimiento.php" class="nav-link"><i class="fas fa-file-alt nav-icon"></i><p>Seguimiento</p></a>
                             </li>
                         </ul>
                     </li>
                     <?php } ?>
 
-                    <!-- Correos -->
+                    <?php if(Tiene_permiso($permisos_user, 'ver-reparaciones')) { ?>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-tools"></i>
+                            <p>Reparaciones <i class="fas fa-angle-left right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/home/pages/reparaciones/listado_reparaciones.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Listado de Reparaciones</p></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <?php } ?>
+
+                    <?php if(Tiene_permiso($permisos_user, 'ver-garantia')) { ?>
+                    <li class="nav-item">
+                        <a href="/home/pages/form_garantia.php" class="nav-link">
+                            <i class="nav-icon fas fa-file-alt"></i><p>Iniciar Garantía</p>
+                        </a>
+                    </li>
+                    <?php } ?>
+
+                    <?php if(Tiene_permiso($permisos_user, 'ver-empleados')) { ?>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-user"></i><p>Empleados <i class="fas fa-angle-left right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/home/pages/empleados/lista.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Listado</p></a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/home/pages/empleados/nuevo.php" class="nav-link"><i class="fas fa-user-plus nav-icon"></i><p>Nuevo</p></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <?php } ?>
+
+                    <?php if(Tiene_permiso($permisos_user, 'ver-usuarios')) { ?>
+                    <li class="nav-item">
+                        <a href="/home/pages/usuarios/listado_users.php" class="nav-link">
+                            <i class="nav-icon fas fa-users-cog"></i><p>Usuarios</p>
+                        </a>
+                    </li>
+                    <?php } ?>
+
+                    <!-- HERRAMIENTAS -->
+                    <li class="nav-header">HERRAMIENTAS</li>
+                    <?php if(Tiene_permiso($permisos_user, 'ver-tareas')) { ?>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link"><i class="nav-icon fas fa-tasks"></i><p>Tareas <i class="fas fa-angle-left right"></i></p></a>
+                        <ul class="nav nav-treeview">
+                            <?php if(Tiene_permiso($permisos_user, 'crear-tarea')) { ?>
+                            <li class="nav-item"><a href="/home/pages/tares/crear.php" class="nav-link"><i class="fas fa-plus nav-icon"></i><p>Crear</p></a></li>
+                            <?php } ?>
+                            <?php if(Tiene_permiso($permisos_user, 'ver-tareas')) { ?>
+                            <li class="nav-item"><a href="/home/pages/tares/lista.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Lista</p></a></li>
+                            <?php } ?>
+                        </ul>
+                    </li>
+                    <?php } ?>
+
                     <?php if(Tiene_permiso($permisos_user, 'ver-correos')) { ?>
                     <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-envelope"></i>
-                            <p>
-                                Correos
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
+                        <a href="#" class="nav-link"><i class="nav-icon fas fa-envelope"></i><p>Correos <i class="fas fa-angle-left right"></i></p></a>
                         <ul class="nav nav-treeview">
                             <?php if(Tiene_permiso($permisos_user, 'asignar-correos')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/correos/asignacion_correos.php" class="nav-link">
-                                    <i class="fas fa-user-plus nav-icon"></i>
-                                    <p>Asignación Correos</p>
-                                </a>
-                            </li>
+                            <li class="nav-item"><a href="/home/pages/correos/asignacion_correos.php" class="nav-link"><i class="fas fa-user-plus nav-icon"></i><p>Asignación</p></a></li>
                             <?php } ?>
                             <?php if(Tiene_permiso($permisos_user, 'ver-tipos-correo')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/correos/tipos_correo.php" class="nav-link">
-                                    <i class="fas fa-tags nav-icon"></i>
-                                    <p>Tipos correo</p>
-                                </a>
-                            </li>
+                            <li class="nav-item"><a href="/home/pages/correos/tipos_correo.php" class="nav-link"><i class="fas fa-tags nav-icon"></i><p>Tipos</p></a></li>
                             <?php } ?>
                         </ul>
                     </li>
                     <?php } ?>
 
-                    <!-- Reportes -->
                     <?php if(Tiene_permiso($permisos_user, 'ver-reportes') || Tiene_permiso($permisos_user, 'exportar-reportes')) { ?>
                     <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-chart-line"></i>
-                            <p>
-                                Reportes
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
+                        <a href="#" class="nav-link"><i class="nav-icon fas fa-chart-line"></i><p>Reportes <i class="fas fa-angle-left right"></i></p></a>
                         <ul class="nav nav-treeview">
                             <?php if(Tiene_permiso($permisos_user, 'ver-reportes')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/reportes/ver.php" class="nav-link">
-                                    <i class="fas fa-eye nav-icon"></i>
-                                    <p>Ver Reportes</p>
-                                </a>
-                            </li>
+                            <li class="nav-item"><a href="/home/pages/reportes/ver.php" class="nav-link"><i class="fas fa-eye nav-icon"></i><p>Ver Reportes</p></a></li>
                             <?php } ?>
                             <?php if(Tiene_permiso($permisos_user, 'exportar-reportes')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/reportes/exportar.php" class="nav-link">
-                                    <i class="fas fa-download nav-icon"></i>
-                                    <p>Exportar Reportes</p>
-                                </a>
-                            </li>
+                            <li class="nav-item"><a href="/home/pages/reportes/exportar.php" class="nav-link"><i class="fas fa-download nav-icon"></i><p>Exportar</p></a></li>
                             <?php } ?>
                         </ul>
                     </li>
                     <?php } ?>
 
-                    <!-- Configuración -->
+                    <!-- ADMIN -->
+                    <li class="nav-header">ADMINISTRACIÓN</li>
+                    <?php if(Tiene_permiso($permisos_user, 'ver_permiso')) { ?>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link"><i class="nav-icon fas fa-user-shield"></i><p>Permisos <i class="fas fa-angle-left right"></i></p></a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item"><a href="/home/pages/permisos_view.php" class="nav-link"><i class="fas fa-users nav-icon"></i><p>Permisos para Grupos</p></a></li>
+                            <li class="nav-item"><a href="/home/pages/admin_permisos.php" class="nav-link"><i class="fas fa-user-cog nav-icon"></i><p>Administrar Permisos</p></a></li>
+                        </ul>
+                    </li>
+                    <?php } ?>
+
+                    <?php if(Tiene_permiso($permisos_user, 'ver-icloud')) { ?>
+                    <li class="nav-item">
+                        <a href="/home/pages/permisos_view.php" class="nav-link"><i class="nav-icon fas fa-cloud"></i><p>iCloud</p></a>
+                    </li>
+                    <?php } ?>
+
                     <?php if(Tiene_permiso($permisos_user, 'modificar-configuracion') || Tiene_permiso($permisos_user, 'gestionar-roles') || Tiene_permiso($permisos_user, 'gestionar-permisos')) { ?>
                     <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-cogs"></i>
-                            <p>
-                                Configuración
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
+                        <a href="#" class="nav-link"><i class="nav-icon fas fa-cogs"></i><p>Configuración <i class="fas fa-angle-left right"></i></p></a>
                         <ul class="nav nav-treeview">
                             <?php if(Tiene_permiso($permisos_user, 'modificar-configuracion')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/configuracion/modificar.php" class="nav-link">
-                                    <i class="fas fa-edit nav-icon"></i>
-                                    <p>Modificar Configuración</p>
-                                </a>
-                            </li>
+                            <li class="nav-item"><a href="/home/pages/configuracion/modificar.php" class="nav-link"><i class="fas fa-edit nav-icon"></i><p>Modificar</p></a></li>
                             <?php } ?>
                             <?php if(Tiene_permiso($permisos_user, 'gestionar-roles')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/configuracion/roles.php" class="nav-link">
-                                    <i class="fas fa-users nav-icon"></i>
-                                    <p>Gestionar Roles</p>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <?php if(Tiene_permiso($permisos_user, 'gestionar-permisos')) { ?>
-                            <li class="nav-item">
-                                <a href="/home/pages/configuracion/permisos.php" class="nav-link">
-                                    <i class="fas fa-user-shield nav-icon"></i>
-                                    <p>Gestionar Permisos</p>
-                                </a>
-                            </li>
+                            <li class="nav-item"><a href="/home/pages/configuracion/roles.php" class="nav-link"><i class="fas fa-users nav-icon"></i><p>Roles</p></a></li>
                             <?php } ?>
                         </ul>
                     </li>
                     <?php } ?>
+
                 </ul>
             </nav>
         </div>
