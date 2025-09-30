@@ -611,6 +611,144 @@
   });
 </script>
 
+<!-- Estilos para sidebar (mejor color, toggle y transiciones) -->
+<style>
+  /* Toggle limpio (sin cuadro) */
+  .tree-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: .5rem;
+    color: rgba(0,0,0,.45);
+    background: transparent;
+    border: 0;
+    padding: 0;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    transition: color .18s ease;
+    font-size: .85rem;
+  }
+  .tree-toggle i {
+    transition: transform .22s cubic-bezier(.2,.8,.2,1), color .18s ease;
+    transform-origin: 50% 50%;
+  }
+  /* Rotación cuando está abierto (apunta hacia abajo) */
+  .nav-item.menu-open > a .tree-toggle i {
+    transform: rotate(-90deg);
+    color: rgba(0,0,0,.65);
+  }
+
+  /* Active / hover */
+  .nav-sidebar .nav-link.active {
+    background: linear-gradient(90deg, rgba(0,123,255,.12), rgba(0,123,255,.06));
+    color: #004085 !important;
+    border-left: 3px solid #007bff;
+  }
+  .nav-sidebar .nav-link:hover {
+    background: rgba(0,0,0,.03);
+    color: #0056b3;
+  }
+  /* Submenu smooth visibility (fallback) */
+  .nav-treeview { transition: all .22s ease; }
+  /* Dark mode tweaks (aplica clases ya usadas en script) */
+  .main-sidebar.dark-mode .nav-link.active { background: rgba(255,255,255,.06); color: #fff !important; border-left-color: #66b2ff; }
+</style>
+
+<!-- Script mejorado: toggle limpio, rotación, single-open, animación y persistencia opcional -->
+<script>
+  $(function() {
+      // asignar ids únicos
+      $('.nav-item.has-treeview').each(function(i){
+          $(this).attr('data-menu-id','menu-'+i);
+      });
+
+      // crear toggles como span (evita apariencia de botón)
+      $('.nav-item.has-treeview').each(function(){
+          var $link = $(this).children('a').first();
+          if ($link.find('.tree-toggle').length === 0) {
+              var $toggle = $('<span class="tree-toggle" role="button" tabindex="0" aria-expanded="false"><i class="fas fa-chevron-left"></i></span>');
+              // colocar al final del texto (pero antes del icono derecho si existe)
+              $link.append($toggle);
+          }
+      });
+
+      // asegurar todos cerrados inicialmente
+      $('.nav-item.has-treeview').removeClass('menu-open');
+      $('.nav-item.has-treeview > ul.nav-treeview').hide();
+      $('.nav-item.has-treeview > a .tree-toggle').attr('aria-expanded','false');
+
+      // detectar ruta y abrir sólo padres del link activo (el más específico)
+      function normalizePath(p){ return (p||'').split('?')[0].replace(/\/+$/,''); }
+      var path = normalizePath(window.location.pathname);
+      var best = null, bestLen = 0;
+      $('a.nav-link').each(function(){
+          var href = $(this).attr('href');
+          if (!href || href === '#') return;
+          var h = normalizePath(href);
+          if (h && (path === h || path.indexOf(h + '/') === 0)) {
+              if (h.length > bestLen) { bestLen = h.length; best = $(this); }
+          }
+      });
+      if (best) {
+          $('a.nav-link').removeClass('active');
+          best.addClass('active');
+          best.parents('.nav-item.has-treeview').each(function(){
+              var $p = $(this);
+              $p.addClass('menu-open');
+              $p.children('a').first().addClass('active');
+              $p.find('> ul.nav-treeview').show();
+              $p.find('> a .tree-toggle').attr('aria-expanded','true');
+          });
+      }
+
+      // abrir/cerrar con animación y rotación; comportamiento single-open por nivel
+      function closeSiblings($item){
+          $item.siblings('.nav-item.has-treeview.menu-open').each(function(){
+              var $s = $(this);
+              $s.removeClass('menu-open');
+              $s.find('> a .tree-toggle').attr('aria-expanded','false');
+              $s.find('> ul.nav-treeview').stop(true,true).slideUp(200,'swing');
+          });
+      }
+
+      $(document).on('click keypress', '.tree-toggle', function(e){
+          if (e.type === 'keypress' && e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault(); e.stopPropagation();
+          var $parent = $(this).closest('.nav-item');
+          var $submenu = $parent.find('> ul.nav-treeview').first();
+          var isOpen = $parent.hasClass('menu-open');
+          if (isOpen) {
+              $submenu.stop(true,true).slideUp(200,'swing', function(){ $parent.removeClass('menu-open'); });
+              $(this).attr('aria-expanded','false');
+          } else {
+              closeSiblings($parent);
+              $submenu.stop(true,true).slideDown(220,'swing', function(){ $parent.addClass('menu-open'); });
+              $(this).attr('aria-expanded','true');
+          }
+      });
+
+      // click en el label principal que tenga href="#" actúa como toggle
+      $(document).on('click', '.nav-item.has-treeview > a.nav-link', function(e){
+          var href = $(this).attr('href');
+          if (!href || href.trim() === '#') {
+              e.preventDefault();
+              $(this).find('.tree-toggle').first().trigger('click');
+          }
+      });
+
+      // estilo dark-mode toggle aplica clase a sidebar
+      if (localStorage.getItem('darkMode') === 'true') {
+          $('.main-sidebar').addClass('dark-mode');
+      }
+      $('#darkModeSwitch').on('change', function(){
+          var enabled = $(this).is(':checked');
+          localStorage.setItem('darkMode', enabled ? 'true' : 'false');
+          $('.main-sidebar').toggleClass('dark-mode', enabled);
+      });
+  });
+</script>
+
 <!-- Scripts adicionales para funcionalidades específicas -->
 <!-- iCheck -->
 <script src="/home/plugins/icheck/icheck.min.js"></script>
