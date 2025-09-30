@@ -99,7 +99,7 @@
                     </li>
 
                     <!-- Grupo: Servicio Técnico -->
-                    <?php /* Incluye reparaciones, garantías, liberaciones, tareas y horarios */ ?>
+                    <?php /* Incluye reparaciones, garantías, liberaciones, tareas, horarios e iCloud */ ?>
                     <?php if(Tiene_permiso($permisos_user, 'ver-reparaciones') || Tiene_permiso($permisos_user, 'ver-garantia') || true) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
@@ -194,6 +194,16 @@
                                 <a href="/home/pages/horarios/configurar.php" class="nav-link">
                                     <i class="fas fa-clock nav-icon"></i>
                                     <p>Horarios</p>
+                                </a>
+                            </li>
+                            <?php } ?>
+
+                            <!-- iCloud movido aquí -->
+                            <?php if(Tiene_permiso($permisos_user, 'ver-icloud')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/guardar_icloud.php" class="nav-link">
+                                    <i class="fas fa-cloud nav-icon"></i>
+                                    <p>iCloud</p>
                                 </a>
                             </li>
                             <?php } ?>
@@ -313,7 +323,7 @@
                     <?php } ?>
 
                     <!-- Grupo: Configuraciones -->
-                    <?php if(Tiene_permiso($permisos_user, 'modificar-configuracion') || Tiene_permiso($permisos_user, 'gestionar-roles') || Tiene_permiso($permisos_user, 'gestionar-permisos') || Tiene_permiso($permisos_user, 'ver-reportes') || Tiene_permiso($permisos_user, 'exportar-reportes')) { ?>
+                    <?php if(Tiene_permiso($permisos_user, 'modificar-configuracion') || Tiene_permiso($permisos_user, 'gestionar-roles') || Tiene_permiso($permisos_user, 'gestionar-permisos')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-cogs"></i>
@@ -347,8 +357,21 @@
                                 </a>
                             </li>
                             <?php } ?>
+                        </ul>
+                    </li>
+                    <?php } ?>
 
-                            <!-- Reportes -->
+                    <!-- Nuevo Grupo: Reportes (separado de Configuraciones) -->
+                    <?php if(Tiene_permiso($permisos_user, 'ver-reportes') || Tiene_permiso($permisos_user, 'exportar-reportes')) { ?>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-chart-line"></i>
+                            <p>
+                                Reportes
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
                             <?php if(Tiene_permiso($permisos_user, 'ver-reportes')) { ?>
                             <li class="nav-item">
                                 <a href="/home/pages/reportes/ver.php" class="nav-link">
@@ -463,233 +486,149 @@
               }
           }
       });
-
+      // Marcar como activo el mejor enlace encontrado
       if (bestMatch) {
-          // Marcar activo el link más específico encontrado
-          $('a.nav-link').removeClass('active');
           bestMatch.addClass('active');
-
-          // Abrir únicamente los padres directos de ese link
-          bestMatch.parents('.nav-item.has-treeview').each(function() {
-              var $parent = $(this);
+          var $parent = bestMatch.closest('.nav-item.has-treeview');
+          while ($parent.length) {
               $parent.addClass('menu-open');
-              $parent.find('> ul.nav-treeview').first().show();
-              $parent.find('> a .tree-toggle').attr('aria-expanded', 'true');
-          });
-      }
-
-      // Función para actualizar localStorage cuando se abren/cerran menús
-      function updateOpenMenus(id, opened) {
-          var arr = JSON.parse(localStorage.getItem('openMenus') || '[]');
-          if (opened) {
-              if (arr.indexOf(id) === -1) arr.push(id);
-          } else {
-              var i = arr.indexOf(id);
-              if (i !== -1) arr.splice(i, 1);
+              $parent.children('a').first().addClass('active');
+              $parent = $parent.closest('.nav-item.has-treeview');
           }
-          localStorage.setItem('openMenus', JSON.stringify(arr));
       }
 
-      // Manejo de clicks en toggles (accesible) con comportamiento single-open
-      $(document).on('click', '.tree-toggle', function(e) {
-          e.stopPropagation();
-          var $btn = $(this);
-          var $parent = $btn.closest('.nav-item');
-          var $submenu = $parent.find('> ul.nav-treeview').first();
-          var id = $parent.attr('data-menu-id');
+      // Guardar/Restaurar estado de los menús (abiertos/cerrados) y el modo oscuro
+      var $body = $('body');
+      var $sidebar = $('.main-sidebar');
+      var $navbar = $('.main-header');
 
-          if ($parent.hasClass('menu-open')) {
-              $submenu.slideUp(180, function() {
-                  $parent.removeClass('menu-open');
-                  $btn.attr('aria-expanded', 'false');
-                  if (id) updateOpenMenus(id, false);
-              });
+      // Función para aplicar el modo oscuro
+      function applyDarkMode(enabled) {
+          if (enabled) {
+              $body.addClass('dark-mode');
+              $navbar.removeClass('navbar-white navbar-light').addClass('navbar-dark bg-dark');
+              $sidebar.removeClass('bg-white').addClass('bg-dark');
+              $('.nav-link').removeClass('btn-light').addClass('btn-dark');
           } else {
-              // cerrar otros abiertos (siempre mantener limpio)
-              $('.nav-item.has-treeview.menu-open').not($parent).each(function() {
-                  var $other = $(this);
-                  $other.find('> ul.nav-treeview').slideUp(180, function() {
-                      $other.removeClass('menu-open');
-                      $other.find('> a .tree-toggle').attr('aria-expanded', 'false');
-                      updateOpenMenus($other.attr('data-menu-id'), false);
-                  });
-              });
-              $submenu.slideDown(180, function() {
-                  $parent.addClass('menu-open');
-                  $btn.attr('aria-expanded', 'true');
-                  if (id) updateOpenMenus(id, true);
-              });
+              $body.removeClass('dark-mode');
+              $navbar.removeClass('navbar-dark bg-dark').addClass('navbar-white navbar-light');
+              $sidebar.removeClass('bg-dark').addClass('bg-white');
+              $('.nav-link').removeClass('btn-dark').addClass('btn-light');
+          }
+      }
+
+      // Cargar estado guardado (si existe)
+      var darkModeEnabled = localStorage.getItem('darkMode') === 'true';
+      $('#darkModeSwitch').prop('checked', darkModeEnabled);
+      applyDarkMode(darkModeEnabled);
+
+      // Guardar estado en localStorage al cambiar el switch
+      $('#darkModeSwitch').change(function() {
+          darkModeEnabled = $(this).is(':checked');
+          localStorage.setItem('darkMode', darkModeEnabled);
+          applyDarkMode(darkModeEnabled);
+      });
+
+      // Restaurar estado de los menús (abiertos/cerrados) desde data-attributes
+      $('.nav-item.has-treeview').each(function() {
+          var $item = $(this);
+          var menuId = $item.attr('data-menu-id');
+          var isOpen = localStorage.getItem('menuState-' + menuId) === 'true';
+          if (isOpen) {
+              $item.addClass('menu-open');
+              $item.children('a').first().addClass('active');
+              $item.find('> ul.nav-treeview').show();
           }
       });
 
-      // Click en el enlace principal: si href === '#' toggle, si tiene ruta real, navegar
-      $('.nav-item.has-treeview > a.nav-link').on('click', function(e) {
-          var href = $(this).attr('href');
-          if (!href || href.trim() === '#') {
-              e.preventDefault();
-              $(this).find('.tree-toggle').trigger('click');
-          }
-      });
+      // Guardar/Restaurar estado de los menús (abiertos/cerrados) y el modo oscuro
+      var $body = $('body');
+      var $sidebar = $('.main-sidebar');
+      var $navbar = $('.main-header');
 
-      // Navegación por teclado: Enter / Space para toggles, flechas para moverse
-      $(document).on('keydown', '.tree-toggle, .nav-link', function(e) {
-          var $focused = $(this);
-          if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              if ($focused.hasClass('tree-toggle')) {
-                  $focused.trigger('click');
-              } else if ($focused.is('a.nav-link')) {
-                  $focused.trigger('click');
-              }
-          } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-              e.preventDefault();
-              var $items = $('.nav-sidebar .nav-link:visible');
-              var idx = $items.index($focused);
-              if (e.key === 'ArrowDown' && idx < $items.length - 1) {
-                  $items.eq(idx + 1).focus();
-              } else if (e.key === 'ArrowUp' && idx > 0) {
-                  $items.eq(idx - 1).focus();
-              }
-          } else if (e.key === 'ArrowRight') {
-              if ($(this).closest('.nav-item.has-treeview').length) {
-                  $(this).closest('.nav-item').find('.tree-toggle').first().trigger('click');
-              }
-          } else if (e.key === 'ArrowLeft') {
-              var $parentMenu = $(this).closest('.nav-item.has-treeview.menu-open');
-              if ($parentMenu.length) {
-                  $parentMenu.find('.tree-toggle').first().trigger('click');
-              }
+      // Función para aplicar el modo oscuro
+      function applyDarkMode(enabled) {
+          if (enabled) {
+              $body.addClass('dark-mode');
+              $navbar.removeClass('navbar-white navbar-light').addClass('navbar-dark bg-dark');
+              $sidebar.removeClass('bg-white').addClass('bg-dark');
+              $('.nav-link').removeClass('btn-light').addClass('btn-dark');
+          } else {
+              $body.removeClass('dark-mode');
+              $navbar.removeClass('navbar-dark bg-dark').addClass('navbar-white navbar-light');
+              $sidebar.removeClass('bg-dark').addClass('bg-white');
+              $('.nav-link').removeClass('btn-dark').addClass('btn-light');
           }
-      });
-
-      // Verificar en localStorage la preferencia de Dark Mode
-      if (localStorage.getItem('darkMode') === 'true') {
-          $('.main-header, .main-sidebar').addClass('dark-mode');
-          $('#darkModeSwitch').prop('checked', true);
       }
 
-      // Dark Mode Switch: Solo afecta header y sidebar
-      $('#darkModeSwitch').on('change', function() {
-          if ($(this).is(':checked')) {
-              $('.main-header, .main-sidebar').addClass('dark-mode');
-              localStorage.setItem('darkMode', 'true');
+      // Cargar estado guardado (si existe)
+      var darkModeEnabled = localStorage.getItem('darkMode') === 'true';
+      $('#darkModeSwitch').prop('checked', darkModeEnabled);
+      applyDarkMode(darkModeEnabled);
+
+      // Guardar estado en localStorage al cambiar el switch
+      $('#darkModeSwitch').change(function() {
+          darkModeEnabled = $(this).is(':checked');
+          localStorage.setItem('darkMode', darkModeEnabled);
+          applyDarkMode(darkModeEnabled);
+      });
+
+      // Restaurar estado de los menús (abiertos/cerrados) desde data-attributes
+      $('.nav-item.has-treeview').each(function() {
+          var $item = $(this);
+          var menuId = $item.attr('data-menu-id');
+          var isOpen = localStorage.getItem('menuState-' + menuId) === 'true';
+          if (isOpen) {
+              $item.addClass('menu-open');
+              $item.children('a').first().addClass('active');
+              $item.find('> ul.nav-treeview').show();
+          }
+      });
+
+      // Guardar estado de los menús (abiertos/cerrados) al hacer clic
+      $('.nav-item.has-treeview > a').click(function(e) {
+          e.preventDefault();
+          var $item = $(this).parent();
+          var menuId = $item.attr('data-menu-id');
+          var isOpen = $item.hasClass('menu-open');
+
+          // Cerrar otros menús en el mismo nivel (hermanos)
+          $item.siblings('.nav-item.has-treeview').removeClass('menu-open').find('> ul.nav-treeview').slideUp();
+          $item.siblings('.nav-item').find('a').removeClass('active');
+
+          if (isOpen) {
+              // Si ya está abierto, cerrar
+              $item.removeClass('menu-open');
+              $item.find('> ul.nav-treeview').slideUp();
+              localStorage.setItem('menuState-' + menuId, 'false');
           } else {
-              $('.main-header, .main-sidebar').removeClass('dark-mode');
-              localStorage.setItem('darkMode', 'false');
+              // Abrir el menú y cerrando otros hermanos
+              $item.addClass('menu-open');
+              $item.find('> ul.nav-treeview').slideDown();
+              localStorage.setItem('menuState-' + menuId, 'true');
           }
       });
   });
 </script>
-<style>
-  /* Light Mode (por defecto) */
-  .main-header {
-      background-color: #ffffff;
-      color:  #515a5a;
-  }
-  .main-sidebar {
-      background-color: #ffffff;
-      color:  #515a5a;
-  }
-  .main-header .nav-link,
-  .main-sidebar .nav-link {
-      color:  #515a5a !important;
-  }
-  .main-header .nav-link:hover,
-  .main-sidebar .nav-link:hover {
-      background-color: #e6e6e6;
-      color:  #515a5a !important;
-  }
-  
-  /* Dark Mode para header y sidebar */
-  .main-header.dark-mode {
-      background-color: #2c2c2c !important;
-      color: #ffffff;
-  }
-  .main-header.dark-mode .nav-link,
-  .main-header.dark-mode #homeLink {
-      color: #ffffff !important;
-  }
-  .main-header.dark-mode .nav-link:hover,
-  .main-header.dark-mode #homeLink:hover {
-      background-color: #444444 !important;
-      color: #ffffff !important;
-  }
-  .main-sidebar.dark-mode {
-      background-color: #2c2c2c !important;
-      color: #ffffff;
-  }
-  .main-sidebar.dark-mode .nav-link {
-      color: #ffffff !important;
-  }
-  .main-sidebar.dark-mode .nav-link:hover {
-      background-color: #444444 !important;
-      color: #ffffff !important;
-  }
-  /* Ajuste para el nombre de usuario en el panel (modo oscuro) */
-  .main-sidebar.dark-mode .user-panel .info span {
-      color: #ffcc00 !important;
-  }
-  /* Ajuste del título del sitio */
-  .brand-link .brand-text {
-      font-size: 1.3rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color:  #515a5a !important;
-  }
-  .main-sidebar.dark-mode .brand-link .brand-text {
-      color: #ffffff !important;
-  }
-  /* Estilos para la pestaña activa */
-  .nav-sidebar .nav-link.active {
-      background-color: #007bff !important;
-      color: #ffffff !important;
-  }
 
-  /* Estilos para el botón toggle que añade control visual sin romper el layout */
-  .tree-toggle {
-      background: transparent;
-      border: none;
-      color: inherit;
-      float: right;
-      width: 28px;
-      height: 28px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 0;
-      margin-left: 8px;
-  }
-  .tree-toggle:focus {
-      outline: 2px solid #80bdff;
-      outline-offset: 2px;
-  }
-  .tree-toggle i {
-      transition: transform 0.2s ease;
-  }
-  .nav-item.menu-open > a .tree-toggle i {
-      transform: rotate(-90deg); /* indicar abierto */
-  }
+<!-- Scripts adicionales para funcionalidades específicas -->
+<!-- iCheck -->
+<script src="/home/plugins/icheck/icheck.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/home/dist/js/adminlte.min.js"></script>
+<!-- Page specific script -->
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2({
+      theme: 'bootstrap4'
+    });
 
-  /* Ocultar el icono toggle cuando la barra lateral está colapsada / en modo mini (AdminLTE) */
-  .sidebar-mini .nav-sidebar .tree-toggle,
-  body.sidebar-collapse .nav-sidebar .tree-toggle {
-      display: none !important;
-      pointer-events: none;
-  }
-
-  /* Pequeño ajuste para que los enlaces puedan recibir focus claramente */
-  .nav-sidebar .nav-link {
-      outline: none;
-  }
-  .nav-sidebar .nav-link:focus {
-      background-color: rgba(0,123,255,0.1);
-      color: inherit !important;
-  }
-
-  /* Mantener el comportamiento visual previo para active */
-  .nav-sidebar .nav-link.active {
-      background-color: #007bff !important;
-      color: #ffffff !important;
-  }
-</style>
+    //Datemask dd/mm/yyyy
+    $('#datemask').inputmask('dd/mm/yyyy', {'placeholder': 'dd/mm/yyyy'});
+    //Datemask2 mm/dd/yyyy
+    $('#datemask2').inputmask('mm/dd/yyyy', {'placeholder': 'mm/dd/yyyy'});
+    //Money Euro
+    $('[data-mask]').inputmask();
+  });
+</script>
