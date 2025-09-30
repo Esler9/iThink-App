@@ -341,7 +341,7 @@
                             <?php } ?>
                             <?php if(Tiene_permiso($permisos_user, 'gestionar-permisos')) { ?>
                             <li class="nav-item">
-                                <a href="/home/pages/configuracion/permisos.php" class="nav-link">
+                                <a href="/home/pages/admin_permisos.php" class="nav-link">
                                     <i class="fas fa-user-shield nav-icon"></i>
                                     <p>Gestionar Permisos</p>
                                 </a>
