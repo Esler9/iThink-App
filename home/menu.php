@@ -92,7 +92,7 @@
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                     <!-- Dashboard (siempre primero) -->
                     <li class="nav-item">
-                        <a href="/home/dashboard.php" class="nav-link active">
+                        <a href="/home/dashboard.php" class="nav-link" id="menu-dashboard">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>Dashboard</p>
                         </a>
@@ -100,7 +100,6 @@
 
                     <!-- Grupo: Servicio Técnico -->
                     <?php /* Incluye reparaciones, garantías, liberaciones, tareas y horarios */ ?>
-                    <!-- Reparaciones / Garantías -->
                     <?php if(Tiene_permiso($permisos_user, 'ver-reparaciones') || Tiene_permiso($permisos_user, 'ver-garantia') || true) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
@@ -182,22 +181,20 @@
                             <!-- Tareas -->
                             <?php if(Tiene_permiso($permisos_user, 'ver-tareas')) { ?>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="/home/pages/tares/lista.php" class="nav-link">
                                     <i class="fas fa-tasks nav-icon"></i>
                                     <p>Tareas</p>
                                 </a>
-                                <ul class="nav nav-treeview" style="display:none;"></ul> <!-- Mantener estructura si se abre desde JS -->
                             </li>
                             <?php } ?>
 
                             <!-- Horarios -->
                             <?php if(Tiene_permiso($permisos_user, 'ver-horario')) { ?>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="/home/pages/horarios/configurar.php" class="nav-link">
                                     <i class="fas fa-clock nav-icon"></i>
                                     <p>Horarios</p>
                                 </a>
-                                <ul class="nav nav-treeview" style="display:none;"></ul>
                             </li>
                             <?php } ?>
                         </ul>
@@ -205,7 +202,7 @@
                     <?php } ?>
 
                     <!-- Grupo: Ventas -->
-                    <?php if(Tiene_permiso($permisos_user, 'crear-venta') || Tiene_permiso($permisos_user, 'ver-guias') || Tiene_permiso($permisos_user, 'ver-garantia') || Tiene_permiso($permisos_user, 'ver-inventario')) { ?>
+                    <?php if(Tiene_permiso($permisos_user, 'crear-venta') || Tiene_permiso($permisos_user, 'ver-guias') || Tiene_permiso($permisos_user, 'ver-inventario')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-dollar-sign"></i>
@@ -215,36 +212,30 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            <!-- Comercio (Ventas / Compras / Inventario) -->
-                            <?php if(Tiene_permiso($permisos_user, 'crear-venta') || Tiene_permiso($permisos_user, 'editar-venta') || Tiene_permiso($permisos_user, 'eliminar-venta') || Tiene_permiso($permisos_user, 'crear-compra') || Tiene_permiso($permisos_user, 'editar-compra') || Tiene_permiso($permisos_user, 'eliminar-compra') || Tiene_permiso($permisos_user, 'ver-inventario') || Tiene_permiso($permisos_user, 'modificar-inventario') || Tiene_permiso($permisos_user, 'eliminar-inventario')) { ?>
+                            <!-- Ventas -->
+                            <?php if(Tiene_permiso($permisos_user, 'crear-venta')) { ?>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="fas fa-cash-register nav-icon"></i>
-                                    <p>Comercio</p>
+                                <a href="/home/pages/ventas/crear.php" class="nav-link">
+                                    <i class="fas fa-plus nav-icon"></i>
+                                    <p>Crear Venta</p>
                                 </a>
-                                <ul class="nav nav-treeview" style="display:none;"></ul>
                             </li>
                             <?php } ?>
-
+                            <?php if(Tiene_permiso($permisos_user, 'ver-inventario')) { ?>
+                            <li class="nav-item">
+                                <a href="/home/pages/inventario/ver.php" class="nav-link">
+                                    <i class="fas fa-boxes nav-icon"></i>
+                                    <p>Inventario</p>
+                                </a>
+                            </li>
+                            <?php } ?>
                             <!-- Guías -->
                             <?php if(Tiene_permiso($permisos_user, 'ver-guias')) { ?>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="/home/pages/guias/listado_guias.php" class="nav-link">
                                     <i class="fas fa-shipping-fast nav-icon"></i>
                                     <p>Guías</p>
                                 </a>
-                                <ul class="nav nav-treeview" style="display:none;"></ul>
-                            </li>
-                            <?php } ?>
-
-                            <!-- Clientes -->
-                            <?php if(Tiene_permiso($permisos_user, 'ver-garantia')) { ?>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="fas fa-shield-alt nav-icon"></i>
-                                    <p>Clientes</p>
-                                </a>
-                                <ul class="nav nav-treeview" style="display:none;"></ul>
                             </li>
                             <?php } ?>
                         </ul>
@@ -378,27 +369,27 @@
                     </li>
                     <?php } ?>
 
-                    <!-- Opciones recomendadas (vacías / placeholders) -->
-                    <li class="nav-header">Recomendadas</li>
-                    <!-- Integraciones (vacío - próximo desarrollo) -->
+                    <!-- Opciones recomendadas (más enfocadas a la app) -->
+                    <li class="nav-header">Extras</li>
+                    <!-- Inventario (placeholder si no tiene permiso aparece igual como próximo) -->
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-plug"></i>
-                            <p>Integraciones <span class="right text-muted">Próximamente</span></p>
+                        <a href="/home/pages/inventario/ver.php" class="nav-link">
+                            <i class="nav-icon fas fa-boxes"></i>
+                            <p>Inventario <span class="right text-muted">Próximamente</span></p>
                         </a>
                     </li>
-                    <!-- Soporte (vacío - próximo desarrollo) -->
+                    <!-- Proveedores -->
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-life-ring"></i>
-                            <p>Soporte <span class="right text-muted">Próximamente</span></p>
+                        <a href="/home/pages/proveedores/index.php" class="nav-link">
+                            <i class="nav-icon fas fa-truck"></i>
+                            <p>Proveedores <span class="right text-muted">Próximamente</span></p>
                         </a>
                     </li>
-                    <!-- Analítica (vacío - próximo desarrollo) -->
+                    <!-- Documentación / Ayuda -->
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-chart-pie"></i>
-                            <p>Analítica <span class="right text-muted">Próximamente</span></p>
+                        <a href="/home/pages/documentacion/index.php" class="nav-link">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Documentación <span class="right text-muted">Ayuda</span></p>
                         </a>
                     </li>
                 </ul>
