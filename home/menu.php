@@ -89,7 +89,7 @@
 
             <!-- Sidebar Menu -->
             <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <ul class="nav nav-pills nav-sidebar flex-column" role="menu" data-accordion="false">
                     <!-- Dashboard (siempre primero) -->
                     <li class="nav-item">
                         <a href="/home/dashboard.php" class="nav-link" id="menu-dashboard">
@@ -431,8 +431,8 @@
 
 <!-- Consolidated: estilos y script de sidebar (elimina duplicados y corrige toggles) -->
 <style>
-  /* Oculta el icono "right" de AdminLTE para evitar doble indicador */
-  .nav-link > .right { display: none; }
+  /* Oculta cualquier icono "right" dentro de enlaces (previene el doble toggle) */
+  .nav-link .right { display: none !important; }
 
   /* Toggle limpio (sin cuadro) */
   .tree-toggle {
@@ -481,13 +481,13 @@
 <script>
   (function($){
     $(function(){
-      // asignar ids únicos y crear un único toggle por item con submenú
+      // asignar ids únicos y crear un único toggle por item con submenú (solo si no existe ya)
       $('.nav-item.has-treeview').each(function(i){
           var $item = $(this);
           $item.attr('data-menu-id','menu-'+i);
           var $link = $item.children('a').first();
+          // si ya hay un .tree-toggle no añadir otro
           if ($link.find('.tree-toggle').length === 0) {
-              // usare chevron-left para mantener consistencia y rotar
               var $toggle = $('<span class="tree-toggle" role="button" tabindex="0" aria-expanded="false"><i class="fas fa-chevron-left"></i></span>');
               $link.append($toggle);
           }
