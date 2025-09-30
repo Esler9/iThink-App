@@ -408,7 +408,8 @@
 <!-- Script para el menú Sidebar con animaciones y Dark Mode para header y sidebar -->
 <script>
   $(document).ready(function() {
-      // Inicializar ids para persistencia
+      // Inicializar ids para persistencia (se guardan cuando el usuario los abre/cierra,
+      // pero no se aplican automáticamente al cargar para evitar menús abiertos)
       $('.nav-item.has-treeview').each(function(index) {
           $(this).attr('data-menu-id', 'menu-' + index);
       });
@@ -418,7 +419,6 @@
           var $item = $(this);
           var $link = $item.children('a').first();
 
-          // Crear botón toggle solo si no existe
           if ($link.find('.tree-toggle').length === 0) {
               var $toggle = $('<button>', {
                   'class': 'tree-toggle',
@@ -426,40 +426,57 @@
                   'aria-expanded': 'false',
                   'aria-label': 'Expandir menú'
               }).html('<i class="fas fa-angle-left"></i>');
-              // insertar al final del enlace para posicionar a la derecha
               $link.append($toggle);
           }
       });
 
-      // Cargar estado de menús abiertos desde localStorage
-      var openMenus = JSON.parse(localStorage.getItem('openMenus') || '[]');
-      openMenus.forEach(function(id) {
-          var $m = $('.nav-item.has-treeview[data-menu-id="' + id + '"]');
-          if ($m.length) {
-              $m.addClass('menu-open');
-              $m.find('ul.nav-treeview').show();
-              $m.find('.tree-toggle').attr('aria-expanded', 'true');
-          }
-      });
+      // Cerrar todos los submenús al cargar (comportamiento solicitado)
+      $('.nav-item.has-treeview').removeClass('menu-open');
+      $('.nav-item.has-treeview > ul.nav-treeview').hide();
+      $('.nav-item.has-treeview > a .tree-toggle').attr('aria-expanded', 'false');
 
-      // Detección de la ruta actual para marcar link activo y abrir padres
-      var path = window.location.pathname;
+      // Función utilitaria: normalizar rutas (quita query y slashes finales)
+      function normalizePath(p) {
+          if (!p) return '';
+          try {
+              // si es ruta absoluta, usar tal cual
+              var s = p.split('?')[0];
+              return s.replace(/\/+$/, '');
+          } catch (e) {
+              return p;
+          }
+      }
+
+      // Seleccionar el mejor link activo: el href más específico que sea prefijo de la ruta actual
+      var path = normalizePath(window.location.pathname);
+      var bestMatch = null;
+      var bestLen = 0;
       $('a.nav-link').each(function() {
           var href = $(this).attr('href');
-          if (href && href !== '#' && path.indexOf(href) !== -1) {
-              $(this).addClass('active');
-              var $parent = $(this).closest('.nav-item.has-treeview');
-              $parent.addClass('menu-open');
-              $parent.find('ul.nav-treeview').show();
-              $parent.find('.tree-toggle').attr('aria-expanded', 'true');
-              // asegurar que quede guardado en openMenus
-              var id = $parent.attr('data-menu-id');
-              if (id && openMenus.indexOf(id) === -1) {
-                  openMenus.push(id);
+          if (!href || href === '#') return;
+          var hrefNorm = normalizePath(href);
+          // Coincidencia solo si hrefNorm es igual a path o es prefijo del path (carpeta)
+          if (hrefNorm && (path === hrefNorm || path.indexOf(hrefNorm + '/') === 0)) {
+              if (hrefNorm.length > bestLen) {
+                  bestLen = hrefNorm.length;
+                  bestMatch = $(this);
               }
           }
       });
-      localStorage.setItem('openMenus', JSON.stringify(openMenus));
+
+      if (bestMatch) {
+          // Marcar activo el link más específico encontrado
+          $('a.nav-link').removeClass('active');
+          bestMatch.addClass('active');
+
+          // Abrir únicamente los padres directos de ese link
+          bestMatch.parents('.nav-item.has-treeview').each(function() {
+              var $parent = $(this);
+              $parent.addClass('menu-open');
+              $parent.find('> ul.nav-treeview').first().show();
+              $parent.find('> a .tree-toggle').attr('aria-expanded', 'true');
+          });
+      }
 
       // Función para actualizar localStorage cuando se abren/cerran menús
       function updateOpenMenus(id, opened) {
@@ -473,30 +490,31 @@
           localStorage.setItem('openMenus', JSON.stringify(arr));
       }
 
-      // Manejo de clicks en toggles (accesible)
+      // Manejo de clicks en toggles (accesible) con comportamiento single-open
       $(document).on('click', '.tree-toggle', function(e) {
           e.stopPropagation();
           var $btn = $(this);
           var $parent = $btn.closest('.nav-item');
-          var $submenu = $parent.find('ul.nav-treeview').first();
+          var $submenu = $parent.find('> ul.nav-treeview').first();
           var id = $parent.attr('data-menu-id');
+
           if ($parent.hasClass('menu-open')) {
-              $submenu.slideUp(200, function() {
+              $submenu.slideUp(180, function() {
                   $parent.removeClass('menu-open');
                   $btn.attr('aria-expanded', 'false');
                   if (id) updateOpenMenus(id, false);
               });
           } else {
-              // cerrar otros abiertos
+              // cerrar otros abiertos (siempre mantener limpio)
               $('.nav-item.has-treeview.menu-open').not($parent).each(function() {
                   var $other = $(this);
-                  $other.find('ul.nav-treeview').slideUp(200, function() {
+                  $other.find('> ul.nav-treeview').slideUp(180, function() {
                       $other.removeClass('menu-open');
-                      $other.find('.tree-toggle').attr('aria-expanded', 'false');
+                      $other.find('> a .tree-toggle').attr('aria-expanded', 'false');
                       updateOpenMenus($other.attr('data-menu-id'), false);
                   });
               });
-              $submenu.slideDown(200, function() {
+              $submenu.slideDown(180, function() {
                   $parent.addClass('menu-open');
                   $btn.attr('aria-expanded', 'true');
                   if (id) updateOpenMenus(id, true);
@@ -507,8 +525,7 @@
       // Click en el enlace principal: si href === '#' toggle, si tiene ruta real, navegar
       $('.nav-item.has-treeview > a.nav-link').on('click', function(e) {
           var href = $(this).attr('href');
-          // si es un enlace 'placeholder', evitar navegar y alternar
-          if (!href || href.trim() === '#' ) {
+          if (!href || href.trim() === '#') {
               e.preventDefault();
               $(this).find('.tree-toggle').trigger('click');
           }
@@ -526,7 +543,6 @@
               }
           } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
               e.preventDefault();
-              // crear lista de elementos navegables
               var $items = $('.nav-sidebar .nav-link:visible');
               var idx = $items.index($focused);
               if (e.key === 'ArrowDown' && idx < $items.length - 1) {
@@ -535,12 +551,10 @@
                   $items.eq(idx - 1).focus();
               }
           } else if (e.key === 'ArrowRight') {
-              // abrir menú si existe
               if ($(this).closest('.nav-item.has-treeview').length) {
                   $(this).closest('.nav-item').find('.tree-toggle').first().trigger('click');
               }
           } else if (e.key === 'ArrowLeft') {
-              // cerrar menú si existe
               var $parentMenu = $(this).closest('.nav-item.has-treeview.menu-open');
               if ($parentMenu.length) {
                   $parentMenu.find('.tree-toggle').first().trigger('click');
