@@ -284,7 +284,7 @@
                             <li class="nav-item">
                                 <a href="/home/pages/permisos_view.php" class="nav-link">
                                     <i class="fas fa-user-shield nav-icon"></i>
-                                    <p>Permisos</p>
+                                    <p>Permisos Por roles</p>
                                 </a>
                             </li>
                             <?php } ?>
