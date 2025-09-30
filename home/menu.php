@@ -461,33 +461,7 @@
     color: rgba(0,0,0,.65);
   }
 
-  /* --- Diferenciación: títulos de grupo vs opciones --- */
-  /* Título de grupo (anchor padre) */
-  .nav-item.has-treeview > a.nav-link {
-    font-weight: 700;
-    font-size: 1rem;
-    color: #2c3e50;
-    background: transparent;
-    padding-left: 1rem;
-  }
-  .nav-item.has-treeview > a.nav-link .nav-icon {
-    color: #495057;
-    margin-right: .5rem;
-  }
-
-  /* Opciones hijas con "tab" (sangría notable) */
-  .nav-treeview .nav-link {
-    padding-left: 2.75rem; /* tab visual */
-    font-weight: 500;
-    color: #4b5563;
-  }
-  .nav-treeview .nav-link .nav-icon {
-    width: 1.25rem;
-    margin-left: .25rem;
-    color: #6b7280;
-  }
-
-  /* Active / hover (modo claro) */
+  /* Active / hover */
   .nav-sidebar .nav-link.active {
     background: linear-gradient(90deg, rgba(0,123,255,.12), rgba(0,123,255,.06));
     color: #004085 !important;
@@ -497,28 +471,11 @@
     background: rgba(0,0,0,.03);
     color: #0056b3;
   }
-
   /* Submenu smooth visibility */
   .nav-treeview { transition: all .18s ease; display: none; }
   .nav-item.menu-open > .nav-treeview { display: block; }
-
-  /* Dark mode: cambiar azules por anaranjado claro */
-  .main-sidebar.dark-mode .nav-link.active {
-    background: linear-gradient(90deg, rgba(255,184,107,.12), rgba(255,184,107,.06));
-    color: #ffb86b !important;             /* texto anaranjado claro */
-    border-left: 3px solid #ffb86b;       /* borde izquierdo anaranjado */
-  }
-  .main-sidebar.dark-mode .nav-link:hover {
-    background: rgba(255,184,107,.06);
-    color: #ffc58a !important;
-  }
-  /* Ajuste para toggles en modo oscuro */
-  .main-sidebar.dark-mode .tree-toggle { color: rgba(255,184,107,.85); }
-  .main-sidebar.dark-mode .nav-item.menu-open > a .tree-toggle i { color: #ffb86b; }
-
-  /* Fallback contrast tweaks */
-  .main-sidebar.dark-mode .nav-link { color: #e6e6e6; }
-  .main-sidebar.dark-mode .nav-link .nav-icon { color: #d6d6d6; }
+  /* Dark mode tweaks */
+  .main-sidebar.dark-mode .nav-link.active { background: rgba(255,255,255,.06); color: #fff !important; border-left-color: #66b2ff; }
 </style>
 
 <script>
