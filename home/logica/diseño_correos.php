@@ -17,7 +17,7 @@ function obtenerTiempoUsaTexto($tiempo) {
  * Genera el cuerpo del correo HTML según el tipo de notificación y los datos proporcionados.
  *
  * @param string $tipo   Tipo de correo
- * @param array  $datos  Arreglo asociativo con la información necesaria
+ * @param array  $datos  Arreglo asociativo con TODA la información
  * @return string        Cadena con el contenido HTML del correo
  */
 function correo_enviar($tipo, $datos)
@@ -149,13 +149,6 @@ function correo_enviar($tipo, $datos)
         font-size: 24px;
         margin-right: 10px;
         font-weight: bold;
-    }
-    .info-highlight {
-        background: #e3f2fd;
-        padding: 15px;
-        border-radius: 8px;
-        margin: 15px 0;
-        border-left: 4px solid #2196f3;
     }
     .summary-box {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -324,8 +317,9 @@ function correo_enviar($tipo, $datos)
 <div class="content">
     <p style="font-size: 17px;">Se ha registrado una actualización en el sistema de liberaciones. A continuación se presenta la <strong>información completa</strong> del proceso:</p>';
 
-    // RESUMEN DESTACADO
-    if (isset($datos['precio']) && $datos['precio'] > 0 && isset($datos['tiempo']) && $datos['tiempo'] > 0) {
+    // ========== RESUMEN DESTACADO (SOLO SI HAY PRECIO Y TIEMPO) ==========
+    if (isset($datos['precio']) && !empty($datos['precio']) && $datos['precio'] > 0 && 
+        isset($datos['tiempo']) && !empty($datos['tiempo']) && $datos['tiempo'] > 0) {
         $content .= '<div class="summary-box">
         <h3>📊 Resumen del Servicio</h3>
         <div class="summary-item">
@@ -337,7 +331,7 @@ function correo_enviar($tipo, $datos)
             <span class="summary-value">' . htmlspecialchars($datos['tiempo']) . ' días</span>
         </div>';
         
-        if (isset($datos['estado'])) {
+        if (isset($datos['estado']) && !empty($datos['estado'])) {
             $content .= '<div class="summary-item">
             <span>Estado Actual:</span>
             <span class="summary-value">' . htmlspecialchars($datos['estado']) . '</span>
@@ -347,21 +341,21 @@ function correo_enviar($tipo, $datos)
         $content .= '</div>';
     }
     
-    // SECCIÓN: INFORMACIÓN DEL CLIENTE
+    // ========== SECCIÓN: INFORMACIÓN DEL CLIENTE (SIEMPRE SE MUESTRA) ==========
     $content .= '<div class="section-title">
         <span class="icon">👤</span> Información del Cliente
     </div>
     <table class="details-table">
         <tr>
             <td>Nombre Completo:</td>
-            <td><strong>' . htmlspecialchars($datos['name']) . '</strong></td>
+            <td><strong>' . htmlspecialchars($datos['name'] ?? 'No especificado') . '</strong></td>
         </tr>
         <tr>
             <td>Número de Celular:</td>
-            <td><strong>+502 ' . htmlspecialchars($datos['celular']) . '</strong></td>
+            <td><strong>+502 ' . htmlspecialchars($datos['celular'] ?? 'No especificado') . '</strong></td>
         </tr>';
     
-    if (isset($datos['tienda']) && $datos['tienda']) {
+    if (isset($datos['tienda']) && !empty($datos['tienda'])) {
         $content .= '<tr>
             <td>Tienda:</td>
             <td>' . htmlspecialchars($datos['tienda']) . '</td>
@@ -370,103 +364,112 @@ function correo_enviar($tipo, $datos)
     
     $content .= '</table>';
     
-    // SECCIÓN: INFORMACIÓN DEL EQUIPO
+    // ========== SECCIÓN: INFORMACIÓN DEL EQUIPO (SIEMPRE SE MUESTRA) ==========
     $content .= '<div class="section-title">
         <span class="icon">📱</span> Información del Equipo
     </div>
     <table class="details-table">
         <tr>
             <td>IMEI Principal:</td>
-            <td><strong style="font-size: 16px;">' . htmlspecialchars($datos['imei']) . '</strong></td>
+            <td><strong style="font-size: 16px; color: #1976d2;">' . htmlspecialchars($datos['imei'] ?? 'No especificado') . '</strong></td>
         </tr>';
 
-    // IMEI secundario
-    if (isset($datos['imei2']) && $datos['imei2'] !== "" && $datos['imei2'] !== null) {
+    // IMEI secundario (SI EXISTE)
+    if (isset($datos['imei2']) && !empty($datos['imei2'])) {
         $content .= '<tr>
             <td>IMEI Secundario:</td>
-            <td><strong style="font-size: 16px;">' . htmlspecialchars($datos['imei2']) . '</strong> <span class="badge badge-info">Dual SIM</span></td>
+            <td><strong style="font-size: 16px; color: #1976d2;">' . htmlspecialchars($datos['imei2']) . '</strong> <span class="badge badge-info">📱 Dual SIM</span></td>
         </tr>';
     }
 
     $content .= '<tr>
-            <td>Modelo:</td>
-            <td><strong>' . htmlspecialchars($datos['modelo']) . '</strong></td>
+            <td>Modelo del Equipo:</td>
+            <td><strong>' . htmlspecialchars($datos['modelo'] ?? 'No especificado') . '</strong></td>
         </tr>';
 
-    // Tiempo de uso en USA
-    if (isset($datos['tiempo_usa']) && $datos['tiempo_usa'] !== "" && $datos['tiempo_usa'] !== null) {
+    // Tiempo de uso en USA (SI EXISTE)
+    if (isset($datos['tiempo_usa']) && !empty($datos['tiempo_usa'])) {
         $tiempoTexto = obtenerTiempoUsaTexto($datos['tiempo_usa']);
         $badgeClass = ($datos['tiempo_usa'] === 'nunca' || $datos['tiempo_usa'] === '0-3') ? 'badge-success' : 'badge-warning';
         $content .= '<tr>
-            <td>Tiempo en USA:</td>
-            <td>' . htmlspecialchars($tiempoTexto) . ' <span class="badge ' . $badgeClass . '">USA</span></td>
+            <td>Tiempo de Uso en USA:</td>
+            <td>' . htmlspecialchars($tiempoTexto) . ' <span class="badge ' . $badgeClass . '">🇺🇸 USA</span></td>
         </tr>';
     }
 
     $content .= '</table>';
 
-    // VERIFICACIONES DE SEGURIDAD
+    // ========== VERIFICACIONES DE SEGURIDAD (SI EXISTEN) ==========
     if ((isset($datos['no_blacklist']) && $datos['no_blacklist'] == 1) || 
         (isset($datos['no_icloud']) && $datos['no_icloud'] == 1)) {
         
         $content .= '<div class="section-title">
-        <span class="icon">🔒</span> Verificaciones de Seguridad
+        <span class="icon">🔒</span> Verificaciones de Seguridad Confirmadas
     </div>
     <div class="security-checks">';
 
         if (isset($datos['no_blacklist']) && $datos['no_blacklist'] == 1) {
             $content .= '<div class="security-item">
             <span class="check-icon">✓</span>
-            <span>Equipo <strong>NO</strong> está en Blacklist</span>
+            <span>El equipo <strong>NO</strong> está reportado en Blacklist (sin reporte de pérdida o robo)</span>
         </div>';
         }
 
         if (isset($datos['no_icloud']) && $datos['no_icloud'] == 1) {
             $content .= '<div class="security-item">
             <span class="check-icon">✓</span>
-            <span>Equipo <strong>NO</strong> tiene iCloud activo</span>
+            <span>El equipo <strong>NO</strong> tiene cuenta iCloud activa ni "Buscar mi iPhone"</span>
         </div>';
         }
 
         $content .= '</div>';
     }
 
-    // DETALLES DEL SERVICIO
-    if ((isset($datos['precio']) && $datos['precio'] > 0) || (isset($datos['tiempo']) && $datos['tiempo'] > 0) || isset($datos['estado'])) {
+    // ========== DETALLES DEL SERVICIO (SI HAY DATOS) ==========
+    $mostrarSeccionServicio = false;
+    if ((isset($datos['precio']) && !empty($datos['precio']) && $datos['precio'] > 0) || 
+        (isset($datos['tiempo']) && !empty($datos['tiempo']) && $datos['tiempo'] > 0) || 
+        (isset($datos['estado']) && !empty($datos['estado'])) ||
+        (isset($datos['fecha_creacion']) && !empty($datos['fecha_creacion'])) ||
+        (isset($datos['fecha_actualizacion']) && !empty($datos['fecha_actualizacion']))) {
+        $mostrarSeccionServicio = true;
+    }
+    
+    if ($mostrarSeccionServicio) {
         $content .= '<div class="section-title">
         <span class="icon">💼</span> Detalles del Servicio
     </div>
     <table class="details-table">';
 
-        if (isset($datos['precio']) && $datos['precio'] > 0) {
+        if (isset($datos['precio']) && !empty($datos['precio']) && $datos['precio'] > 0) {
             $content .= '<tr>
-            <td>Precio:</td>
+            <td>Precio del Servicio:</td>
             <td><strong style="color: #28a745; font-size: 18px;">Q ' . number_format($datos['precio'], 2) . '</strong></td>
         </tr>';
         }
 
-        if (isset($datos['tiempo']) && $datos['tiempo'] > 0) {
+        if (isset($datos['tiempo']) && !empty($datos['tiempo']) && $datos['tiempo'] > 0) {
             $content .= '<tr>
             <td>Tiempo Estimado:</td>
             <td><strong>' . htmlspecialchars($datos['tiempo']) . ' días hábiles</strong></td>
         </tr>';
         }
 
-        if (isset($datos['estado'])) {
+        if (isset($datos['estado']) && !empty($datos['estado'])) {
             $content .= '<tr>
-            <td>Estado:</td>
-            <td><span class="badge badge-primary">' . htmlspecialchars($datos['estado']) . '</span></td>
+            <td>Estado Actual:</td>
+            <td><span class="badge badge-primary" style="font-size: 14px; padding: 6px 15px;">' . htmlspecialchars($datos['estado']) . '</span></td>
         </tr>';
         }
 
-        if (isset($datos['fecha_creacion'])) {
+        if (isset($datos['fecha_creacion']) && !empty($datos['fecha_creacion'])) {
             $content .= '<tr>
-            <td>Fecha Creación:</td>
+            <td>Fecha de Creación:</td>
             <td>' . date('d/m/Y H:i', strtotime($datos['fecha_creacion'])) . '</td>
         </tr>';
         }
 
-        if (isset($datos['fecha_actualizacion'])) {
+        if (isset($datos['fecha_actualizacion']) && !empty($datos['fecha_actualizacion'])) {
             $content .= '<tr>
             <td>Última Actualización:</td>
             <td>' . date('d/m/Y H:i', strtotime($datos['fecha_actualizacion'])) . '</td>
@@ -476,17 +479,17 @@ function correo_enviar($tipo, $datos)
         $content .= '</table>';
     }
 
-    // OBSERVACIONES
-    if (isset($datos['observaciones']) && $datos['observaciones'] !== "" && $datos['observaciones'] !== null) {
+    // ========== OBSERVACIONES (SI EXISTEN) ==========
+    if (isset($datos['observaciones']) && !empty($datos['observaciones'])) {
         $content .= '<div class="observaciones-box">
-        <strong>📝 Observaciones:</strong><br><br>
-        <div style="font-size: 15px;">' . nl2br(htmlspecialchars($datos['observaciones'])) . '</div>
+        <strong>📝 Observaciones del Proceso:</strong><br><br>
+        <div style="font-size: 15px; line-height: 1.8;">' . nl2br(htmlspecialchars($datos['observaciones'])) . '</div>
     </div>';
     }
 
-    // BOTÓN
+    // ========== BOTÓN DE ACCIÓN (SIEMPRE SE MUESTRA) ==========
     $content .= '<div class="cta">
-        <a href="https://app.ithinkguatemala.com/home/pages/liberaciones/buscar.php?search=' . urlencode($datos['imei']) . '" target="_blank">' . htmlspecialchars($ctaText) . '</a>
+        <a href="https://app.ithinkguatemala.com/home/pages/liberaciones/buscar.php?search=' . urlencode($datos['imei'] ?? '') . '" target="_blank">' . htmlspecialchars($ctaText) . '</a>
     </div>
 </div>';
 
