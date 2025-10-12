@@ -199,4 +199,4 @@ switch ($accion) {
     default:
         echo "Error: Acción no reconocida.";
         break;
-}?>
+}
