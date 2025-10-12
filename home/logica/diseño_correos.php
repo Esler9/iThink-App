@@ -3,52 +3,37 @@
  * Función auxiliar para mapear tiempo de uso
  */
 function obtenerTiempoUsaTexto($tiempo) {
-    $tiempos = [
+    $tiempos = array(
         '0-3' => '0 a 3 meses',
         '3-6' => '3 a 6 meses',
         '6-12' => '6 a 12 meses',
         '12+' => 'Más de 12 meses',
         'nunca' => 'Nunca usado en USA'
-    ];
+    );
     return isset($tiempos[$tiempo]) ? $tiempos[$tiempo] : $tiempo;
 }
 
 /**
  * Genera el cuerpo del correo HTML según el tipo de notificación y los datos proporcionados.
  *
- * @param string $tipo   Tipo de correo ("consulta", "pendiente", "aprobado", "finalizado", "rechazado", "consultaReiniciada", etc.).
- * @param array  $datos  Arreglo asociativo con la información necesaria. Se espera que incluya:
- *                       - 'name'          => Nombre del cliente
- *                       - 'celular'       => Número de celular
- *                       - 'imei'          => IMEI o serie
- *                       - 'imei2'         => IMEI secundario (opcional)
- *                       - 'modelo'        => Modelo del dispositivo
- *                       - 'tiempo_usa'    => Tiempo de uso en USA (opcional)
- *                       - 'no_blacklist'  => Confirmación no blacklist (opcional)
- *                       - 'no_icloud'     => Confirmación no iCloud (opcional)
- *                       Además, opcionalmente:
- *                       - 'precio'        => Precio
- *                       - 'tiempo'        => Tiempo
- *                       - 'observaciones' => Observaciones
- *
- * @return string        Cadena con el contenido HTML del correo.
+ * @param string $tipo   Tipo de correo
+ * @param array  $datos  Arreglo asociativo con la información necesaria
+ * @return string        Cadena con el contenido HTML del correo
  */
 function correo_enviar($tipo, $datos)
 {
     // Cabecera HTML y estilos base mejorados
-    $html_header = <<<HTML
-<!DOCTYPE html>
+    $html_header = '<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notificación de Liberación</title>
 <style>
-    /* Reset y estilos base */
     body, p, div { margin: 0; padding: 0; }
     body {
         background-color: #f4f4f4;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
         color: #333;
         line-height: 1.6;
         padding: 20px;
@@ -65,7 +50,6 @@ function correo_enviar($tipo, $datos)
         text-align: center;
         padding: 30px 20px;
         color: #ffffff;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     .header h1 {
         font-size: 26px;
@@ -168,12 +152,7 @@ function correo_enviar($tipo, $datos)
         font-weight: bold;
         font-size: 16px;
         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        transition: all 0.3s ease;
         display: inline-block;
-    }
-    .cta a:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
     }
     .footer {
         background: #2c3e50;
@@ -191,7 +170,7 @@ function correo_enviar($tipo, $datos)
         padding: 5px 15px;
         border-radius: 15px;
         margin-top: 10px;
-        font-family: 'Courier New', monospace;
+        font-family: Courier New, monospace;
         font-weight: bold;
     }
     .observaciones-box {
@@ -215,86 +194,88 @@ function correo_enviar($tipo, $datos)
 </style>
 </head>
 <body>
-<div class="container">
-HTML;
+<div class="container">';
 
-    // Pie de página mejorado
-    $html_footer = <<<HTML
-<div class="footer">
+    // Pie de página
+    $html_footer = '<div class="footer">
     <p>Este es un correo automático, por favor no responder.</p>
     <p><strong>iThink Guatemala</strong> - Sistema de Liberaciones</p>
     <p class="code">Código: {codigo}</p>
 </div>
 </div>
 </body>
-</html>
-HTML;
+</html>';
 
     // Definir variables según el tipo de notificación
+    $titulo = '';
+    $ctaText = '';
+    $codigo = '';
+    $headerColor = '';
+    $icon = '';
+    
     switch ($tipo) {
         case "consulta":
-            $titulo      = "Nueva Consulta de Liberación";
-            $ctaText     = "📋 Informar Consulta";
-            $codigo      = "0";
+            $titulo = "Nueva Consulta de Liberación";
+            $ctaText = "Informar Consulta";
+            $codigo = "0";
             $headerColor = "linear-gradient(135deg, #0097A7 0%, #00ACC1 100%)";
-            $icon        = "&#x1F4CB;";  // 📋 Clipboard
+            $icon = "&#x1F4CB;";
             break;
         case "pendiente":
-            $titulo      = "Liberación Cambió a Pendiente";
-            $ctaText     = "⚡ Realizar Acción";
-            $codigo      = "1";
+            $titulo = "Liberación Cambió a Pendiente";
+            $ctaText = "Realizar Acción";
+            $codigo = "1";
             $headerColor = "linear-gradient(135deg, #D32F2F 0%, #F44336 100%)";
-            $icon        = "&#x23F3;";  // ⏳ Reloj de arena
+            $icon = "&#x23F3;";
             break;
         case "aprobado":
-            $titulo      = "Liberación Aprobada por Cliente";
-            $ctaText     = "✅ Ver Detalles";
-            $codigo      = "2";
+            $titulo = "Liberación Aprobada por Cliente";
+            $ctaText = "Ver Detalles";
+            $codigo = "2";
             $headerColor = "linear-gradient(135deg, #388E3C 0%, #4CAF50 100%)";
-            $icon        = "&#x2705;";  // ✅ Marca de verificación
+            $icon = "&#x2705;";
             break;
         case "finalizado":
-            $titulo      = "Proceso de Liberación Finalizado";
-            $ctaText     = "🎉 Ver Resultados";
-            $codigo      = "4";
+            $titulo = "Proceso de Liberación Finalizado";
+            $ctaText = "Ver Resultados";
+            $codigo = "4";
             $headerColor = "linear-gradient(135deg, #F57C00 0%, #FFA726 100%)";
-            $icon        = "&#x1F3C1;"; // 🏁 Bandera a cuadros
+            $icon = "&#x1F3C1;";
             break;
         case "iniciado":
-            $titulo      = "Inicio de Proceso de Liberación";
-            $ctaText     = "🚀 Ver Progreso";
-            $codigo      = "3";
+            $titulo = "Inicio de Proceso de Liberación";
+            $ctaText = "Ver Progreso";
+            $codigo = "3";
             $headerColor = "linear-gradient(135deg, #1976D2 0%, #2196F3 100%)";
-            $icon        = "&#x1F680;"; // 🚀 Cohete
+            $icon = "&#x1F680;";
             break;
         case "rechazado":
-            $titulo      = "Liberación Rechazada";
-            $ctaText     = "❌ Realizar Acción";
-            $codigo      = "5";
+            $titulo = "Liberación Rechazada";
+            $ctaText = "Realizar Acción";
+            $codigo = "5";
             $headerColor = "linear-gradient(135deg, #C62828 0%, #E53935 100%)";
-            $icon        = "&#x274C;";  // ❌ Cruz
+            $icon = "&#x274C;";
             break;
         case "consultaReiniciada":
-            $titulo      = "Consulta de Liberación Reiniciada";
-            $ctaText     = "🔄 Realizar Acción";
-            $codigo      = "2.1";
+            $titulo = "Consulta de Liberación Reiniciada";
+            $ctaText = "Realizar Acción";
+            $codigo = "2.1";
             $headerColor = "linear-gradient(135deg, #F57C00 0%, #FF9800 100%)";
-            $icon        = "&#x1F501;"; // 🔁 Símbolo de reinicio
+            $icon = "&#x1F501;";
             break;
         default:
-            $titulo      = "Notificación de Liberación";
-            $ctaText     = "👁️ Ver Detalles";
-            $codigo      = "0";
+            $titulo = "Notificación de Liberación";
+            $ctaText = "Ver Detalles";
+            $codigo = "0";
             $headerColor = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
-            $icon        = "&#x1F4E7;"; // 📧 Correo
+            $icon = "&#x1F4E7;";
             break;
     }
 
-    // Sección de contenido con diseño mejorado
-    $content = <<<HTML
-<div class="header" style="background: $headerColor;">
-    <span class="icon">$icon</span>
-    <h1>$titulo</h1>
+    // Construir contenido
+    $content = '<div class="header" style="background: ' . $headerColor . ';">
+    <span class="icon">' . $icon . '</span>
+    <h1>' . $titulo . '</h1>
 </div>
 <div class="content">
     <p>Se ha registrado una actualización en el sistema de liberaciones. A continuación, se detallan los datos asociados:</p>
@@ -305,11 +286,11 @@ HTML;
     <table class="details-table">
         <tr>
             <td>Nombre:</td>
-            <td>{$datos['name']}</td>
+            <td>' . htmlspecialchars($datos['name']) . '</td>
         </tr>
         <tr>
             <td>Celular:</td>
-            <td>+502 {$datos['celular']}</td>
+            <td>+502 ' . htmlspecialchars($datos['celular']) . '</td>
         </tr>
     </table>
     
@@ -319,126 +300,103 @@ HTML;
     <table class="details-table">
         <tr>
             <td>IMEI Principal:</td>
-            <td><strong>{$datos['imei']}</strong></td>
-        </tr>
-HTML;
+            <td><strong>' . htmlspecialchars($datos['imei']) . '</strong></td>
+        </tr>';
 
     // IMEI secundario si existe
     if (isset($datos['imei2']) && $datos['imei2'] !== "" && $datos['imei2'] !== null) {
-        $content .= <<<HTML
-        <tr>
+        $content .= '<tr>
             <td>IMEI Secundario:</td>
-            <td><strong>{$datos['imei2']}</strong> <span class="badge badge-info">Dual SIM</span></td>
-        </tr>
-HTML;
+            <td><strong>' . htmlspecialchars($datos['imei2']) . '</strong> <span class="badge badge-info">Dual SIM</span></td>
+        </tr>';
     }
 
-    $content .= <<<HTML
-        <tr>
+    $content .= '<tr>
             <td>Modelo:</td>
-            <td>{$datos['modelo']}</td>
-        </tr>
-HTML;
+            <td>' . htmlspecialchars($datos['modelo']) . '</td>
+        </tr>';
 
     // Tiempo de uso en USA
     if (isset($datos['tiempo_usa']) && $datos['tiempo_usa'] !== "" && $datos['tiempo_usa'] !== null) {
         $tiempoTexto = obtenerTiempoUsaTexto($datos['tiempo_usa']);
         $badgeClass = ($datos['tiempo_usa'] === 'nunca' || $datos['tiempo_usa'] === '0-3') ? 'badge-success' : 'badge-warning';
-        $content .= <<<HTML
-        <tr>
+        $content .= '<tr>
             <td>Tiempo en USA:</td>
-            <td>$tiempoTexto <span class="badge $badgeClass">USA</span></td>
-        </tr>
-HTML;
+            <td>' . htmlspecialchars($tiempoTexto) . ' <span class="badge ' . $badgeClass . '">USA</span></td>
+        </tr>';
     }
 
-    $content .= "</table>";
+    $content .= '</table>';
 
     // Verificaciones de Seguridad
     if ((isset($datos['no_blacklist']) && $datos['no_blacklist'] == 1) || 
         (isset($datos['no_icloud']) && $datos['no_icloud'] == 1)) {
         
-        $content .= <<<HTML
-    <div class="section-title">
+        $content .= '<div class="section-title">
         <span class="icon">🔒</span> Verificaciones de Seguridad
     </div>
-    <div class="security-checks">
-HTML;
+    <div class="security-checks">';
 
         if (isset($datos['no_blacklist']) && $datos['no_blacklist'] == 1) {
-            $content .= <<<HTML
-        <div class="security-item">
+            $content .= '<div class="security-item">
             <span class="check-icon">✓</span>
             <span>Equipo <strong>NO</strong> está en Blacklist (sin reporte de pérdida/robo)</span>
-        </div>
-HTML;
+        </div>';
         }
 
         if (isset($datos['no_icloud']) && $datos['no_icloud'] == 1) {
-            $content .= <<<HTML
-        <div class="security-item">
+            $content .= '<div class="security-item">
             <span class="check-icon">✓</span>
             <span>Equipo <strong>NO</strong> tiene cuenta iCloud activa</span>
-        </div>
-HTML;
+        </div>';
         }
 
-        $content .= "</div>";
+        $content .= '</div>';
     }
 
-    // Información de Precio y Tiempo si están disponibles
+    // Información de Precio y Tiempo
     if ((isset($datos['precio']) && $datos['precio'] !== "" && $datos['precio'] > 0) || 
         (isset($datos['tiempo']) && $datos['tiempo'] !== "" && $datos['tiempo'] > 0)) {
         
-        $content .= <<<HTML
-    <div class="section-title">
+        $content .= '<div class="section-title">
         <span class="icon">💰</span> Detalles de Servicio
     </div>
-    <table class="details-table">
-HTML;
+    <table class="details-table">';
 
         if (isset($datos['precio']) && $datos['precio'] !== "" && $datos['precio'] > 0) {
-            $content .= <<<HTML
-        <tr>
+            $content .= '<tr>
             <td>Precio:</td>
-            <td><strong>Q {$datos['precio']}</strong></td>
-        </tr>
-HTML;
+            <td><strong>Q ' . htmlspecialchars($datos['precio']) . '</strong></td>
+        </tr>';
         }
 
         if (isset($datos['tiempo']) && $datos['tiempo'] !== "" && $datos['tiempo'] > 0) {
-            $content .= <<<HTML
-        <tr>
+            $content .= '<tr>
             <td>Tiempo Estimado:</td>
-            <td>{$datos['tiempo']} días hábiles</td>
-        </tr>
-HTML;
+            <td>' . htmlspecialchars($datos['tiempo']) . ' días hábiles</td>
+        </tr>';
         }
 
-        $content .= "</table>";
+        $content .= '</table>';
     }
 
-    // Observaciones si existen
+    // Observaciones
     if (isset($datos['observaciones']) && $datos['observaciones'] !== "" && $datos['observaciones'] !== null) {
-        $content .= <<<HTML
-    <div class="observaciones-box">
+        $content .= '<div class="observaciones-box">
         <strong>📝 Observaciones:</strong><br>
-        {$datos['observaciones']}
-    </div>
-HTML;
+        ' . nl2br(htmlspecialchars($datos['observaciones'])) . '
+    </div>';
     }
 
-    $content .= <<<HTML
-    <div class="cta">
-        <a href="https://app.ithinkguatemala.com/home/pages/liberaciones/buscar.php?search={$datos['imei']}" target="_blank">$ctaText</a>
+    $content .= '<div class="cta">
+        <a href="https://app.ithinkguatemala.com/home/pages/liberaciones/buscar.php?search=' . urlencode($datos['imei']) . '" target="_blank">' . htmlspecialchars($ctaText) . '</a>
     </div>
-</div>
-HTML;
+</div>';
 
-    // Reemplazar el placeholder {codigo} en el footer
-    $html_footer = str_replace("{codigo}", $codigo, $html_footer);
+    // Reemplazar el código en el footer
+    $html_footer = str_replace('{codigo}', $codigo, $html_footer);
 
-    // Unir todas las partes para formar el correo completo
+    // Unir todas las partes
     $correo = $html_header . $content . $html_footer;
     return $correo;
 }
