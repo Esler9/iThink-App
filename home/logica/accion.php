@@ -17,6 +17,11 @@ function reenviarCorreo($listaCorreos, $imei, $body) {
     }
 }
 
+// Verificar que sea una petición POST o GET con parámetros
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && empty($_GET['accion'])) {
+    die("Acceso denegado: Este archivo solo puede ser accedido mediante formularios.");
+}
+
 $accion = isset($_GET['accion']) ? $_GET['accion'] : "";
 $imei   = isset($_GET['imei']) ? $_GET['imei'] : "";
 $desc   = isset($_POST['desc']) ? $_POST['desc'] : "";
@@ -25,7 +30,7 @@ $result = isset($_POST['resultado']) ? $_POST['resultado'] : "";
 
 // Validar que exista la acción
 if (empty($accion)) {
-    die("Error: No se especificó una acción.");
+    die("Error: No se especifico una accion valida.");
 }
 
 // Inicializar array de datos común
@@ -94,7 +99,11 @@ if ($accion !== "0" && !empty($imei)) {
 switch ($accion) {
 
     case "0":
-        // Creación de una nueva liberación
+        // Creación de una nueva liberación - REQUIERE POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            die("Error: Este caso requiere metodo POST.");
+        }
+        
         if (empty($_POST['c_imei']) || empty($_POST['model']) || empty($_POST['name']) || empty($_POST['celular'])) {
             header("location:../pages/liberaciones/crear.php?alert=DataMissing");
             exit();
