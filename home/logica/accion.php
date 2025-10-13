@@ -1,13 +1,16 @@
 <?php
-// DEBUG - Ver qué está recibiendo
+session_start();
+
+// DEBUG - Ver qué está recibiendo (DESPUÉS de session_start)
+file_put_contents('debug.log', date('Y-m-d H:i:s') . " - Nueva petición\n", FILE_APPEND);
 file_put_contents('debug.log', print_r([
     'REQUEST_URI' => $_SERVER['REQUEST_URI'],
     'QUERY_STRING' => $_SERVER['QUERY_STRING'],
+    'REQUEST_METHOD' => $_SERVER['REQUEST_METHOD'],
     'GET' => $_GET,
     'POST' => $_POST
-], true), FILE_APPEND);
+], true) . "\n\n", FILE_APPEND);
 
-session_start();
 if (!isset($_SESSION["username"])) {
     header('location:login.php');
     exit();
@@ -45,13 +48,15 @@ else {
     }
 }
 
+file_put_contents('debug.log', "Accion detectada: '$accion'\n\n", FILE_APPEND);
+
 // Validar que exista la acción
 if (empty($accion)) {
     // Log detallado del error
     file_put_contents('debug.log', "ERROR: No se encontró acción\n", FILE_APPEND);
     file_put_contents('debug.log', "GET: " . print_r($_GET, true) . "\n", FILE_APPEND);
     file_put_contents('debug.log', "POST: " . print_r($_POST, true) . "\n", FILE_APPEND);
-    file_put_contents('debug.log', "QUERY_STRING: " . ($_SERVER['QUERY_STRING'] ?? 'vacio') . "\n", FILE_APPEND);
+    file_put_contents('debug.log', "QUERY_STRING: " . ($_SERVER['QUERY_STRING'] ?? 'vacio') . "\n\n", FILE_APPEND);
     
     die("Error: No se especifico una accion valida. Debe proporcionar el parametro 'accion'.");
 }
@@ -88,7 +93,6 @@ if ($accion !== "0" && !empty($imei)) {
         die("No se encontro el registro con IMEI: " . htmlspecialchars($imei));
     }
 
-    // Variables obtenidas de la base de datos
     $dtname         = $row_dt['Nombre_Cliente'] ?? "";
     $dtcel          = $row_dt['Celular'] ?? "";
     $dtmodel        = $row_dt['modelo'] ?? "";
@@ -104,7 +108,6 @@ if ($accion !== "0" && !empty($imei)) {
     $dtfecha_creacion = $row_dt['date'] ?? "";
     $dtfecha_update = $row_dt['date_update'] ?? "";
 
-    // Arreglo común con TODOS los datos
     $datosCommon = [
         'name'                => $dtname,
         'celular'             => $dtcel,
