@@ -17,18 +17,24 @@ function reenviarCorreo($listaCorreos, $imei, $body) {
     }
 }
 
-$accion = $_GET['accion'];
-$imei   = $_GET['imei'];
+$accion = isset($_GET['accion']) ? $_GET['accion'] : "";
+$imei   = isset($_GET['imei']) ? $_GET['imei'] : "";
 $desc   = isset($_POST['desc']) ? $_POST['desc'] : "";
 $date   = date('Y-m-d H:i:s');
 $result = isset($_POST['resultado']) ? $_POST['resultado'] : "";
 
+// Validar que exista la acción
+if (empty($accion)) {
+    die("Error: No se especificó una acción.");
+}
+
 // Inicializar array de datos común
 $datosCommon = [];
 
-// Solo consultar la BD si NO es una creación nueva (caso "0")
-if ($accion !== "0") {
+// Solo consultar la BD si NO es una creación nueva (caso "0") Y existe el IMEI
+if ($accion !== "0" && !empty($imei)) {
     // Consulta COMPLETA para obtener TODOS los datos
+    $imei_escaped = mysqli_real_escape_string($conn, $imei);
     $sql = "SELECT 
                 l.*,
                 t.nombre as tienda_nombre,
@@ -36,7 +42,7 @@ if ($accion !== "0") {
             FROM liberacion l
             LEFT JOIN tiendas t ON l.cod_tienda = t.cod_tienda
             LEFT JOIN estados e ON l.cod_estado = e.cod_estado
-            WHERE l.serie = '$imei'";
+            WHERE l.serie = '$imei_escaped'";
     $consulta = mysqli_query($conn, $sql);
     
     if (!$consulta) {
@@ -46,7 +52,7 @@ if ($accion !== "0") {
     $row_dt = mysqli_fetch_array($consulta);
     
     if (!$row_dt) {
-        die("No se encontró el registro con IMEI: " . $imei);
+        die("No se encontro el registro con IMEI: " . htmlspecialchars($imei));
     }
 
     // Variables obtenidas de la base de datos
@@ -110,7 +116,7 @@ switch ($accion) {
         $consulta_check = mysqli_query($conn, $sql_check);
         
         if (!$consulta_check) {
-            die("Error en verificación: " . mysqli_error($conn));
+            die("Error en verificacion: " . mysqli_error($conn));
         }
         
         $existe = mysqli_fetch_array($consulta_check);
@@ -178,7 +184,11 @@ switch ($accion) {
             ];
             
             $body = correo_enviar("consulta", $datos);
-            reenviarCorreo($correos, $imei, $body);
+            
+            // Obtener lista de correos desde correo.php
+            if (isset($correos) && is_array($correos) && count($correos) > 0) {
+                reenviarCorreo($correos, $imei, $body);
+            }
 
             header("location:../pages/liberaciones/crear.php?alert=0&imei=$imei&model=$model&name=$name&celular=$celular");
         } else {
@@ -188,6 +198,9 @@ switch ($accion) {
 
     case "1":
         // Cambio de estado a Pendiente (Informar)
+        if (empty($imei)) {
+            die("Error: IMEI no especificado.");
+        }
         if (empty($_POST['precio']) || empty($_POST['tiempo'])) {
             header("location:../pages/liberaciones/consultas.php?alert=DataMissing&imei=$imei");
             exit();
@@ -195,6 +208,7 @@ switch ($accion) {
         $precio = mysqli_real_escape_string($conn, $_POST['precio']);
         $tiempo = mysqli_real_escape_string($conn, $_POST['tiempo']);
         $desc_escaped = mysqli_real_escape_string($conn, $desc);
+        $imei_escaped = mysqli_real_escape_string($conn, $imei);
         
         $sql = "UPDATE liberacion SET 
                 cod_estado = '2', 
@@ -202,7 +216,7 @@ switch ($accion) {
                 Tiempo = '$tiempo', 
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
-                WHERE serie = '$imei'";
+                WHERE serie = '$imei_escaped'";
         $result_update = mysqli_query($conn, $sql);
         
         if (!$result_update) {
@@ -216,18 +230,24 @@ switch ($accion) {
         $datosCommon['estado'] = "Pendiente";
         
         $body = correo_enviar("pendiente", $datosCommon);
-        reenviarCorreo($correos, $imei, $body);
+        if (isset($correos) && is_array($correos)) {
+            reenviarCorreo($correos, $imei, $body);
+        }
         header("location:../pages/liberaciones/consultas.php?alert=1&imei=$imei");
         break;
 
     case "5.1":
         // Liberación rechazada (desde consultas)
+        if (empty($imei)) {
+            die("Error: IMEI no especificado.");
+        }
         $desc_escaped = mysqli_real_escape_string($conn, $desc);
+        $imei_escaped = mysqli_real_escape_string($conn, $imei);
         $sql = "UPDATE liberacion SET 
                 cod_estado = '6', 
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
-                WHERE serie = '$imei'";
+                WHERE serie = '$imei_escaped'";
         $result_update = mysqli_query($conn, $sql);
         
         if (!$result_update) {
@@ -237,18 +257,24 @@ switch ($accion) {
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Rechazada";
         $body = correo_enviar("rechazado", $datosCommon);
-        reenviarCorreo($correos, $imei, $body);
+        if (isset($correos) && is_array($correos)) {
+            reenviarCorreo($correos, $imei, $body);
+        }
         header("location:../pages/liberaciones/consultas.php?alert=5&imei=$imei");
         break;
 
     case "2":
         // Liberación aprobada
+        if (empty($imei)) {
+            die("Error: IMEI no especificado.");
+        }
         $desc_escaped = mysqli_real_escape_string($conn, $desc);
+        $imei_escaped = mysqli_real_escape_string($conn, $imei);
         $sql = "UPDATE liberacion SET 
                 cod_estado = '3', 
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
-                WHERE serie = '$imei'";
+                WHERE serie = '$imei_escaped'";
         $result_update = mysqli_query($conn, $sql);
         
         if (!$result_update) {
@@ -258,12 +284,17 @@ switch ($accion) {
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Aprobada";
         $body = correo_enviar("aprobado", $datosCommon);
-        reenviarCorreo($correos, $imei, $body);
+        if (isset($correos) && is_array($correos)) {
+            reenviarCorreo($correos, $imei, $body);
+        }
         header("location:../pages/liberaciones/pendientes.php?alert=2&imei=$imei");
         break;
 
     case "2.1":
         // Reinicio de Consulta
+        if (empty($imei)) {
+            die("Error: IMEI no especificado.");
+        }
         if (empty($_POST['precio']) || empty($_POST['tiempo'])) {
             header("location:../pages/liberaciones/rechazadas.php?alert=DataMissing&imei=$imei");
             exit();
@@ -271,6 +302,7 @@ switch ($accion) {
         $precio = mysqli_real_escape_string($conn, $_POST['precio']);
         $tiempo = mysqli_real_escape_string($conn, $_POST['tiempo']);
         $desc_escaped = mysqli_real_escape_string($conn, $desc);
+        $imei_escaped = mysqli_real_escape_string($conn, $imei);
         
         $sql = "UPDATE liberacion SET 
                 cod_estado = '1', 
@@ -278,7 +310,7 @@ switch ($accion) {
                 Tiempo = '$tiempo', 
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
-                WHERE serie = '$imei'";
+                WHERE serie = '$imei_escaped'";
         $result_update = mysqli_query($conn, $sql);
         
         if (!$result_update) {
@@ -291,18 +323,24 @@ switch ($accion) {
         $datosCommon['estado'] = "Consulta Reiniciada";
         
         $body = correo_enviar("consultaReiniciada", $datosCommon);
-        reenviarCorreo($correos, $imei, $body);
+        if (isset($correos) && is_array($correos)) {
+            reenviarCorreo($correos, $imei, $body);
+        }
         header("location:../pages/liberaciones/rechazadas.php?alert=2.1&imei=$imei");
         break;
 
     case "5.2":
         // Liberación rechazada (desde pendientes)
+        if (empty($imei)) {
+            die("Error: IMEI no especificado.");
+        }
         $desc_escaped = mysqli_real_escape_string($conn, $desc);
+        $imei_escaped = mysqli_real_escape_string($conn, $imei);
         $sql = "UPDATE liberacion SET 
                 cod_estado = '6', 
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
-                WHERE serie = '$imei'";
+                WHERE serie = '$imei_escaped'";
         $result_update = mysqli_query($conn, $sql);
         
         if (!$result_update) {
@@ -312,18 +350,24 @@ switch ($accion) {
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Rechazada";
         $body = correo_enviar("rechazado", $datosCommon);
-        reenviarCorreo($correos, $imei, $body);
+        if (isset($correos) && is_array($correos)) {
+            reenviarCorreo($correos, $imei, $body);
+        }
         header("location:../pages/liberaciones/pendientes.php?alert=5&imei=$imei");
         break;
 
     case "5.3":
         // Liberación rechazada (desde aprobadas)
+        if (empty($imei)) {
+            die("Error: IMEI no especificado.");
+        }
         $desc_escaped = mysqli_real_escape_string($conn, $desc);
+        $imei_escaped = mysqli_real_escape_string($conn, $imei);
         $sql = "UPDATE liberacion SET 
                 cod_estado = '6', 
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
-                WHERE serie = '$imei'";
+                WHERE serie = '$imei_escaped'";
         $result_update = mysqli_query($conn, $sql);
         
         if (!$result_update) {
@@ -333,18 +377,24 @@ switch ($accion) {
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Rechazada";
         $body = correo_enviar("rechazado", $datosCommon);
-        reenviarCorreo($correos, $imei, $body);
+        if (isset($correos) && is_array($correos)) {
+            reenviarCorreo($correos, $imei, $body);
+        }
         header("location:../pages/liberaciones/aprobadas.php?alert=5&imei=$imei");
         break;
 
     case "5.4":
         // Liberación rechazada (desde finalizadas)
+        if (empty($imei)) {
+            die("Error: IMEI no especificado.");
+        }
         $desc_escaped = mysqli_real_escape_string($conn, $desc);
+        $imei_escaped = mysqli_real_escape_string($conn, $imei);
         $sql = "UPDATE liberacion SET 
                 cod_estado = '6', 
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
-                WHERE serie = '$imei'";
+                WHERE serie = '$imei_escaped'";
         $result_update = mysqli_query($conn, $sql);
         
         if (!$result_update) {
@@ -354,18 +404,24 @@ switch ($accion) {
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Rechazada";
         $body = correo_enviar("rechazado", $datosCommon);
-        reenviarCorreo($correos, $imei, $body);
+        if (isset($correos) && is_array($correos)) {
+            reenviarCorreo($correos, $imei, $body);
+        }
         header("location:../pages/liberaciones/finalizadas.php?alert=5&imei=$imei");
         break;
 
     case "3":
         // Inicio del proceso de liberación
+        if (empty($imei)) {
+            die("Error: IMEI no especificado.");
+        }
         $desc_escaped = mysqli_real_escape_string($conn, $desc);
+        $imei_escaped = mysqli_real_escape_string($conn, $imei);
         $sql = "UPDATE liberacion SET 
                 cod_estado = '4', 
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
-                WHERE serie = '$imei'";
+                WHERE serie = '$imei_escaped'";
         $result_update = mysqli_query($conn, $sql);
         
         if (!$result_update) {
@@ -375,18 +431,25 @@ switch ($accion) {
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "En Proceso";
         $body = correo_enviar("iniciado", $datosCommon);
-        reenviarCorreo($correos, $imei, $body);
+        if (isset($correos) && is_array($correos)) {
+            reenviarCorreo($correos, $imei, $body);
+        }
         header("location:../pages/liberaciones/aprobadas.php?alert=3&imei=$imei");
         break;
 
     case "4":
         // Finalización del proceso de liberación
+        if (empty($imei)) {
+            die("Error: IMEI no especificado.");
+        }
         $desc_escaped = mysqli_real_escape_string($conn, $desc);
+        $imei_escaped = mysqli_real_escape_string($conn, $imei);
+        $result_escaped = mysqli_real_escape_string($conn, $result);
         $sql = "UPDATE liberacion SET 
-                cod_estado = '$result', 
+                cod_estado = '$result_escaped', 
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
-                WHERE serie = '$imei'";
+                WHERE serie = '$imei_escaped'";
         $result_update = mysqli_query($conn, $sql);
         
         if (!$result_update) {
@@ -396,12 +459,14 @@ switch ($accion) {
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Finalizada";
         $body = correo_enviar("finalizado", $datosCommon);
-        reenviarCorreo($correos, $imei, $body);
+        if (isset($correos) && is_array($correos)) {
+            reenviarCorreo($correos, $imei, $body);
+        }
         header("location:../pages/liberaciones/aprobadas.php?alert=4&imei=$imei");
         break;
 
     default:
-        echo "Error: Acción no reconocida.";
+        echo "Error: Accion no reconocida.";
         break;
 }
 ?>
