@@ -1,6 +1,6 @@
 <?php
 /**
- * Función auxiliar para mapear tiempo de uso
+ * Funcion auxiliar para mapear tiempo de uso
  */
 function obtenerTiempoUsaTexto($tiempo) {
     $tiempos = array(

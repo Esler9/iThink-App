@@ -23,52 +23,67 @@ $desc   = isset($_POST['desc']) ? $_POST['desc'] : "";
 $date   = date('Y-m-d H:i:s');
 $result = isset($_POST['resultado']) ? $_POST['resultado'] : "";
 
-// Consulta COMPLETA para obtener TODOS los datos (incluyendo los nuevos campos)
-$sql = "SELECT 
-            l.*,
-            t.nombre as tienda_nombre,
-            e.estado as estado_nombre
-        FROM liberacion l
-        LEFT JOIN tiendas t ON l.cod_tienda = t.cod_tienda
-        LEFT JOIN estados e ON l.cod_estado = e.cod_estado
-        WHERE l.serie = '$imei'";
-$consulta = mysqli_query($conn, $sql);
-$row_dt = mysqli_fetch_array($consulta);
+// Inicializar array de datos común
+$datosCommon = [];
 
-// Variables obtenidas de la base de datos (con TODOS los campos nuevos)
-$dtname         = $row_dt['Nombre_Cliente'] ?? "";
-$dtcel          = $row_dt['Celular'] ?? "";
-$dtmodel        = $row_dt['modelo'] ?? "";
-$dtimei2        = $row_dt['serie_2'] ?? "";
-$dttiempo_usa   = $row_dt['tiempo_usa'] ?? "";
-$dtno_blacklist = $row_dt['no_blacklist'] ?? 0;
-$dtno_icloud    = $row_dt['no_icloud'] ?? 0;
-$dtprecio       = $row_dt['Precio'] ?? "";
-$dttime         = $row_dt['Tiempo'] ?? "";
-$dtobs          = $row_dt['Observaciones'] ?? "";
-$dttienda       = $row_dt['tienda_nombre'] ?? "";
-$dtestado       = $row_dt['estado_nombre'] ?? "";
-$dtfecha_creacion = $row_dt['date'] ?? "";
-$dtfecha_update = $row_dt['date_update'] ?? "";
+// Solo consultar la BD si NO es una creación nueva (caso "0")
+if ($accion !== "0") {
+    // Consulta COMPLETA para obtener TODOS los datos
+    $sql = "SELECT 
+                l.*,
+                t.nombre as tienda_nombre,
+                e.estado as estado_nombre
+            FROM liberacion l
+            LEFT JOIN tiendas t ON l.cod_tienda = t.cod_tienda
+            LEFT JOIN estados e ON l.cod_estado = e.cod_estado
+            WHERE l.serie = '$imei'";
+    $consulta = mysqli_query($conn, $sql);
+    
+    if (!$consulta) {
+        die("Error en consulta: " . mysqli_error($conn));
+    }
+    
+    $row_dt = mysqli_fetch_array($consulta);
+    
+    if (!$row_dt) {
+        die("No se encontró el registro con IMEI: " . $imei);
+    }
 
-// Arreglo común con TODOS los datos para la notificación por correo
-$datosCommon = [
-    'name'                => $dtname,
-    'celular'             => $dtcel,
-    'imei'                => $imei,
-    'imei2'               => $dtimei2,
-    'modelo'              => $dtmodel,
-    'tiempo_usa'          => $dttiempo_usa,
-    'no_blacklist'        => $dtno_blacklist,
-    'no_icloud'           => $dtno_icloud,
-    'precio'              => $dtprecio,
-    'tiempo'              => $dttime,
-    'observaciones'       => $desc,
-    'tienda'              => $dttienda,
-    'estado'              => $dtestado,
-    'fecha_creacion'      => $dtfecha_creacion,
-    'fecha_actualizacion' => $dtfecha_update
-];
+    // Variables obtenidas de la base de datos
+    $dtname         = $row_dt['Nombre_Cliente'] ?? "";
+    $dtcel          = $row_dt['Celular'] ?? "";
+    $dtmodel        = $row_dt['modelo'] ?? "";
+    $dtimei2        = $row_dt['serie_2'] ?? "";
+    $dttiempo_usa   = $row_dt['tiempo_usa'] ?? "";
+    $dtno_blacklist = $row_dt['no_blacklist'] ?? 0;
+    $dtno_icloud    = $row_dt['no_icloud'] ?? 0;
+    $dtprecio       = $row_dt['Precio'] ?? "";
+    $dttime         = $row_dt['Tiempo'] ?? "";
+    $dtobs          = $row_dt['Observaciones'] ?? "";
+    $dttienda       = $row_dt['tienda_nombre'] ?? "";
+    $dtestado       = $row_dt['estado_nombre'] ?? "";
+    $dtfecha_creacion = $row_dt['date'] ?? "";
+    $dtfecha_update = $row_dt['date_update'] ?? "";
+
+    // Arreglo común con TODOS los datos
+    $datosCommon = [
+        'name'                => $dtname,
+        'celular'             => $dtcel,
+        'imei'                => $imei,
+        'imei2'               => $dtimei2,
+        'modelo'              => $dtmodel,
+        'tiempo_usa'          => $dttiempo_usa,
+        'no_blacklist'        => $dtno_blacklist,
+        'no_icloud'           => $dtno_icloud,
+        'precio'              => $dtprecio,
+        'tiempo'              => $dttime,
+        'observaciones'       => $desc,
+        'tienda'              => $dttienda,
+        'estado'              => $dtestado,
+        'fecha_creacion'      => $dtfecha_creacion,
+        'fecha_actualizacion' => $dtfecha_update
+    ];
+}
 
 switch ($accion) {
 
@@ -93,6 +108,11 @@ switch ($accion) {
         // Verificar si ya existe
         $sql_check = "SELECT COUNT(*) AS contar FROM liberacion WHERE serie = '$imei'";
         $consulta_check = mysqli_query($conn, $sql_check);
+        
+        if (!$consulta_check) {
+            die("Error en verificación: " . mysqli_error($conn));
+        }
+        
         $existe = mysqli_fetch_array($consulta_check);
 
         if ($existe["contar"] == 0) {
@@ -125,25 +145,38 @@ switch ($accion) {
                 '$date', 
                 '$date'
             )";
-            mysqli_query($conn, $sql_insert);
+            
+            $result_insert = mysqli_query($conn, $sql_insert);
+            
+            if (!$result_insert) {
+                die("Error al insertar: " . mysqli_error($conn));
+            }
 
+            // Obtener nombre de tienda
+            $sql_tienda = "SELECT nombre FROM tiendas WHERE cod_tienda = '$cod_tienda'";
+            $consulta_tienda = mysqli_query($conn, $sql_tienda);
+            $tienda_data = mysqli_fetch_array($consulta_tienda);
+            $nombre_tienda = $tienda_data['nombre'] ?? "";
+
+            // Crear array de datos para el correo
             $datos = [
-                'name'          => $name,
-                'celular'       => $celular,
-                'imei'          => $imei,
-                'imei2'         => $imei2,
-                'modelo'        => $model,
-                'tiempo_usa'    => $tiempo_usa,
-                'no_blacklist'  => $no_blacklist,
-                'no_icloud'     => $no_icloud,
-                'precio'        => "",
-                'tiempo'        => "",
-                'observaciones' => $observaciones,
-                'tienda'        => "",
-                'estado'        => "Consulta",
-                'fecha_creacion' => $date,
+                'name'                => $name,
+                'celular'             => $celular,
+                'imei'                => $imei,
+                'imei2'               => $imei2,
+                'modelo'              => $model,
+                'tiempo_usa'          => $tiempo_usa,
+                'no_blacklist'        => $no_blacklist,
+                'no_icloud'           => $no_icloud,
+                'precio'              => "",
+                'tiempo'              => "",
+                'observaciones'       => $observaciones,
+                'tienda'              => $nombre_tienda,
+                'estado'              => "Consulta",
+                'fecha_creacion'      => $date,
                 'fecha_actualizacion' => $date
             ];
+            
             $body = correo_enviar("consulta", $datos);
             reenviarCorreo($correos, $imei, $body);
 
@@ -170,7 +203,11 @@ switch ($accion) {
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
                 WHERE serie = '$imei'";
-        mysqli_query($conn, $sql);
+        $result_update = mysqli_query($conn, $sql);
+        
+        if (!$result_update) {
+            die("Error al actualizar: " . mysqli_error($conn));
+        }
 
         // Actualizar datos con los nuevos valores
         $datosCommon['precio'] = $precio;
@@ -191,7 +228,11 @@ switch ($accion) {
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
                 WHERE serie = '$imei'";
-        mysqli_query($conn, $sql);
+        $result_update = mysqli_query($conn, $sql);
+        
+        if (!$result_update) {
+            die("Error al actualizar: " . mysqli_error($conn));
+        }
         
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Rechazada";
@@ -208,7 +249,11 @@ switch ($accion) {
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
                 WHERE serie = '$imei'";
-        mysqli_query($conn, $sql);
+        $result_update = mysqli_query($conn, $sql);
+        
+        if (!$result_update) {
+            die("Error al actualizar: " . mysqli_error($conn));
+        }
         
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Aprobada";
@@ -234,7 +279,11 @@ switch ($accion) {
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
                 WHERE serie = '$imei'";
-        mysqli_query($conn, $sql);
+        $result_update = mysqli_query($conn, $sql);
+        
+        if (!$result_update) {
+            die("Error al actualizar: " . mysqli_error($conn));
+        }
         
         $datosCommon['precio'] = $precio;
         $datosCommon['tiempo'] = $tiempo;
@@ -254,7 +303,11 @@ switch ($accion) {
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
                 WHERE serie = '$imei'";
-        mysqli_query($conn, $sql);
+        $result_update = mysqli_query($conn, $sql);
+        
+        if (!$result_update) {
+            die("Error al actualizar: " . mysqli_error($conn));
+        }
         
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Rechazada";
@@ -271,7 +324,11 @@ switch ($accion) {
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
                 WHERE serie = '$imei'";
-        mysqli_query($conn, $sql);
+        $result_update = mysqli_query($conn, $sql);
+        
+        if (!$result_update) {
+            die("Error al actualizar: " . mysqli_error($conn));
+        }
         
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Rechazada";
@@ -288,7 +345,11 @@ switch ($accion) {
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
                 WHERE serie = '$imei'";
-        mysqli_query($conn, $sql);
+        $result_update = mysqli_query($conn, $sql);
+        
+        if (!$result_update) {
+            die("Error al actualizar: " . mysqli_error($conn));
+        }
         
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Rechazada";
@@ -305,7 +366,11 @@ switch ($accion) {
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
                 WHERE serie = '$imei'";
-        mysqli_query($conn, $sql);
+        $result_update = mysqli_query($conn, $sql);
+        
+        if (!$result_update) {
+            die("Error al actualizar: " . mysqli_error($conn));
+        }
         
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "En Proceso";
@@ -322,7 +387,11 @@ switch ($accion) {
                 Observaciones = '$desc_escaped', 
                 date_update = '$date' 
                 WHERE serie = '$imei'";
-        mysqli_query($conn, $sql);
+        $result_update = mysqli_query($conn, $sql);
+        
+        if (!$result_update) {
+            die("Error al actualizar: " . mysqli_error($conn));
+        }
         
         $datosCommon['observaciones'] = $desc;
         $datosCommon['estado'] = "Finalizada";
