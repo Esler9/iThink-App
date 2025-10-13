@@ -1,4 +1,12 @@
 <?php
+// DEBUG - Ver qué está recibiendo
+file_put_contents('debug.log', print_r([
+    'REQUEST_URI' => $_SERVER['REQUEST_URI'],
+    'QUERY_STRING' => $_SERVER['QUERY_STRING'],
+    'GET' => $_GET,
+    'POST' => $_POST
+], true), FILE_APPEND);
+
 session_start();
 if (!isset($_SESSION["username"])) {
     header('location:login.php');
@@ -19,14 +27,32 @@ function reenviarCorreo($listaCorreos, $imei, $body) {
 
 // Obtener acción desde GET o POST
 $accion = "";
-if (isset($_GET['accion'])) {
+
+// Primero intentar desde $_GET
+if (isset($_GET['accion']) && !empty($_GET['accion'])) {
     $accion = $_GET['accion'];
-} elseif (isset($_POST['accion'])) {
+}
+// Si no está en GET, intentar desde POST
+elseif (isset($_POST['accion']) && !empty($_POST['accion'])) {
     $accion = $_POST['accion'];
+}
+// Si aún no hay acción, verificar si viene en la URL directamente
+else {
+    // Parsear la URL manualmente por si acaso
+    $query_string = $_SERVER['QUERY_STRING'] ?? '';
+    if (preg_match('/accion=([^&]+)/', $query_string, $matches)) {
+        $accion = $matches[1];
+    }
 }
 
 // Validar que exista la acción
 if (empty($accion)) {
+    // Log detallado del error
+    file_put_contents('debug.log', "ERROR: No se encontró acción\n", FILE_APPEND);
+    file_put_contents('debug.log', "GET: " . print_r($_GET, true) . "\n", FILE_APPEND);
+    file_put_contents('debug.log', "POST: " . print_r($_POST, true) . "\n", FILE_APPEND);
+    file_put_contents('debug.log', "QUERY_STRING: " . ($_SERVER['QUERY_STRING'] ?? 'vacio') . "\n", FILE_APPEND);
+    
     die("Error: No se especifico una accion valida. Debe proporcionar el parametro 'accion'.");
 }
 
