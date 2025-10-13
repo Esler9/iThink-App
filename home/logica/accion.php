@@ -17,21 +17,23 @@ function reenviarCorreo($listaCorreos, $imei, $body) {
     }
 }
 
-// Verificar que sea una petición POST o GET con parámetros
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' && empty($_GET['accion'])) {
-    die("Acceso denegado: Este archivo solo puede ser accedido mediante formularios.");
+// Obtener acción desde GET o POST
+$accion = "";
+if (isset($_GET['accion'])) {
+    $accion = $_GET['accion'];
+} elseif (isset($_POST['accion'])) {
+    $accion = $_POST['accion'];
 }
 
-$accion = isset($_GET['accion']) ? $_GET['accion'] : "";
+// Validar que exista la acción
+if (empty($accion)) {
+    die("Error: No se especifico una accion valida. Debe proporcionar el parametro 'accion'.");
+}
+
 $imei   = isset($_GET['imei']) ? $_GET['imei'] : "";
 $desc   = isset($_POST['desc']) ? $_POST['desc'] : "";
 $date   = date('Y-m-d H:i:s');
 $result = isset($_POST['resultado']) ? $_POST['resultado'] : "";
-
-// Validar que exista la acción
-if (empty($accion)) {
-    die("Error: No se especifico una accion valida.");
-}
 
 // Inicializar array de datos común
 $datosCommon = [];
@@ -101,7 +103,7 @@ switch ($accion) {
     case "0":
         // Creación de una nueva liberación - REQUIERE POST
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            die("Error: Este caso requiere metodo POST.");
+            die("Error: La creacion de liberaciones requiere metodo POST. Accede desde el formulario de creacion.");
         }
         
         if (empty($_POST['c_imei']) || empty($_POST['model']) || empty($_POST['name']) || empty($_POST['celular'])) {
